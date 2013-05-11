@@ -1,0 +1,5 @@
+src/main/resources/Connection.properties
+/target
+.classpath
+.project
+.settings
