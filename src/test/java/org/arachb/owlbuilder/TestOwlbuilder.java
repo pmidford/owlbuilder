@@ -1,8 +1,12 @@
 package org.arachb.owlbuilder;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+import java.io.File;
+
+import org.junit.Before;
+import org.junit.Test;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
@@ -11,36 +15,25 @@ import org.apache.log4j.PropertyConfigurator;
  * Unit test for simple App.
  */
 public class TestOwlbuilder 
-    extends TestCase
 {
 
     private static Logger log = Logger.getLogger(TestOwlbuilder.class);
-    /**
-     * Create the test case
-     *
-     * @param testName name of the test case
-     */
-    public TestOwlbuilder( String testName )
-    {
-        super( testName );
+
+    @Before
+    public void setup(){
 	//configure log4j
         PropertyConfigurator.configure(TestOwlbuilder.class.getClassLoader().getResource("log4j.properties"));
     }
 
-    /**
-     * @return the suite of tests being tested
-     */
-    public static Test suite()
-    {
-        return new TestSuite( TestOwlbuilder.class );
-    }
 
-    /**
-     * Rigourous Test :-)
-     */
-    public void testbuilder1()
+    @Test
+    public void testOwlbuilderConstructor() throws Exception
     {
-        log.warn("About to assert true");
-        assertTrue( true );
+    	Owlbuilder b = new Owlbuilder();
+    	assertNotNull(b);
+    	assertNotNull(b.getOntologyManager());
+    	assertNotNull(b.getDataFactory());
+    	assertNotNull(b.getConnection());
+    	b.shutdown();
     }
 }

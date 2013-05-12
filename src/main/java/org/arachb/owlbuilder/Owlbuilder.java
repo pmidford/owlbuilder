@@ -5,6 +5,8 @@ package org.arachb.owlbuilder;
  *
  */
 
+import java.io.File;
+
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLClass;
@@ -26,8 +28,12 @@ public class Owlbuilder {
 	
 	private final OWLOntologyManager manager;
 	private final OWLDataFactory factory;
+	private final DBConnection connection;
 	
-	public static final String targetIRI = "http://arachb.org/arachb/spider_behavior";
+	public static final String targetIRI = "http://arachb.org/arachb/arachb.owl";
+	
+	private static String temporaryOutput = "test.owl";
+	
 	private static Logger log = Logger.getLogger(Owlbuilder.class);
 
 	public static void main( String[] args ) throws Exception {
@@ -36,27 +42,41 @@ public class Owlbuilder {
 		log.info("Trying to start");
 		Owlbuilder builder = new Owlbuilder();
 		builder.process();
+		builder.shutdown();
 	}
 	
-	Owlbuilder(){
+	Owlbuilder() throws Exception{
 		manager = OWLManager.createOWLOntologyManager();
-		factory = manager.getOWLDataFactory();		
+		factory = manager.getOWLDataFactory();
+		connection = new DBConnection();
 	}
 
-	void process() throws Exception{
-		DBConnection c = new DBConnection();
-		
-		IRI iri = IRI.create("http://www.semanticweb.org/owlapi/ontologies/ontology#A");
-		OWLClass clsAMethodA = factory.getOWLClass(iri);
-		PrefixManager pm = new DefaultPrefixManager("http://www.semanticweb.org/owlapi/ontologies/ontology#");
-		@SuppressWarnings("unused")
-		OWLClass clsAMethodB = factory.getOWLClass(":A", pm);
+	void process() throws Exception{		
 		OWLOntology ontology = manager.createOntology(IRI.create(targetIRI));
-		log.info("Initial signature size: " + ontology.getSignature().size());
-		OWLDeclarationAxiom declarationAxiom = factory.getOWLDeclarationAxiom(clsAMethodA);
-		manager.addAxiom(ontology, declarationAxiom);
-		log.info("Final signature size: " + ontology.getSignature().size());
-		c.close();
+		File f = new File(temporaryOutput);
+		manager.saveOntology(ontology, IRI.create(f.toURI()));
+
+	}
+	
+	void shutdown() throws Exception{
+		connection.close();
 	}
 
+	void processDatabase(){
+		
+	}
+	
+	
+	OWLOntologyManager getOntologyManager(){
+		return manager;
+	}
+	
+	OWLDataFactory getDataFactory(){
+		return factory;
+	}
+	
+	DBConnection getConnection(){
+		return connection;
+	}
+	
 }
