@@ -24,6 +24,7 @@ public class TestDBConnection {
 	public void testgetPublication() throws SQLException {
 		Publication testPub = testConnection.getPublication(1);
 		assertNotNull(testPub);
+		assertEquals(1,testPub.get_id());
 	}
 	
 	@Test

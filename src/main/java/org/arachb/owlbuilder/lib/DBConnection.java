@@ -5,7 +5,10 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.HashSet;
 import java.util.Properties;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 
@@ -52,11 +55,29 @@ public class DBConnection {
 		ResultSet publicationSet = publicationStatement.executeQuery();
 		if (publicationSet.next()){
 			Publication result = new Publication();
+			result.fill(publicationSet);
 			return result;
 		}
 		else {
 			return null;
 		}
+	}
+	
+	static final private String ALLPUBLICATIONSQUERY = "SELECT id, publication_type,dispensation," +
+			"downloaded,reviewed,title,alternate_title,author_list,editor_list,source_publication," +
+			"volume,issue,serial_identifier,page_range,publication_date,publication_year,doi " +
+			"FROM publication";
+	
+	public Set<Publication> getPublications() throws SQLException{
+		final Set<Publication> result = new HashSet<Publication>();
+		Statement allpubStatement = c.createStatement();
+		ResultSet publicationSet = allpubStatement.executeQuery(ALLPUBLICATIONSQUERY);
+		while (publicationSet.next()){
+			Publication pub = new Publication();
+			pub.fill(publicationSet);
+			result.add(pub);
+		}
+		return result;
 	}
 	
 	static final private String USAGEQUERY = "SELECT id,behavior_term,publication_taxon," +
