@@ -91,6 +91,7 @@ public class DBConnection {
 		ResultSet usageSet = usageStatement.executeQuery();
 		if (usageSet.next()){
 			Usage result = new Usage();
+			result.fill(usageSet);
 			return result;
 		}
 		else {
@@ -98,6 +99,23 @@ public class DBConnection {
 		}
 	}
 	
+	static final private String ALLUSAGESQUERY = "SELECT id,behavior_term,publication_taxon," +
+			"direct_source,evidence,secondary_source,resolved_taxon,anatomy,participant_list," + 
+		    "obo_term_name, obo_term_id, nbo_term_name, nbo_term_id, abo_term, description " +
+			"FROM term_usage";
+	
+	public Set<Usage> getUsages() throws SQLException {
+		final Set<Usage> result = new HashSet<Usage>();
+		final Statement allusageStatement = c.createStatement();
+		final ResultSet usageSet = allusageStatement.executeQuery(ALLUSAGESQUERY);
+		while (usageSet.next()){
+			Usage u = new Usage();
+			u.fill(usageSet);
+			result.add(u);
+		}
+		return result;
+
+	}
 	
 	public void close() throws Exception {
 		c.close();
