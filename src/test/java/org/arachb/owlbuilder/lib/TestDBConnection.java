@@ -4,14 +4,12 @@ import static org.junit.Assert.*;
 
 import java.sql.SQLException;
 
-import org.apache.log4j.Logger;
-import org.arachb.owlbuilder.TestOwlbuilder;
 import org.junit.Before;
 import org.junit.Test;
 
 public class TestDBConnection {
 
-    private static Logger log = Logger.getLogger(TestDBConnection.class);
+    //private static Logger log = Logger.getLogger(TestDBConnection.class);
 
     private DBConnection testConnection;
     

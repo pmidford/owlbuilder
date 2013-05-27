@@ -65,6 +65,13 @@ public class Owlbuilder {
 	}
 
 	void processDatabase(OWLOntology ontology) throws Exception{
+		log.info("Processing publications");
+		processPublications(ontology);
+		log.info("Processing term usages");
+		processTermUsages(ontology);
+	}
+	
+	void processPublications(OWLOntology ontology) throws Exception{
 		IRI pubAboutInvestigation = IRI.create("http://purl.obolibrary.org/obo/IAO_0000312");
 		OWLClass IAO312 = factory.getOWLClass(pubAboutInvestigation);
 		final Set<Publication> pubs = connection.getPublications();
@@ -77,11 +84,15 @@ public class Owlbuilder {
 				manager.addAxiom(ontology, classAssertion);
 			}
 		}
+	}
+	
+	void processTermUsages(OWLOntology ontology) throws Exception{
 		final Set<Usage> usages = connection.getUsages();
 		for (Usage u : usages){
-			OWLIndividual usage_ind = factory.getOWLAnonymousIndividual();			
-		}
+			OWLIndividual ind = factory.getOWLAnonymousIndividual();			
+		}		
 	}
+	
 	
 	private URL cleanupDOI(String doi) throws Exception{
 		URL raw = new URL(doi);
