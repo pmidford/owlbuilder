@@ -6,7 +6,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
@@ -43,14 +45,13 @@ public class DBConnection {
 		return 0;
 	}
 	
-	
-	static final private String PUBLICATIONQUERY = "SELECT id, publication_type,dispensation," +
-	"downloaded,reviewed,title,alternate_title,author_list,editor_list,source_publication," +
-	"volume,issue,serial_identifier,page_range,publication_date,publication_year,doi " +
-	"FROM publication where publication.id = ?";
+	public List<String> privateIDStrings() throws SQLException{
+		List<String> result = new ArrayList<String>();
+		return result;
+	}
 	
 	public Publication getPublication(int id) throws SQLException{
-		PreparedStatement publicationStatement = c.prepareStatement(PUBLICATIONQUERY);
+		PreparedStatement publicationStatement = c.prepareStatement(Publication.getRowQuery());
 		publicationStatement.setInt(1, id);
 		ResultSet publicationSet = publicationStatement.executeQuery();
 		if (publicationSet.next()){
@@ -63,15 +64,10 @@ public class DBConnection {
 		}
 	}
 	
-	static final private String ALLPUBLICATIONSQUERY = "SELECT id, publication_type,dispensation," +
-			"downloaded,reviewed,title,alternate_title,author_list,editor_list,source_publication," +
-			"volume,issue,serial_identifier,page_range,publication_date,publication_year,doi " +
-			"FROM publication";
-	
 	public Set<Publication> getPublications() throws SQLException{
 		final Set<Publication> result = new HashSet<Publication>();
 		Statement allpubStatement = c.createStatement();
-		ResultSet publicationSet = allpubStatement.executeQuery(ALLPUBLICATIONSQUERY);
+		ResultSet publicationSet = allpubStatement.executeQuery(Publication.getTableQuery());
 		while (publicationSet.next()){
 			Publication pub = new Publication();
 			pub.fill(publicationSet);
@@ -80,13 +76,20 @@ public class DBConnection {
 		return result;
 	}
 	
-	static final private String USAGEQUERY = "SELECT id,behavior_term,publication_taxon," +
-	"direct_source,evidence,secondary_source,resolved_taxon,anatomy,participant_list," + 
-    "obo_term_name, obo_term_id, nbo_term_name, nbo_term_id, abo_term, description " +
-	"FROM term_usage where term_usage.id = ?";
-
+	public void updatePublication(Publication pub) throws SQLException{
+		PreparedStatement updateStatement = 
+				c.prepareStatement(Publication.getUpdateStatement());
+		updateStatement.setString(1, pub.get_generated_id());
+		updateStatement.setInt(2,pub.get_id());
+		int count = updateStatement.executeUpdate();
+		if (count != 1){
+			logger.error("publication update failed; row count = " + count);
+		}
+		
+	}
+	
 	public Usage getTerm_usage(int id) throws SQLException{
-		PreparedStatement usageStatement = c.prepareStatement(USAGEQUERY);
+		PreparedStatement usageStatement = c.prepareStatement(Usage.getRowQuery());
 		usageStatement.setInt(1, id);
 		ResultSet usageSet = usageStatement.executeQuery();
 		if (usageSet.next()){
@@ -99,24 +102,48 @@ public class DBConnection {
 		}
 	}
 	
-	static final private String ALLUSAGESQUERY = "SELECT id,behavior_term,publication_taxon," +
-			"direct_source,evidence,secondary_source,resolved_taxon,anatomy,participant_list," + 
-		    "obo_term_name, obo_term_id, nbo_term_name, nbo_term_id, abo_term, description " +
-			"FROM term_usage";
-	
 	public Set<Usage> getUsages() throws SQLException {
 		final Set<Usage> result = new HashSet<Usage>();
-		final Statement allusageStatement = c.createStatement();
-		final ResultSet usageSet = allusageStatement.executeQuery(ALLUSAGESQUERY);
+		final Statement allUsageStatement = c.createStatement();
+		final ResultSet usageSet = allUsageStatement.executeQuery(Usage.getTableQuery());
 		while (usageSet.next()){
 			Usage u = new Usage();
 			u.fill(usageSet);
 			result.add(u);
 		}
 		return result;
-
 	}
 	
+	public Taxon getTaxon(int id) throws SQLException{
+		PreparedStatement taxonStatement = c.prepareStatement(Taxon.getRowQuery());
+		taxonStatement.setInt(1, id);
+		ResultSet taxonSet = taxonStatement.executeQuery();
+		if (taxonSet.next()){
+			Taxon result = new Taxon();
+			result.fill(taxonSet);
+			return result;
+		}
+		else {
+			return null;
+		}
+	}
+	
+	public Set<Taxon> getTaxa() throws SQLException {
+		final Set<Taxon> result = new HashSet<Taxon>();
+		final Statement allTaxonStatement = c.createStatement();
+		final ResultSet taxonSet = allTaxonStatement.executeQuery(Taxon.getTableQuery());
+		while (taxonSet.next()){
+			Taxon t = new Taxon();
+			t.fill(taxonSet);
+			result.add(t);
+		}
+		return result;
+	}
+	
+	public void updateTaxon(Taxon tx){
+		
+	}
+
 	public void close() throws Exception {
 		c.close();
 	}

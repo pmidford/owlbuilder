@@ -22,7 +22,35 @@ public class Publication {
 	private String publication_date;
 	private String publication_year;
 	private String doi;
+	private String generated_id;
 	
+	static final private String ROWQUERY = "SELECT id, publication_type,dispensation," +
+	"downloaded,reviewed,title,alternate_title,author_list,editor_list," +
+	"source_publication, volume,issue,serial_identifier,page_range,publication_date," +
+	"publication_year,doi,generated_id " +
+	"FROM publication where publication.id = ?";
+	
+	static final private String TABLEQUERY = "SELECT id, publication_type,dispensation," +
+	"downloaded,reviewed,title,alternate_title,author_list,editor_list," +
+	"source_publication,volume,issue,serial_identifier,page_range,publication_date," +
+	"publication_year,doi,generated_id " +
+	"FROM publication";
+	
+	static final private String ROWUPDATE = "UPDATE publication " +
+			"SET generated_id = ? WHERE id = ?";
+	
+	public static String getRowQuery(){
+		return Publication.ROWQUERY;
+	}
+	
+	public static String getTableQuery(){
+		return Publication.TABLEQUERY;
+	}
+	
+	public static String getUpdateStatement(){
+		return Publication.ROWUPDATE;
+	}
+
 	
 	//maybe make this a constructor
 	protected void fill(ResultSet record) throws SQLException{
@@ -43,6 +71,7 @@ public class Publication {
 		publication_date = record.getString("publication_date");
 		publication_year = record.getString("publication_year");
 		doi = record.getString("doi");
+		generated_id = record.getString("generated_id");
 	}
 	
 	public int get_id(){
@@ -113,6 +142,13 @@ public class Publication {
 		return doi;
 	}
 
+	public String get_generated_id(){
+		return generated_id;
+	}
 	
+	//Just updates the id in the bean - method for updating db is in DBConnection
+	public void set_generated_id(String new_id){
+		generated_id = new_id;
+	}
 	
 }
