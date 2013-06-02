@@ -9,13 +9,16 @@ import java.io.File;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
+import org.arachb.owlbuilder.lib.Config;
 import org.arachb.owlbuilder.lib.DBConnection;
 import org.arachb.owlbuilder.lib.IRIManager;
+import org.arachb.owlbuilder.lib.Mireot;
 import org.arachb.owlbuilder.lib.Publication;
 import org.arachb.owlbuilder.lib.Taxon;
 import org.arachb.owlbuilder.lib.Usage;
@@ -35,12 +38,14 @@ public class Owlbuilder {
 	private final OWLDataFactory factory;
 	private final IRIManager iriManager;
 	private final DBConnection connection;
+	private final Mireot mireot;
 	
 	private final List<IRI> taxonMiriotList = new ArrayList<IRI>();
 	
 	
 	public static final String targetIRI = "http://arachb.org/arachb/arachb.owl";
-	
+	public static final String taxonomyTarget = "http://arachb.org/imports/NCBI_import.owl";
+
 	private static String temporaryOutput = "test.owl";
 	
 	private static Logger log = Logger.getLogger(Owlbuilder.class);
@@ -60,10 +65,14 @@ public class Owlbuilder {
 	}
 	
 	Owlbuilder() throws Exception{
+		Config config = new Config("");
 		connection = new DBConnection();
 		manager = OWLManager.createOWLOntologyManager();
 		factory = manager.getOWLDataFactory();
 		iriManager = new IRIManager(connection);
+		mireot = new Mireot();
+		mireot.setImportDir(config.getImportDir());
+		mireot.setMireotDir(config.getMireotDir());
 	}
 
 	void process() throws Exception{		
@@ -114,23 +123,32 @@ public class Owlbuilder {
 	void processTermUsages(OWLOntology ontology) throws Exception{
 		final Set<Usage> usages = connection.getUsages();
 		for (Usage u : usages){
+			//Anonymous OWL class???
 			OWLIndividual ind = factory.getOWLAnonymousIndividual();			
 		}		
 	}
 	
 	void processTaxonomy(OWLOntology ontology) throws Exception{
 		final Set<Taxon> taxa = connection.getTaxa();
+		final HashMap<IRI,String> taxonomyMap = new HashMap<IRI,String>();
 		for (Taxon t : taxa){
 			IRI taxonID;
-			if (t.get_ncbi_id() != null){
+			if (t.get_ncbi_id() == null){
 				taxonID = iriManager.getARACHB_IRI();
 				t.set_generated_id(taxonID.toString());
 				connection.updateTaxon(t);
 			}
 			else {
-				
+				IRI ncbiIRI = iriManager.getNCBI_IRI(t.get_ncbi_id());
+				taxonomyMap.put(ncbiIRI, t.get_name());
 			}
 		}
+		mireot.setSourceTerms(taxonomyMap);
+		mireot.setSourceOntology("NCBITaxon");
+		mireot.setTargetOntology(IRI.create(taxonomyTarget));
+		mireot.setTop("http://purl.obolibrary.org/obo/NCBITaxon_6893", "Araneae");
+
+		mireot.generateRequest();
 	}
 	
 	private void generateTaxonMiriotReport(){
