@@ -12,6 +12,7 @@ public class Usage {
 	String evidence;
 	int secondary_source;
 	String anatomy;
+	String anatomy_term_id;
 	String participant_list;
 	String obo_term_name;
 	String obo_term_id;
@@ -20,17 +21,21 @@ public class Usage {
 	String abo_term;
 	String description;
 	String resolved_taxon_id;
+	String generated_behavior_id;
+	String generated_anatomy_id;
 	
 	static final Usage dummy = new Usage(); 
 	
 	static final private String ROWQUERY = "SELECT id,behavior_term,publication_taxon," +
 	"direct_source,evidence,secondary_source,anatomy,participant_list, obo_term_name," + 
-    "obo_term_id, nbo_term_name, nbo_term_id, abo_term, description, resolved_taxon_id " +
-	"FROM term_usage where term_usage.id = ?";
+    "obo_term_id, nbo_term_name, nbo_term_id, abo_term, description, resolved_taxon_id, " +
+    "generated_behavior_id, generated_anatomy_id " +
+    "FROM term_usage where term_usage.id = ?";
 
 	static final private String TABLEQUERY = "SELECT id,behavior_term,publication_taxon," +
 	"direct_source,evidence,secondary_source,anatomy,participant_list, obo_term_name, " + 
-	"obo_term_id, nbo_term_name, nbo_term_id, abo_term, description, resolved_taxon_id " +
+	"obo_term_id, nbo_term_name, nbo_term_id, abo_term, description, resolved_taxon_id, " +
+    "generated_behavior_id, generated_anatomy_id " +
 	"FROM term_usage";
 	
 	
@@ -61,6 +66,8 @@ public class Usage {
 		abo_term = record.getString("abo_term");
 		description = record.getString("description");
 		resolved_taxon_id = record.getString("resolved_taxon_id");
+		generated_behavior_id = record.getString("generated_behavior_id");
+		generated_anatomy_id = record.getString("generated_anatomy_id");
 	}
 
 	
@@ -122,6 +129,22 @@ public class Usage {
 	
 	public String get_resolved_taxon_id(){
 		return resolved_taxon_id;
+	}
+	
+	public String get_generated_behavior_id(){
+		return generated_behavior_id;
+	}
+	
+	public String get_generated_anatomy_id(){
+		return generated_anatomy_id;
+	}
+	
+	public void set_generated_behavior_id(String id){
+		generated_behavior_id = id;
+	}
+
+	public void set_generated_anatomy_id(String id){
+		generated_anatomy_id = id;
 	}
 
 }

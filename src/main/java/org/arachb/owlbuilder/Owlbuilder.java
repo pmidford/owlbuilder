@@ -122,40 +122,64 @@ public class Owlbuilder {
 	
 	void processTermUsages(OWLOntology ontology) throws Exception{
 		final Set<Usage> usages = connection.getUsages();
+		final HashMap<IRI,String> nboTermMap = new HashMap<IRI,String>();
+		final HashMap<IRI,String> missingBehaviorMap = new HashMap<IRI,String>();
+		final HashMap<IRI,String> spdTermMap = new HashMap<IRI,String>();
+		final HashMap<IRI,String> missingAnatomyMap = new HashMap<IRI,String>();
 		for (Usage u : usages){
-			//Anonymous OWL class???
-			OWLIndividual ind = factory.getOWLAnonymousIndividual();			
+			processBehaviorTerm(u,nboTermMap,missingBehaviorMap);
+			processAnatomyTerm(u,spdTermMap,missingAnatomyMap);
 		}		
+	}
+	
+	private void processBehaviorTerm(Usage u, 
+			                         HashMap<IRI,String> nboTermMap, 
+			                         HashMap<IRI,String> missingBehaviorMap){
+		IRI behaviorID;
+		if (u.get_nbo_term_id() == null){
+			behaviorID = iriManager.getARACHB_IRI();
+			u.set_generated_behavior_id(behaviorID.toString());
+		}
+	}
+	
+	private void processAnatomyTerm(Usage u,
+									HashMap<IRI,String> spdTermMap,
+									HashMap<IRI,String> missingAnatomyMap){
+		
 	}
 	
 	void processTaxonomy(OWLOntology ontology) throws Exception{
 		final Set<Taxon> taxa = connection.getTaxa();
-		final HashMap<IRI,String> taxonomyMap = new HashMap<IRI,String>();
+		final HashMap<IRI,String> ncbiTaxonMap = new HashMap<IRI,String>();
+		final HashMap<IRI,String> missingTaxonMap = new HashMap<IRI,String>();
 		for (Taxon t : taxa){
 			IRI taxonID;
 			if (t.get_ncbi_id() == null){
 				taxonID = iriManager.getARACHB_IRI();
 				t.set_generated_id(taxonID.toString());
 				connection.updateTaxon(t);
+				missingTaxonMap.put(taxonID,t.get_name());
 			}
 			else {
 				IRI ncbiIRI = iriManager.getNCBI_IRI(t.get_ncbi_id());
-				taxonomyMap.put(ncbiIRI, t.get_name());
+				ncbiTaxonMap.put(ncbiIRI, t.get_name());
 			}
 		}
+		generateTaxonMiriotReport(ncbiTaxonMap);
+		generateMissingTaxaPage();
+		
+	}
+	
+	private void generateTaxonMiriotReport(HashMap<IRI,String> taxonomyMap) throws Exception{
 		mireot.setSourceTerms(taxonomyMap);
 		mireot.setSourceOntology("NCBITaxon");
 		mireot.setTargetOntology(IRI.create(taxonomyTarget));
 		mireot.setTop("http://purl.obolibrary.org/obo/NCBITaxon_6893", "Araneae");
-
 		mireot.generateRequest();
-	}
-	
-	private void generateTaxonMiriotReport(){
 		
 	}
 	
-	private void generateMissinTaxReport(){
+	private void generateMissingTaxaPage(){
 		
 	}
 	
