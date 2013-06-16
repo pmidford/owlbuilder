@@ -15,13 +15,13 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
+import org.arachb.owlbuilder.lib.Assertion;
 import org.arachb.owlbuilder.lib.Config;
 import org.arachb.owlbuilder.lib.DBConnection;
 import org.arachb.owlbuilder.lib.IRIManager;
 import org.arachb.owlbuilder.lib.Mireot;
 import org.arachb.owlbuilder.lib.Publication;
 import org.arachb.owlbuilder.lib.Taxon;
-import org.arachb.owlbuilder.lib.Usage;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLClass;
@@ -121,28 +121,28 @@ public class Owlbuilder {
 	}
 	
 	void processTermUsages(OWLOntology ontology) throws Exception{
-		final Set<Usage> usages = connection.getUsages();
+		final Set<Assertion> assertions = connection.getAssertions();
 		final HashMap<IRI,String> nboTermMap = new HashMap<IRI,String>();
 		final HashMap<IRI,String> missingBehaviorMap = new HashMap<IRI,String>();
 		final HashMap<IRI,String> spdTermMap = new HashMap<IRI,String>();
 		final HashMap<IRI,String> missingAnatomyMap = new HashMap<IRI,String>();
-		for (Usage u : usages){
+		for (Assertion u : assertions){
 			processBehaviorTerm(u,nboTermMap,missingBehaviorMap);
 			processAnatomyTerm(u,spdTermMap,missingAnatomyMap);
 		}		
 	}
 	
-	private void processBehaviorTerm(Usage u, 
+	private void processBehaviorTerm(Assertion a, 
 			                         HashMap<IRI,String> nboTermMap, 
 			                         HashMap<IRI,String> missingBehaviorMap){
 		IRI behaviorID;
-		if (u.get_nbo_term_id() == null){
+		if (a.get_nbo_term_id() == null){
 			behaviorID = iriManager.getARACHB_IRI();
-			u.set_generated_behavior_id(behaviorID.toString());
+			a.set_generated_behavior_id(behaviorID.toString());
 		}
 	}
 	
-	private void processAnatomyTerm(Usage u,
+	private void processAnatomyTerm(Assertion a,
 									HashMap<IRI,String> spdTermMap,
 									HashMap<IRI,String> missingAnatomyMap){
 		

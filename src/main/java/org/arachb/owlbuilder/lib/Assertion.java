@@ -3,7 +3,7 @@ package org.arachb.owlbuilder.lib;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class Usage {
+public class Assertion {
 	
 	int id;
 	String behavior_term;
@@ -24,27 +24,27 @@ public class Usage {
 	String generated_behavior_id;
 	String generated_anatomy_id;
 	
-	static final Usage dummy = new Usage(); 
+	static final Assertion dummy = new Assertion(); 
 	
 	static final private String ROWQUERY = "SELECT id,behavior_term,publication_taxon," +
 	"direct_source,evidence,secondary_source,anatomy,participant_list, obo_term_name," + 
     "obo_term_id, nbo_term_name, nbo_term_id, abo_term, description, resolved_taxon_id, " +
     "generated_behavior_id, generated_anatomy_id " +
-    "FROM term_usage where term_usage.id = ?";
+    "FROM assertion where assertion.id = ?";
 
 	static final private String TABLEQUERY = "SELECT id,behavior_term,publication_taxon," +
 	"direct_source,evidence,secondary_source,anatomy,participant_list, obo_term_name, " + 
 	"obo_term_id, nbo_term_name, nbo_term_id, abo_term, description, resolved_taxon_id, " +
     "generated_behavior_id, generated_anatomy_id " +
-	"FROM term_usage";
+	"FROM assertion";
 	
 	
 	public static String getRowQuery(){
-		return Usage.ROWQUERY;
+		return Assertion.ROWQUERY;
 	}
 	
 	public static String getTableQuery(){
-		return Usage.TABLEQUERY;
+		return Assertion.TABLEQUERY;
 	}
 	
 

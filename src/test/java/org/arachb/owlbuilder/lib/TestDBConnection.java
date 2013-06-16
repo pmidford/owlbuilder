@@ -26,9 +26,9 @@ public class TestDBConnection {
 	}
 	
 	@Test
-	public void testgetTerm_usage() throws SQLException{
-		Usage testUsage = testConnection.getTerm_usage(1);
-		assertNotNull(testUsage);
+	public void testgetAssertion() throws SQLException{
+		Assertion testAssertion = testConnection.getAssertion(1);
+		assertNotNull(testAssertion);
 	}
 
 }

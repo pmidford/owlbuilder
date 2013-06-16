@@ -88,12 +88,12 @@ public class DBConnection {
 		
 	}
 	
-	public Usage getTerm_usage(int id) throws SQLException{
-		PreparedStatement usageStatement = c.prepareStatement(Usage.getRowQuery());
-		usageStatement.setInt(1, id);
-		ResultSet usageSet = usageStatement.executeQuery();
+	public Assertion getAssertion(int id) throws SQLException{
+		PreparedStatement assertionStatement = c.prepareStatement(Assertion.getRowQuery());
+		assertionStatement.setInt(1, id);
+		ResultSet usageSet = assertionStatement.executeQuery();
 		if (usageSet.next()){
-			Usage result = new Usage();
+			Assertion result = new Assertion();
 			result.fill(usageSet);
 			return result;
 		}
@@ -102,14 +102,14 @@ public class DBConnection {
 		}
 	}
 	
-	public Set<Usage> getUsages() throws SQLException {
-		final Set<Usage> result = new HashSet<Usage>();
+	public Set<Assertion> getAssertions() throws SQLException {
+		final Set<Assertion> result = new HashSet<Assertion>();
 		final Statement allUsageStatement = c.createStatement();
-		final ResultSet usageSet = allUsageStatement.executeQuery(Usage.getTableQuery());
+		final ResultSet usageSet = allUsageStatement.executeQuery(Assertion.getTableQuery());
 		while (usageSet.next()){
-			Usage u = new Usage();
-			u.fill(usageSet);
-			result.add(u);
+			Assertion a = new Assertion();
+			a.fill(usageSet);
+			result.add(a);
 		}
 		return result;
 	}
