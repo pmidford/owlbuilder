@@ -91,10 +91,10 @@ public class DBConnection {
 	public Assertion getAssertion(int id) throws SQLException{
 		PreparedStatement assertionStatement = c.prepareStatement(Assertion.getRowQuery());
 		assertionStatement.setInt(1, id);
-		ResultSet usageSet = assertionStatement.executeQuery();
-		if (usageSet.next()){
+		ResultSet assertionSet = assertionStatement.executeQuery();
+		if (assertionSet.next()){
 			Assertion result = new Assertion();
-			result.fill(usageSet);
+			result.fill(assertionSet);
 			return result;
 		}
 		else {
@@ -105,10 +105,10 @@ public class DBConnection {
 	public Set<Assertion> getAssertions() throws SQLException {
 		final Set<Assertion> result = new HashSet<Assertion>();
 		final Statement allUsageStatement = c.createStatement();
-		final ResultSet usageSet = allUsageStatement.executeQuery(Assertion.getTableQuery());
-		while (usageSet.next()){
+		final ResultSet assertionSet = allUsageStatement.executeQuery(Assertion.getTableQuery());
+		while (assertionSet.next()){
 			Assertion a = new Assertion();
-			a.fill(usageSet);
+			a.fill(assertionSet);
 			result.add(a);
 		}
 		return result;

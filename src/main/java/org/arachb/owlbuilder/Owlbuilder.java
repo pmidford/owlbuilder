@@ -91,8 +91,8 @@ public class Owlbuilder {
 	void processDatabase(OWLOntology ontology) throws Exception{
 		log.info("Processing publications");
 		processPublications(ontology);
-		log.info("Processing term usages");
-		processTermUsages(ontology);
+		log.info("Processing assertions");
+		processAssertions(ontology);
 		log.info("Processing taxonomy");
 		processTaxonomy(ontology);
 	}
@@ -120,15 +120,15 @@ public class Owlbuilder {
 		}
 	}
 	
-	void processTermUsages(OWLOntology ontology) throws Exception{
+	void processAssertions(OWLOntology ontology) throws Exception{
 		final Set<Assertion> assertions = connection.getAssertions();
 		final HashMap<IRI,String> nboTermMap = new HashMap<IRI,String>();
 		final HashMap<IRI,String> missingBehaviorMap = new HashMap<IRI,String>();
 		final HashMap<IRI,String> spdTermMap = new HashMap<IRI,String>();
 		final HashMap<IRI,String> missingAnatomyMap = new HashMap<IRI,String>();
-		for (Assertion u : assertions){
-			processBehaviorTerm(u,nboTermMap,missingBehaviorMap);
-			processAnatomyTerm(u,spdTermMap,missingAnatomyMap);
+		for (Assertion a : assertions){
+			processBehaviorTerm(a,nboTermMap,missingBehaviorMap);
+			processAnatomyTerm(a,spdTermMap,missingAnatomyMap);
 		}		
 	}
 	
