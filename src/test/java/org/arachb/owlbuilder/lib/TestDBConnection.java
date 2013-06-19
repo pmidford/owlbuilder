@@ -15,7 +15,7 @@ public class TestDBConnection {
     
 	@Before
 	public void setUp() throws Exception {
-    	testConnection = new DBConnection();
+    	testConnection = DBConnection.getTestConnection();
 	}
 
 	@Test

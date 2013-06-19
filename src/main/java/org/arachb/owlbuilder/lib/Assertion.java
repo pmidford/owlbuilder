@@ -6,30 +6,19 @@ import java.sql.SQLException;
 public class Assertion {
 	
 	int id;
-	String behavior_term;
+	int publication;
+	int behavior_term;
+	String publication_behavior;
+	int taxon;
 	String publication_taxon;
-	int direct_source;
-	String evidence;
-	int secondary_source;
-	String anatomy;
-	String anatomy_term_id;
-	String participant_list;
-	String obo_term_name;
-	String obo_term_id;
-	String nbo_term_name;
-	String nbo_term_id;
-	String abo_term;
-	String description;
-	String resolved_taxon_id;
-	String generated_behavior_id;
-	String generated_anatomy_id;
+	String publication_anatomy;
+	int evidence;
 	
 	static final Assertion dummy = new Assertion(); 
 	
-	static final private String ROWQUERY = "SELECT id,behavior_term,publication_taxon," +
-	"direct_source,evidence,secondary_source,anatomy,participant_list, obo_term_name," + 
-    "obo_term_id, nbo_term_name, nbo_term_id, abo_term, description, resolved_taxon_id, " +
-    "generated_behavior_id, generated_anatomy_id " +
+	static final private String ROWQUERY = "SELECT id, publication, " +
+	"publication_behavior, behavior_term, publication_taxon, taxon," +
+	"publication_anatomy, evidence " +
     "FROM assertion where assertion.id = ?";
 
 	static final private String TABLEQUERY = "SELECT id,behavior_term,publication_taxon," +
@@ -52,22 +41,13 @@ public class Assertion {
 	//maybe make this a constructor
 	protected void fill(ResultSet record) throws SQLException{
 		id = record.getInt("id");
-		behavior_term = record.getString("behavior_term");
+		publication = record.getInt("publication");
+		publication_behavior = record.getString("publication_behavior");
+		behavior_term = record.getInt("behavior_term");
 		publication_taxon = record.getString("publication_taxon");
-		direct_source = record.getInt("direct_source");
-		evidence = record.getString("evidence");
-		secondary_source = record.getInt("secondary_source");
-		anatomy = record.getString("anatomy");
-		participant_list = record.getString("participant_list");
-		obo_term_name = record.getString("obo_term_name");
-		obo_term_id = record.getString("obo_term_id");
-		nbo_term_name = record.getString("nbo_term_name");
-		nbo_term_id = record.getString("nbo_term_id");
-		abo_term = record.getString("abo_term");
-		description = record.getString("description");
-		resolved_taxon_id = record.getString("resolved_taxon_id");
-		generated_behavior_id = record.getString("generated_behavior_id");
-		generated_anatomy_id = record.getString("generated_anatomy_id");
+		taxon = record.getInt("taxon");
+		publication_anatomy = record.getString("publication_anatomy");
+		evidence = record.getInt("evidence");
 	}
 
 	
@@ -75,7 +55,15 @@ public class Assertion {
 		return id;
 	}
 	
-	public String get_behavior_term(){
+	public int get_publication(){
+		return publication;
+	}
+	
+	public String get_publication_behavior(){
+		return publication_behavior;
+	}
+	
+	public int get_behavior_term(){
 		return behavior_term;
 	}
 	
@@ -83,68 +71,16 @@ public class Assertion {
 		return publication_taxon;
 	}
 	
-	public int direct_source(){
-		return direct_source;
+	public int get_taxon(){
+		return taxon;
 	}
 	
-	public String get_evidence(){
+	public String get_publication_anatomy(){
+		return publication_anatomy;
+	}
+	
+	public int get_evidence(){
 		return evidence;
-	}
-	
-	public int get_secondary_source(){
-		return secondary_source;
-	}
-	
-	public String get_anatomy(){
-		return anatomy;
-	}
-	
-	public String get_participant_list(){
-		return participant_list;
-	}
-	
-	public String get_obo_term_name(){
-		return obo_term_name;
-	}
-	
-	public String get_obo_term_id(){
-		return obo_term_id;
-	}
-	
-	public String get_nbo_term_name(){
-		return nbo_term_name;
-	}
-	
-	public String get_nbo_term_id(){
-		return nbo_term_id;
-	}
-	
-	public String get_abo_term(){
-		return abo_term;
-	}
-	
-	public String get_description(){
-		return description;
-	}
-	
-	public String get_resolved_taxon_id(){
-		return resolved_taxon_id;
-	}
-	
-	public String get_generated_behavior_id(){
-		return generated_behavior_id;
-	}
-	
-	public String get_generated_anatomy_id(){
-		return generated_anatomy_id;
-	}
-	
-	public void set_generated_behavior_id(String id){
-		generated_behavior_id = id;
-	}
-
-	public void set_generated_anatomy_id(String id){
-		generated_anatomy_id = id;
 	}
 
 }

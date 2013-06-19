@@ -66,7 +66,7 @@ public class Owlbuilder {
 	
 	Owlbuilder() throws Exception{
 		Config config = new Config("");
-		connection = new DBConnection();
+		connection = DBConnection.getDBConnection();
 		manager = OWLManager.createOWLOntologyManager();
 		factory = manager.getOWLDataFactory();
 		iriManager = new IRIManager(connection);
@@ -127,26 +127,10 @@ public class Owlbuilder {
 		final HashMap<IRI,String> spdTermMap = new HashMap<IRI,String>();
 		final HashMap<IRI,String> missingAnatomyMap = new HashMap<IRI,String>();
 		for (Assertion a : assertions){
-			processBehaviorTerm(a,nboTermMap,missingBehaviorMap);
-			processAnatomyTerm(a,spdTermMap,missingAnatomyMap);
 		}		
 	}
 	
-	private void processBehaviorTerm(Assertion a, 
-			                         HashMap<IRI,String> nboTermMap, 
-			                         HashMap<IRI,String> missingBehaviorMap){
-		IRI behaviorID;
-		if (a.get_nbo_term_id() == null){
-			behaviorID = iriManager.getARACHB_IRI();
-			a.set_generated_behavior_id(behaviorID.toString());
-		}
-	}
 	
-	private void processAnatomyTerm(Assertion a,
-									HashMap<IRI,String> spdTermMap,
-									HashMap<IRI,String> missingAnatomyMap){
-		
-	}
 	
 	void processTaxonomy(OWLOntology ontology) throws Exception{
 		final Set<Taxon> taxa = connection.getTaxa();
