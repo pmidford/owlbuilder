@@ -112,6 +112,7 @@ CREATE TABLE `assertion` (
   `taxon` int(11) DEFAULT NULL,
   `publication_anatomy` varchar(255) DEFAULT NULL,
   `evidence` int(11) DEFAULT NULL,
+  `generated_id` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `publication__idx` (`publication`),
   KEY `taxon__idx` (`taxon`),
@@ -126,7 +127,7 @@ CREATE TABLE `assertion` (
 
 LOCK TABLES `assertion` WRITE;
 /*!40000 ALTER TABLE `assertion` DISABLE KEYS */;
-INSERT INTO `assertion` VALUES (1,1,'',NULL,'Tetragnatha straminea',1,'',NULL);
+INSERT INTO `assertion` VALUES (1,1,'',NULL,'Tetragnatha straminea',1,'',NULL,NULL);
 /*!40000 ALTER TABLE `assertion` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -373,4 +374,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2013-06-18 18:26:56
+-- Dump completed on 2013-06-20 19:01:36
