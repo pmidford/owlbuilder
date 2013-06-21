@@ -50,11 +50,7 @@ public class DBConnection {
 	public Connection getConnection(){
 		return c;
 	}
-	
-	public int lastPublication(){
-		return 0;
-	}
-	
+		
 	public List<String> privateIDStrings() throws SQLException{
 		List<String> result = new ArrayList<String>();
 		return result;
@@ -95,7 +91,6 @@ public class DBConnection {
 		if (count != 1){
 			logger.error("publication update failed; row count = " + count);
 		}
-		
 	}
 	
 	public Assertion getAssertion(int id) throws SQLException{
@@ -123,6 +118,19 @@ public class DBConnection {
 		}
 		return result;
 	}
+	
+	public void updateAssertion(Assertion a) throws SQLException{
+		PreparedStatement updateStatement = 
+				c.prepareStatement(Assertion.getUpdateStatement());
+		updateStatement.setString(1, a.get_generated_id());
+		updateStatement.setInt(2,a.get_id());
+		int count = updateStatement.executeUpdate();
+		if (count != 1){
+			logger.error("assertion update failed; row count = " + count);
+		}
+	}
+	
+
 	
 	public Taxon getTaxon(int id) throws SQLException{
 		PreparedStatement taxonStatement = c.prepareStatement(Taxon.getRowQuery());

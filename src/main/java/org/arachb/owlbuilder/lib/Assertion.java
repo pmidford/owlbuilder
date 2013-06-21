@@ -5,28 +5,32 @@ import java.sql.SQLException;
 
 public class Assertion {
 	
-	int id;
-	int publication;
-	int behavior_term;
-	String publication_behavior;
-	int taxon;
-	String publication_taxon;
-	String publication_anatomy;
-	int evidence;
+	private int id;
+	private int publication;
+	private int behavior_term;
+	private String publication_behavior;
+	private int taxon;
+	private String publication_taxon;
+	private String publication_anatomy;
+	private int evidence;
+	private String generated_id;
 	
 	static final Assertion dummy = new Assertion(); 
 	
 	static final private String ROWQUERY = "SELECT id, publication, " +
 	"publication_behavior, behavior_term, publication_taxon, taxon," +
-	"publication_anatomy, evidence " +
+	"publication_anatomy, evidence, generated_id " +
     "FROM assertion where assertion.id = ?";
 
-	static final private String TABLEQUERY = "SELECT id,behavior_term,publication_taxon," +
-	"direct_source,evidence,secondary_source,anatomy,participant_list, obo_term_name, " + 
-	"obo_term_id, nbo_term_name, nbo_term_id, abo_term, description, resolved_taxon_id, " +
-    "generated_behavior_id, generated_anatomy_id " +
+	static final private String TABLEQUERY = "SELECT id, publication, " +
+	"publication_behavior, behavior_term, publication_taxon, taxon, " +
+    "publication_anatomy, evidence, generated_id " +
 	"FROM assertion";
 	
+	static final private String ROWUPDATE = "UPDATE assertion " +
+			"SET generated_id = ? WHERE id = ?";
+	
+
 	
 	public static String getRowQuery(){
 		return Assertion.ROWQUERY;
@@ -34,6 +38,10 @@ public class Assertion {
 	
 	public static String getTableQuery(){
 		return Assertion.TABLEQUERY;
+	}
+	
+	public static String getUpdateStatement(){
+		return Assertion.ROWUPDATE;
 	}
 	
 
@@ -48,6 +56,7 @@ public class Assertion {
 		taxon = record.getInt("taxon");
 		publication_anatomy = record.getString("publication_anatomy");
 		evidence = record.getInt("evidence");
+		generated_id = record.getString("generated_id");
 	}
 
 	
@@ -82,5 +91,12 @@ public class Assertion {
 	public int get_evidence(){
 		return evidence;
 	}
+	
+	public String get_generated_id(){
+		return generated_id;
+	}
 
+	public void set_generated_id(String id){
+		generated_id = id;
+	}
 }

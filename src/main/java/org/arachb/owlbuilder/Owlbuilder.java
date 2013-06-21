@@ -127,6 +127,8 @@ public class Owlbuilder {
 		final HashMap<IRI,String> spdTermMap = new HashMap<IRI,String>();
 		final HashMap<IRI,String> missingAnatomyMap = new HashMap<IRI,String>();
 		for (Assertion a : assertions){
+			final IRI assertID = iriManager.getARACHB_IRI();
+			OWLIndividual assert_ind = factory.getOWLNamedIndividual(assertID);
 		}		
 	}
 	
