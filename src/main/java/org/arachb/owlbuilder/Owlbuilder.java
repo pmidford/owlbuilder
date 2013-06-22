@@ -26,8 +26,11 @@ import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassAssertionAxiom;
+import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataFactory;
+import org.semanticweb.owlapi.model.OWLEquivalentClassesAxiom;
 import org.semanticweb.owlapi.model.OWLIndividual;
+import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 
@@ -47,6 +50,7 @@ public class Owlbuilder {
 	public static final String taxonomyTarget = "http://arachb.org/imports/NCBI_import.owl";
 
 	private static String temporaryOutput = "test.owl";
+	private static String temporaryTaxonomyReport = "taxonomy.html";
 	
 	private static Logger log = Logger.getLogger(Owlbuilder.class);
 
@@ -98,20 +102,21 @@ public class Owlbuilder {
 	}
 	
 	void processPublications(OWLOntology ontology) throws Exception{
-		OWLClass pubAboutInvestigationClass = factory.getOWLClass(IRIManager.pubAboutInvestigation);
+		final OWLClass pubAboutInvestigationClass = factory.getOWLClass(IRIManager.pubAboutInvestigation);
 		final Set<Publication> pubs = connection.getPublications();
 		for (Publication pub : pubs){
 			IRI pubID;
 			if(pub.get_doi() != null && pub.get_doi() != ""){
 				URL clean = cleanupDOI(pub.get_doi());
 				pubID = IRI.create(clean);
+				if (pub.get_generated_id() != null && pub.get_generated_id() != ""){
 				//TODO check for existing arachb id - generate owl:sameas
+				}
 			}
 			else{ //generate arachb IRI (maybe temporary)
 				pubID = iriManager.getARACHB_IRI();
 				pub.set_generated_id(pubID.toString());
 				connection.updatePublication(pub);
-				//TODO store back into db
 			}
 			OWLIndividual pub_ind = factory.getOWLNamedIndividual(pubID);
 			OWLClassAssertionAxiom classAssertion = 
@@ -121,15 +126,31 @@ public class Owlbuilder {
 	}
 	
 	void processAssertions(OWLOntology ontology) throws Exception{
+		final OWLClass textualEntityClass = factory.getOWLClass(IRIManager.textualEntity);
+		final OWLObjectProperty denotesProp = factory.getOWLObjectProperty(IRIManager.denotesProperty);
+		OWLClass behaviorProcess = factory.getOWLClass(IRI.create("http://purl.obolibrary.org/obo/NBO_0000313")); 
 		final Set<Assertion> assertions = connection.getAssertions();
 		final HashMap<IRI,String> nboTermMap = new HashMap<IRI,String>();
 		final HashMap<IRI,String> missingBehaviorMap = new HashMap<IRI,String>();
 		final HashMap<IRI,String> spdTermMap = new HashMap<IRI,String>();
 		final HashMap<IRI,String> missingAnatomyMap = new HashMap<IRI,String>();
 		for (Assertion a : assertions){
-			final IRI assertID = iriManager.getARACHB_IRI();
-			OWLIndividual assert_ind = factory.getOWLNamedIndividual(assertID);
-		}		
+			//TODO check for existing arachb id, don't generate new one
+			if (a.get_generated_id() == null || a.get_generated_id() == ""){
+				final IRI assertID = iriManager.getARACHB_IRI();
+				a.set_generated_id(assertID.toString());
+				connection.updateAssertion(a);
+			}
+			//Complete hack - denotes some behavior process
+			OWLClassExpression denotesExpr = 
+ 			   factory.getOWLObjectSomeValuesFrom(denotesProp,behaviorProcess); 
+			OWLClassExpression intersectExpr =
+					factory.getOWLObjectIntersectionOf(textualEntityClass,denotesExpr);
+			OWLIndividual assert_ind = factory.getOWLNamedIndividual(IRI.create(a.get_generated_id()));
+			OWLClassAssertionAxiom textClassAssertion = 
+					factory.getOWLClassAssertionAxiom(intersectExpr, assert_ind); 
+			manager.addAxiom(ontology, textClassAssertion);
+ 		}		
 	}
 	
 	
@@ -151,6 +172,7 @@ public class Owlbuilder {
 				ncbiTaxonMap.put(ncbiIRI, t.get_name());
 			}
 		}
+		
 		generateTaxonMiriotReport(ncbiTaxonMap);
 		generateMissingTaxaPage();
 		

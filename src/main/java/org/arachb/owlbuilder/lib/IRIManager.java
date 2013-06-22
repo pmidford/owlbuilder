@@ -13,6 +13,8 @@ public class IRIManager {
 			IRI.create("http://purl.obolibrary.org/obo/IAO_0000219");
 	public static final IRI informationContentEntity = 
 			IRI.create("http://purl.obolibrary.org/obo/IAO_0000030");
+	public static final IRI textualEntity =
+			IRI.create("http://purl.obolibrary.org/obo/IAO_0000300");
 
 	public static Set<IRI> iaoImports = new HashSet<IRI>();
 	static {
