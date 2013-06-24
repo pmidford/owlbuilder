@@ -31,6 +31,7 @@ import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLEquivalentClassesAxiom;
 import org.semanticweb.owlapi.model.OWLIndividual;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
+import org.semanticweb.owlapi.model.OWLObjectPropertyAssertionAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 
@@ -128,6 +129,7 @@ public class Owlbuilder {
 	void processAssertions(OWLOntology ontology) throws Exception{
 		final OWLClass textualEntityClass = factory.getOWLClass(IRIManager.textualEntity);
 		final OWLObjectProperty denotesProp = factory.getOWLObjectProperty(IRIManager.denotesProperty);
+		final OWLObjectProperty partofProperty = factory.getOWLObjectProperty(IRIManager.partOfProperty);
 		OWLClass behaviorProcess = factory.getOWLClass(IRI.create("http://purl.obolibrary.org/obo/NBO_0000313")); 
 		final Set<Assertion> assertions = connection.getAssertions();
 		final HashMap<IRI,String> nboTermMap = new HashMap<IRI,String>();
@@ -141,6 +143,26 @@ public class Owlbuilder {
 				a.set_generated_id(assertID.toString());
 				connection.updateAssertion(a);
 			}
+			//find the taxon id
+			String taxon_id;
+			final Taxon t  = connection.getTaxon(a.get_taxon());
+			if (t != null){
+				taxon_id = t.get_available_id();
+			}
+			else {
+				taxon_id = null;
+			}
+			//find the behavior id
+			
+			//find the publication id
+			String publication_id;
+			Publication p = connection.getPublication(a.get_publication());
+			if (p != null){
+				publication_id = p.get_available_id();
+			}
+			else {
+				publication_id = null;
+			}
 			//Complete hack - denotes some behavior process
 			OWLClassExpression denotesExpr = 
  			   factory.getOWLObjectSomeValuesFrom(denotesProp,behaviorProcess); 
@@ -150,6 +172,12 @@ public class Owlbuilder {
 			OWLClassAssertionAxiom textClassAssertion = 
 					factory.getOWLClassAssertionAxiom(intersectExpr, assert_ind); 
 			manager.addAxiom(ontology, textClassAssertion);
+			if (publication_id != null){
+				OWLIndividual pub_ind = factory.getOWLNamedIndividual(IRI.create(publication_id));
+				OWLObjectPropertyAssertionAxiom partofAssertion = 
+						factory.getOWLObjectPropertyAssertionAxiom(partofProperty, assert_ind, pub_ind);
+				manager.addAxiom(ontology, partofAssertion);
+			}
  		}		
 	}
 	

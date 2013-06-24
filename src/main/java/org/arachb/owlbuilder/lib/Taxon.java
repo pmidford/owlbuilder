@@ -44,6 +44,15 @@ public class Taxon{
 		return id;
 	}
 	
+	public String get_available_id(){
+		if (get_ncbi_id() == null){
+			return get_generated_id();
+		}
+		else {
+			return get_ncbi_id();
+		}
+	}
+	
 	public String get_name(){
 		return name;
 	}

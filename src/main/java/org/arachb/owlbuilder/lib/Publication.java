@@ -78,6 +78,16 @@ public class Publication {
 		return id;
 	}
 	
+	public String get_available_id(){
+		if (get_doi() == null){
+			return get_generated_id();
+		}
+		else {
+			return get_doi();
+		}
+	}
+
+	
 	public String get_publication_type(){
 		return publication_type;
 	}
