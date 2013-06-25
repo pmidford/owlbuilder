@@ -6,6 +6,7 @@ package org.arachb.owlbuilder;
  */
 
 import java.io.File;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -33,7 +34,9 @@ import org.semanticweb.owlapi.model.OWLIndividual;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLObjectPropertyAssertionAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyFormat;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.semanticweb.owlapi.vocab.PrefixOWLOntologyFormat;
 
 public class Owlbuilder {
 
@@ -82,6 +85,8 @@ public class Owlbuilder {
 
 	void process() throws Exception{		
 		OWLOntology ontology = manager.createOntology(IRI.create(targetIRI));
+		OWLOntologyFormat format = manager.getOntologyFormat(ontology);
+		format.asPrefixOWLOntologyFormat().setPrefix("doi", "http://dx.doi.org/");
 		processDatabase(ontology);
 		log.info("Saving ontology");
 		File f = new File(temporaryOutput);
@@ -108,8 +113,8 @@ public class Owlbuilder {
 		for (Publication pub : pubs){
 			IRI pubID;
 			if(pub.get_doi() != null && pub.get_doi() != ""){
-				URL clean = cleanupDOI(pub.get_doi());
-				pubID = IRI.create(clean);
+				IRI clean = cleanupDOI(pub.get_doi());
+				pubID = clean;
 				if (pub.get_generated_id() != null && pub.get_generated_id() != ""){
 				//TODO check for existing arachb id - generate owl:sameas
 				}
@@ -155,10 +160,15 @@ public class Owlbuilder {
 			//find the behavior id
 			
 			//find the publication id
-			String publication_id;
+			IRI publication_id;
 			Publication p = connection.getPublication(a.get_publication());
 			if (p != null){
-				publication_id = p.get_available_id();
+				if(p.get_doi() != null && p.get_doi() != ""){
+					IRI clean = cleanupDOI(p.get_doi());
+					publication_id = clean;
+				}
+				else
+					publication_id = IRI.create(p.get_available_id());
 			}
 			else {
 				publication_id = null;
@@ -173,7 +183,7 @@ public class Owlbuilder {
 					factory.getOWLClassAssertionAxiom(intersectExpr, assert_ind); 
 			manager.addAxiom(ontology, textClassAssertion);
 			if (publication_id != null){
-				OWLIndividual pub_ind = factory.getOWLNamedIndividual(IRI.create(publication_id));
+				OWLIndividual pub_ind = factory.getOWLNamedIndividual(publication_id);
 				OWLObjectPropertyAssertionAxiom partofAssertion = 
 						factory.getOWLObjectPropertyAssertionAxiom(partofProperty, assert_ind, pub_ind);
 				manager.addAxiom(ontology, partofAssertion);
@@ -219,7 +229,7 @@ public class Owlbuilder {
 		
 	}
 	
-	private URL cleanupDOI(String doi) throws Exception{
+	private IRI cleanupDOI(String doi) throws Exception{
 		URL raw = new URL(doi);
 		String cleanpath = URLEncoder.encode(raw.getPath().substring(1),"UTF-8");
 		if (log.isDebugEnabled()){
@@ -228,7 +238,7 @@ public class Owlbuilder {
 		if (log.isDebugEnabled()){
 			log.debug("clean path is " + cleanpath);
 		}
-		return new URL(raw.getProtocol()+"://"+raw.getHost()+'/'+cleanpath);
+		return IRI.create("http://dx.doi.org/",cleanpath);
 	}
 	
 	OWLOntologyManager getOntologyManager(){
