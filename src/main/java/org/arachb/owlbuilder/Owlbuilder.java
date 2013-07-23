@@ -149,10 +149,10 @@ public class Owlbuilder {
 				connection.updateAssertion(a);
 			}
 			//find the taxon id
-			String taxon_id;
+			IRI taxon_id;
 			final Taxon t  = connection.getTaxon(a.get_taxon());
 			if (t != null){
-				taxon_id = t.get_available_id();
+				taxon_id = IRI.create(t.get_available_id());
 			}
 			else {
 				taxon_id = null;
@@ -229,6 +229,12 @@ public class Owlbuilder {
 		
 	}
 	
+	/**
+	 * This cleans up doi's (which tend to have lots of URI unfriendly characters) and returns a properly prefixed doi
+	 * @param doi
+	 * @return IRI using using doi prefix
+	 * @throws Exception either MalformedURL or Encoding exceptions can be thrown
+	 */
 	private IRI cleanupDOI(String doi) throws Exception{
 		URL raw = new URL(doi);
 		String cleanpath = URLEncoder.encode(raw.getPath().substring(1),"UTF-8");
