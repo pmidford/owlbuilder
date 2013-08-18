@@ -1,4 +1,23 @@
-owlbuilder
-==========
+#owlbuilder
 
-tool for generating owl files and web pages from an arachadmin database
+This is a java-based tool for generating owl files and web pages from an arachadmin 
+(https://github.com/pmidford/arachadmin) database.
+
+## Copyright and License
+
+All original code is copyright 2013 Peter E. Midford
+
+> This tool is available under the terms of the 'MIT' license, a copy of which is included in this repository.
+
+## Contact:
+   Peter E. Midford
+   peter.midford@gmail.com
+
+## Building
+
+Use maven (3.0 recommended, 2.x may work) to build.  It was developed under Java 6, has not been tested under Java 7 or 5.
+
+## Configuration
+
+## Use
+
