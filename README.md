@@ -1,7 +1,6 @@
 #owlbuilder
 
-This is a java-based tool for generating owl files and web pages from an arachadmin 
-(https://github.com/pmidford/arachadmin) database.
+This is a java-based tool for generating owl files and web pages from an arachadmin (https://github.com/pmidford/arachadmin) database.  The owl files can be loaded into a sesame server, while the web pages can be collected into a web archive (.war) file for installation.  The current arachnologua install uses Tomcat7 as a container for both sesame and the associated web pages (no JSP's though).
 
 ## Copyright and License
 
@@ -18,6 +17,7 @@ All original code is copyright 2013 Peter E. Midford
 Use maven (3.0 recommended, 2.x may work) to build.  It was developed under Java 6, has not been tested under Java 7 or 5.
 
 ## Configuration
+This tool assumes you have an arachadmin database installed on a MySQL server.  
 
 ## Use
 
