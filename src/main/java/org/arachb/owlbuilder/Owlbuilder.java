@@ -12,6 +12,7 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -47,8 +48,8 @@ public class Owlbuilder {
 	private final DBConnection connection;
 	private final Mireot mireot;
 	
-	private final List<IRI> taxonMiriotList = new ArrayList<IRI>();
-	
+	private final Map<String,OWLOntology>supportOntologies;
+		
 	
 	public static final String targetIRI = "http://arachb.org/arachb/arachb.owl";
 	public static final String taxonomyTarget = "http://arachb.org/imports/NCBI_import.owl";
@@ -78,6 +79,8 @@ public class Owlbuilder {
 		manager = OWLManager.createOWLOntologyManager();
 		factory = manager.getOWLDataFactory();
 		iriManager = new IRIManager(connection);
+		log.info("Loading ontologies");
+		supportOntologies = loadImportedOntologies(connection);
 		mireot = new Mireot();
 		mireot.setImportDir(config.getImportDir());
 		mireot.setMireotDir(config.getMireotDir());
@@ -105,6 +108,23 @@ public class Owlbuilder {
 		processAssertions(ontology);
 		log.info("Processing taxonomy");
 		processTaxonomy(ontology);
+	}
+	
+	/**
+	 * This 
+	 * @param c
+	 * @throws Exception
+	 */
+	Map<String,OWLOntology> loadImportedOntologies(DBConnection c) throws Exception{
+		final Map <String,OWLOntology> result = new HashMap<String,OWLOntology>();
+		final Map <String,String> sourceMap = c.loadImportSourceMap();
+		final Map <String,String> namesForLoading = c.loadOntologyNamesForLoading();
+		for (String source : sourceMap.keySet()){
+			String name = namesForLoading.get(source);
+			String msg = String.format("Loading %s from %s", name,source);
+			log.info(msg);
+		}
+		return result;
 	}
 	
 	void processPublications(OWLOntology ontology) throws Exception{

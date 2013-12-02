@@ -23,17 +23,19 @@ public class Publication {
 	private String publication_year;
 	private String doi;
 	private String generated_id;
+	private String curation_status;
+	private String curation_update;
 	
 	static final private String ROWQUERY = "SELECT id, publication_type,dispensation," +
 	"downloaded,reviewed,title,alternate_title,author_list,editor_list," +
 	"source_publication, volume,issue,serial_identifier,page_range,publication_date," +
-	"publication_year,doi,generated_id " +
+	"publication_year,doi,generated_id,curation_status,curation_update " +
 	"FROM publication where publication.id = ?";
 	
 	static final private String TABLEQUERY = "SELECT id, publication_type,dispensation," +
 	"downloaded,reviewed,title,alternate_title,author_list,editor_list," +
 	"source_publication,volume,issue,serial_identifier,page_range,publication_date," +
-	"publication_year,doi,generated_id " +
+	"publication_year,doi,generated_id,curation_status, curation_update " +
 	"FROM publication";
 	
 	static final private String ROWUPDATE = "UPDATE publication " +
@@ -72,6 +74,8 @@ public class Publication {
 		publication_year = record.getString("publication_year");
 		doi = record.getString("doi");
 		generated_id = record.getString("generated_id");
+        curation_status = record.getString("curation_status");
+        curation_update = record.getString("curation_update");
 	}
 	
 	public int get_id(){
@@ -154,6 +158,14 @@ public class Publication {
 
 	public String get_generated_id(){
 		return generated_id;
+	}
+
+	public String get_curation_status(){
+		return curation_status;
+	}
+	
+	public String get_curation_update(){
+		return curation_update;
 	}
 	
 	//Just updates the id in the bean - method for updating db is in DBConnection
