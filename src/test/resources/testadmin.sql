@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 5.5.30, for osx10.6 (i386)
+-- MySQL dump 10.13  Distrib 5.5.32, for osx10.6 (i386)
 --
 -- Host: localhost    Database: testadmin
 -- ------------------------------------------------------
--- Server version	5.5.30-log
+-- Server version	5.5.32
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -127,8 +127,36 @@ CREATE TABLE `assertion` (
 
 LOCK TABLES `assertion` WRITE;
 /*!40000 ALTER TABLE `assertion` DISABLE KEYS */;
-INSERT INTO `assertion` VALUES (1,1,'',NULL,'Tetragnatha straminea',1,'',NULL,NULL);
+INSERT INTO `assertion` VALUES (1,1,'',NULL,'Tetragnatha straminea',1,'',NULL,'');
 /*!40000 ALTER TABLE `assertion` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `authority`
+--
+
+DROP TABLE IF EXISTS `authority`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `authority` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) DEFAULT NULL,
+  `uri` varchar(255) DEFAULT NULL,
+  `domain` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `domain__idx` (`domain`),
+  CONSTRAINT `authority_ibfk_1` FOREIGN KEY (`domain`) REFERENCES `domain` (`id`) ON DELETE NO ACTION
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `authority`
+--
+
+LOCK TABLES `authority` WRITE;
+/*!40000 ALTER TABLE `authority` DISABLE KEYS */;
+INSERT INTO `authority` VALUES (1,'NCBI','',3),(2,'Marcus Chibucos','MChibucos@som.umaryland.edu',4),(3,'Martin Ramirez','ramirez@macn.gov.ar',2),(4,'George Gkoutos','geg18@aber.ac.uk',1);
+/*!40000 ALTER TABLE `authority` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -214,6 +242,30 @@ INSERT INTO `behavior_term` VALUES (1,'courtship behavior','NBO:0000077','','','
 UNLOCK TABLES;
 
 --
+-- Table structure for table `domain`
+--
+
+DROP TABLE IF EXISTS `domain`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `domain` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `domain`
+--
+
+LOCK TABLES `domain` WRITE;
+/*!40000 ALTER TABLE `domain` DISABLE KEYS */;
+INSERT INTO `domain` VALUES (1,'behavior'),(2,'anatomy'),(3,'taxonomy'),(4,'evidence');
+/*!40000 ALTER TABLE `domain` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `evidence_code`
 --
 
@@ -237,6 +289,65 @@ LOCK TABLES `evidence_code` WRITE;
 /*!40000 ALTER TABLE `evidence_code` DISABLE KEYS */;
 INSERT INTO `evidence_code` VALUES (1,'traceable author statement','ECO:0000033','TAS');
 /*!40000 ALTER TABLE `evidence_code` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ontology_processing`
+--
+
+DROP TABLE IF EXISTS `ontology_processing`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ontology_processing` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `type_name` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ontology_processing`
+--
+
+LOCK TABLES `ontology_processing` WRITE;
+/*!40000 ALTER TABLE `ontology_processing` DISABLE KEYS */;
+INSERT INTO `ontology_processing` VALUES (1,'OWL ontology'),(2,'OBO ontology'),(3,'NCBI taxonomy');
+/*!40000 ALTER TABLE `ontology_processing` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ontology_source`
+--
+
+DROP TABLE IF EXISTS `ontology_source`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ontology_source` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) DEFAULT NULL,
+  `source_url` varchar(255) DEFAULT NULL,
+  `processing` int(11) DEFAULT NULL,
+  `last_update` datetime DEFAULT NULL,
+  `domain` int(11) DEFAULT NULL,
+  `authority` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `processing__idx` (`processing`),
+  KEY `domain__idx` (`domain`),
+  KEY `authority__idx` (`authority`),
+  CONSTRAINT `ontology_source_ibfk_1` FOREIGN KEY (`processing`) REFERENCES `ontology_processing` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `ontology_source_ibfk_2` FOREIGN KEY (`domain`) REFERENCES `domain` (`id`) ON DELETE NO ACTION,
+  CONSTRAINT `ontology_source_ibfk_3` FOREIGN KEY (`authority`) REFERENCES `authority` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ontology_source`
+--
+
+LOCK TABLES `ontology_source` WRITE;
+/*!40000 ALTER TABLE `ontology_source` DISABLE KEYS */;
+INSERT INTO `ontology_source` VALUES (1,'Evidence Codes (ECO)','http://purl.obolibrary.org/obo/eco.owl',1,'2013-11-08 17:28:59',4,2),(2,'NCBI Taxonomy','file:///Users/pmidford/temp/ncbitaxon.owl',3,'2013-11-08 17:39:13',3,1),(3,'Spider Anatomy','http://purl.obolibrary.org/obo/spd.owl',1,'2013-11-08 17:39:44',2,3),(4,'NeuroBehavior Ontology','http://behavior-ontology.googlecode.com/svn/trunk/behavior.owl',1,'2013-11-08 17:40:23',1,4);
+/*!40000 ALTER TABLE `ontology_source` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -294,6 +405,8 @@ CREATE TABLE `publication` (
   `publication_year` varchar(255) DEFAULT NULL,
   `doi` varchar(255) DEFAULT NULL,
   `generated_id` varchar(255) DEFAULT NULL,
+  `curation_status` int(11) DEFAULT NULL,
+  `curation_update` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -304,7 +417,7 @@ CREATE TABLE `publication` (
 
 LOCK TABLES `publication` WRITE;
 /*!40000 ALTER TABLE `publication` DISABLE KEYS */;
-INSERT INTO `publication` VALUES (1,'Journal','Downloaded','2011-04-18','2011-04-23','Habitat distribution, life history and behavior of Tetragnatha spider species in the Great Smoky Mountains National Park.','','Aiken, Marie; Coyle, Frederick A.','','Journal of Arachnology',28,'1','','97-106','','2000','http://dx.doi.org/10.1636/0161-8202(2000)028[0097:HDLHAB]2.0.CO;2','');
+INSERT INTO `publication` VALUES (1,'Journal','Downloaded','2011-04-18','2011-04-23','Habitat distribution, life history and behavior of Tetragnatha spider species in the Great Smoky Mountains National Park.','','Aiken, Marie; Coyle, Frederick A.','','Journal of Arachnology',28,'1','','97-106','','2000','http://dx.doi.org/10.1636/0161-8202(2000)028[0097:HDLHAB]2.0.CO;2','',4,'2013-12-02 08:35:12');
 /*!40000 ALTER TABLE `publication` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -364,6 +477,39 @@ LOCK TABLES `taxon_synonym` WRITE;
 /*!40000 ALTER TABLE `taxon_synonym` DISABLE KEYS */;
 /*!40000 ALTER TABLE `taxon_synonym` ENABLE KEYS */;
 UNLOCK TABLES;
+
+--
+-- Table structure for table `term`
+--
+
+DROP TABLE IF EXISTS `term`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `term` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `source_id` varchar(255) DEFAULT NULL,
+  `domain` int(11) DEFAULT NULL,
+  `authority` int(11) DEFAULT NULL,
+  `label` varchar(255) DEFAULT NULL,
+  `generated_id` varchar(255) DEFAULT NULL,
+  `comment` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `domain__idx` (`domain`),
+  KEY `authority__idx` (`authority`),
+  CONSTRAINT `term_ibfk_1` FOREIGN KEY (`domain`) REFERENCES `domain` (`id`) ON DELETE NO ACTION,
+  CONSTRAINT `term_ibfk_2` FOREIGN KEY (`authority`) REFERENCES `authority` (`id`) ON DELETE NO ACTION
+) ENGINE=InnoDB AUTO_INCREMENT=58149 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `term`
+--
+
+LOCK TABLES `term` WRITE;
+/*!40000 ALTER TABLE `term` DISABLE KEYS */;
+INSERT INTO `term` VALUES (1,'http://purl.obolibrary.org/obo/NCBITaxon_336608',3,NULL,'Tetragnatha straminea','',NULL);
+/*!40000 ALTER TABLE `term` ENABLE KEYS */;
+UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -374,4 +520,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2013-06-20 19:01:36
+-- Dump completed on 2013-12-02 17:14:55
