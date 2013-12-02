@@ -3,6 +3,7 @@ package org.arachb.owlbuilder.lib;
 import static org.junit.Assert.*;
 
 import java.sql.SQLException;
+import java.util.Map;
 import java.util.Set;
 
 import org.junit.Before;
@@ -49,6 +50,34 @@ public class TestDBConnection {
 		assertEquals("",updatePub2.get_generated_id());
 	}
 	
+	@Test 
+	public void testgetTerm() throws SQLException{
+		Term testTerm = testConnection.getTerm(1);
+		assertNotNull(testTerm);
+		testTerm.set_generated_id(testID);
+		testConnection.updateTerm(testTerm);
+	}
+	
+	@Test
+	public void testgetTerms() throws SQLException{
+		Set<Term> testSet = testConnection.getTerms();
+		assertEquals(1,testSet.size());
+	}
+
+	@Test
+	public void testupdateTerm() throws SQLException{
+		Term testTerm = testConnection.getTerm(1);
+		assertNotNull(testTerm);
+		testTerm.set_generated_id(testID);
+		testConnection.updateTerm(testTerm);
+		Term updatedTerm = testConnection.getTerm(1);
+		assertEquals(testID,updatedTerm.get_generated_id());
+		updatedTerm.set_generated_id("");
+		testConnection.updateTerm(updatedTerm);
+		Term updatedTerm2 = testConnection.getTerm(1);
+		assertEquals("",updatedTerm2.get_generated_id());
+	}
+
 	@Test
 	public void testgetAssertion() throws SQLException{
 		Assertion testAssertion = testConnection.getAssertion(1);
@@ -75,5 +104,14 @@ public class TestDBConnection {
 		Assertion updatedAssertion2 = testConnection.getAssertion(1);
 		assertEquals("",updatedAssertion2.get_generated_id());
 	}
+	
+	@Test
+	public void testloadImportSourceMap() throws Exception{
+		Map<String,String> testmap = testConnection.loadImportSourceMap();
+		assertNotNull(testmap);
+		assertTrue(testmap.size()>0);
+	}
+	
+	
 
 }
