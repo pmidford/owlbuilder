@@ -22,6 +22,7 @@ import org.arachb.owlbuilder.lib.Config;
 import org.arachb.owlbuilder.lib.DBConnection;
 import org.arachb.owlbuilder.lib.IRIManager;
 import org.arachb.owlbuilder.lib.Mireot;
+import org.arachb.owlbuilder.lib.Participant;
 import org.arachb.owlbuilder.lib.Publication;
 import org.arachb.owlbuilder.lib.Taxon;
 import org.semanticweb.owlapi.apibinding.OWLManager;
@@ -36,7 +37,9 @@ import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLObjectPropertyAssertionAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyFormat;
+import org.semanticweb.owlapi.model.OWLOntologyIRIMapper;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.semanticweb.owlapi.util.SimpleIRIMapper;
 import org.semanticweb.owlapi.vocab.PrefixOWLOntologyFormat;
 
 public class Owlbuilder {
@@ -61,16 +64,16 @@ public class Owlbuilder {
 
 	public static void main( String[] args ) throws Exception {
 		Owlbuilder builder = null;
-		try{
+		//try{
 			// Configure log4j
 			PropertyConfigurator.configure(Owlbuilder.class.getClassLoader().getResource("log4j.properties"));
 			log.info("Trying to start");
 			builder = new Owlbuilder();
 			builder.process();
-		}
-		finally{
+		//}
+		//finally{
 			builder.shutdown();
-		}
+		//}
 	}
 	
 	Owlbuilder() throws Exception{
@@ -80,7 +83,7 @@ public class Owlbuilder {
 		factory = manager.getOWLDataFactory();
 		iriManager = new IRIManager(connection);
 		log.info("Loading ontologies");
-		supportOntologies = loadImportedOntologies(connection);
+		supportOntologies = loadImportedOntologies(connection,config);
 		mireot = new Mireot();
 		mireot.setImportDir(config.getImportDir());
 		mireot.setMireotDir(config.getMireotDir());
@@ -111,11 +114,13 @@ public class Owlbuilder {
 	}
 	
 	/**
-	 * This 
+	 * This loads the support ontologies specified in the source_ontologies table
 	 * @param c
+	 * @param config - retrieve location of support ontology cache
 	 * @throws Exception
 	 */
-	Map<String,OWLOntology> loadImportedOntologies(DBConnection c) throws Exception{
+	Map<String,OWLOntology> loadImportedOntologies(DBConnection c, 
+			                                       Config config) throws Exception{
 		final Map <String,OWLOntology> result = new HashMap<String,OWLOntology>();
 		final Map <String,String> sourceMap = c.loadImportSourceMap();
 		final Map <String,String> namesForLoading = c.loadOntologyNamesForLoading();
@@ -123,6 +128,15 @@ public class Owlbuilder {
 			String name = namesForLoading.get(source);
 			String msg = String.format("Loading %s from %s", name,source);
 			log.info(msg);
+			IRI iri = IRI.create(source);
+			String sourcePath = iri.toURI().getPath();
+			String [] pathParts = sourcePath.split("/");
+			String cachePath = "file:/" + config.getCacheDir() + "/" + pathParts[pathParts.length-1];
+            log.info("Cachepath is " + cachePath);
+			manager.addIRIMapper(new SimpleIRIMapper(iri, IRI.create(cachePath)));
+			OWLOntology ont = manager.loadOntology(iri);
+			log.info("Loaded ontology: " + ont);
+            result.put(source, ont);
 		}
 		return result;
 	}
@@ -168,6 +182,7 @@ public class Owlbuilder {
 				a.set_generated_id(assertID.toString());
 				connection.updateAssertion(a);
 			}
+			final Set<Participant> participants = connection.getParticipants(a);
 			//find the taxon id
 			IRI taxon_id;
 			final Taxon t  = connection.getTaxon(a.get_taxon());

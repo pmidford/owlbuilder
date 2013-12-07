@@ -188,7 +188,15 @@ public class DBConnection {
 		}
 	}
 	
+	public Set<Participant> getParticipants(Assertion a) {
+		final Set<Participant> result = new HashSet<Participant>();
+		int assertion_id = a.get_id();
+		return result;
+	}
 
+	public void updateParticipant(Participant p) throws SQLException{
+		
+	}
 	
 	public Taxon getTaxon(int id) throws SQLException{
 		PreparedStatement taxonStatement = c.prepareStatement(Taxon.getRowQuery());
@@ -273,5 +281,6 @@ public class DBConnection {
 	public void close() throws Exception {
 		c.close();
 	}
+
 	
 }
