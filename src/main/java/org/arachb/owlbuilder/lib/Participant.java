@@ -1,5 +1,8 @@
 package org.arachb.owlbuilder.lib;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
 public class Participant {
 
 	
@@ -24,7 +27,7 @@ public class Participant {
 	
 	int id;
 	int taxon;
-	int subsrate;
+	int substrate;
 	int anatomy;
 	String quantification;
 	String generated_id;
@@ -44,5 +47,64 @@ public class Participant {
 	public static String getUpdateStatement(){
 		return Participant.ROWUPDATE;
 	}
+	
+	//maybe make this a constructor
+	protected void fill(ResultSet record) throws SQLException{
+		id = record.getInt("id");
+		taxon = record.getInt("source_id");
+		substrate = record.getInt("substrate");
+		anatomy = record.getInt("anatomy");
+		quantification = record.getString("quantification");
+		label = record.getString("label");
+		generated_id = record.getString("generated_id");
+		publication_taxon = record.getString("publication_taxon");
+		publication_anatomy = record.getString("publication_anatomy");
+		publication_substrate = record.getString("publication_substrate");
+	}
+
+	public int get_id(){
+		return id;
+	}
+	
+	public String get_generated_id(){
+		return generated_id;
+	}
+	
+	public String get_available_id(){
+		return get_generated_id();
+	}
+	
+	public int get_taxon(){
+		return taxon;
+	}
+	
+	public int get_substrate(){
+		return substrate;
+	}
+	
+	public int get_anatomy(){
+		return anatomy;
+	}
+	
+	public String get_quantification(){
+		return quantification;
+	}
+	
+	public String get_publication_taxon(){
+		return publication_taxon;
+	}
+	
+	public String get_label(){
+		return label;
+	}
+	
+	public String get_publication_anatomy(){
+		return publication_anatomy;
+	}
+	
+	public String get_publication_substrate(){
+		return publication_substrate;
+	}
+
 
 }

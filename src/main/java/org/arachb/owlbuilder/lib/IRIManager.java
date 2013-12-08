@@ -36,7 +36,7 @@ public class IRIManager {
 	
 	private int idCounter=0; 
 	
-	public IRIManager(DBConnection c){
+	public IRIManager(AbstractConnection connection){
 		idCounter = scanPrivateIDs(); 
 	}
 	

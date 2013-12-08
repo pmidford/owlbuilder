@@ -15,10 +15,11 @@ import java.util.Properties;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.arachb.owlbuilder.Owlbuilder;
 
 
 
-public class DBConnection {
+public class DBConnection implements AbstractConnection{
 
 	static final String DEFAULTPROPERTIESFILE = "Connection.properties";
 	
@@ -31,6 +32,39 @@ public class DBConnection {
 	private final HashMap<Integer,String>id2domain = new HashMap<Integer,String>();
 	
 	private final HashMap<String,Integer>domain2id = new HashMap<String,Integer>();
+
+	private static Logger log = Logger.getLogger(DBConnection.class);
+
+	
+	public static boolean testConnection(){
+		Connection c = null;
+		String connectionSpec = DEFAULTPROPERTIESFILE;
+		try {
+			final Properties properties = new Properties();
+			properties.load(DBConnection.class.getClassLoader().getResourceAsStream(connectionSpec));
+			Class.forName("com.mysql.jdbc.Driver");
+			final String host = properties.getProperty("host");
+			final String db = properties.getProperty("dbname");
+			final String user = properties.getProperty("user");
+			final String password = properties.getProperty("password");
+			c = DriverManager.getConnection(String.format("jdbc:mysql://%s/%s",host,db),user,password);
+		}
+		catch (Exception e){
+			return false;
+		}
+		finally{
+			try {
+				if (c != null){
+					c.close();
+				}
+			}
+			catch (SQLException e){
+				log.error("Error while closing test connection" + e);
+				return false;
+			}
+		}
+		return true;
+	}
 	
 	private DBConnection(String connectionSpec) throws Exception{
 		final Properties properties = new Properties();
@@ -67,6 +101,11 @@ public class DBConnection {
 	public static DBConnection getTestConnection() throws Exception{
 		return new DBConnection(TESTPROPERTIESFILE);
 	}
+	
+	public static AbstractConnection getMockConnection() {
+		return new MockConnection();
+	}
+
 	
 	public Connection getConnection(){
 		return c;
@@ -188,6 +227,10 @@ public class DBConnection {
 		}
 	}
 	
+	public Participant getPrimaryParticipant(Assertion a){
+		return null;
+	}
+	
 	public Set<Participant> getParticipants(Assertion a) {
 		final Set<Participant> result = new HashSet<Participant>();
 		int assertion_id = a.get_id();
@@ -281,6 +324,7 @@ public class DBConnection {
 	public void close() throws Exception {
 		c.close();
 	}
+
 
 	
 }

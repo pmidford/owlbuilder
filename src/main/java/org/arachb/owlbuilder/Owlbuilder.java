@@ -17,6 +17,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
+import org.arachb.owlbuilder.lib.AbstractConnection;
 import org.arachb.owlbuilder.lib.Assertion;
 import org.arachb.owlbuilder.lib.Config;
 import org.arachb.owlbuilder.lib.DBConnection;
@@ -48,10 +49,11 @@ public class Owlbuilder {
 	private final OWLOntologyManager manager;
 	private final OWLDataFactory factory;
 	private final IRIManager iriManager;
-	private final DBConnection connection;
+	private final AbstractConnection connection;
 	private final Mireot mireot;
 	
-	private final Map<String,OWLOntology>supportOntologies;
+	private Map<String,OWLOntology>supportOntologies;
+	
 		
 	
 	public static final String targetIRI = "http://arachb.org/arachb/arachb.owl";
@@ -60,6 +62,7 @@ public class Owlbuilder {
 	private static String temporaryOutput = "test.owl";
 	private static String temporaryTaxonomyReport = "taxonomy.html";
 	
+	private final Config config;
 	private static Logger log = Logger.getLogger(Owlbuilder.class);
 
 	public static void main( String[] args ) throws Exception {
@@ -77,19 +80,24 @@ public class Owlbuilder {
 	}
 	
 	Owlbuilder() throws Exception{
-		Config config = new Config("");
-		connection = DBConnection.getDBConnection();
+		config = new Config("");
+		if (DBConnection.testConnection()){
+			connection = DBConnection.getDBConnection();
+		}
+		else{
+			connection = DBConnection.getMockConnection();
+		}
 		manager = OWLManager.createOWLOntologyManager();
 		factory = manager.getOWLDataFactory();
 		iriManager = new IRIManager(connection);
-		log.info("Loading ontologies");
-		supportOntologies = loadImportedOntologies(connection,config);
 		mireot = new Mireot();
 		mireot.setImportDir(config.getImportDir());
 		mireot.setMireotDir(config.getMireotDir());
 	}
 
 	void process() throws Exception{		
+		log.info("Loading ontologies");
+		loadImportedOntologies(connection,config);
 		OWLOntology ontology = manager.createOntology(IRI.create(targetIRI));
 		OWLOntologyFormat format = manager.getOntologyFormat(ontology);
 		format.asPrefixOWLOntologyFormat().setPrefix("doi", "http://dx.doi.org/");
@@ -115,15 +123,14 @@ public class Owlbuilder {
 	
 	/**
 	 * This loads the support ontologies specified in the source_ontologies table
-	 * @param c
+	 * @param connection2
 	 * @param config - retrieve location of support ontology cache
 	 * @throws Exception
 	 */
-	Map<String,OWLOntology> loadImportedOntologies(DBConnection c, 
-			                                       Config config) throws Exception{
-		final Map <String,OWLOntology> result = new HashMap<String,OWLOntology>();
-		final Map <String,String> sourceMap = c.loadImportSourceMap();
-		final Map <String,String> namesForLoading = c.loadOntologyNamesForLoading();
+	void loadImportedOntologies(AbstractConnection connection, 
+		  	                    Config config) throws Exception{
+		final Map <String,String> sourceMap = connection.loadImportSourceMap();
+		final Map <String,String> namesForLoading = connection.loadOntologyNamesForLoading();
 		for (String source : sourceMap.keySet()){
 			String name = namesForLoading.get(source);
 			String msg = String.format("Loading %s from %s", name,source);
@@ -136,9 +143,8 @@ public class Owlbuilder {
 			manager.addIRIMapper(new SimpleIRIMapper(iri, IRI.create(cachePath)));
 			OWLOntology ont = manager.loadOntology(iri);
 			log.info("Loaded ontology: " + ont);
-            result.put(source, ont);
+            supportOntologies.put(source, ont);
 		}
-		return result;
 	}
 	
 	void processPublications(OWLOntology ontology) throws Exception{
@@ -182,7 +188,11 @@ public class Owlbuilder {
 				a.set_generated_id(assertID.toString());
 				connection.updateAssertion(a);
 			}
+			final Participant primary = connection.getPrimaryParticipant(a);
 			final Set<Participant> participants = connection.getParticipants(a);
+			for (Participant p : participants){
+				
+			}
 			//find the taxon id
 			IRI taxon_id;
 			final Taxon t  = connection.getTaxon(a.get_taxon());
@@ -290,7 +300,7 @@ public class Owlbuilder {
 		return factory;
 	}
 	
-	DBConnection getConnection(){
+	AbstractConnection getConnection(){
 		return connection;
 	}
 	

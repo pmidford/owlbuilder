@@ -10,6 +10,7 @@ import org.junit.Test;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
+import org.arachb.owlbuilder.lib.DBConnection;
 
 /**
  * Unit test for simple App.
