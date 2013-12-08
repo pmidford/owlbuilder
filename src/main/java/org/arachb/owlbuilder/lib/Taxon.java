@@ -30,7 +30,7 @@ public class Taxon{
 	}
 
 	//maybe make this a constructor
-	protected void fill(ResultSet record) throws SQLException{
+	protected void fill(AbstractResults record) throws SQLException{
 		id = record.getInt("id");
 		name = record.getString("name");
 		author = record.getString("author");

@@ -1,10 +1,36 @@
 package org.arachb.owlbuilder.lib;
 
 import java.sql.SQLException;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 public class MockConnection implements AbstractConnection {
+	
+	private static MockResults mockPublicationResults = new MockResults();
+	static {
+		mockPublicationResults.setInteger("id", 1);
+		mockPublicationResults.setString("publication_type","Journal");
+		mockPublicationResults.setString("dispensation","");
+		mockPublicationResults.setString("downloaded","");
+		mockPublicationResults.setString("reviewed","");
+		mockPublicationResults.setString("title","");
+		mockPublicationResults.setString("alternate_title","");
+		mockPublicationResults.setString("author_list","");
+		mockPublicationResults.setString("editor_list","");
+		mockPublicationResults.setString("source_publication","");
+		mockPublicationResults.setInteger("volume",1);
+		mockPublicationResults.setString("issue","");
+		mockPublicationResults.setString("serial_identifier","");
+		mockPublicationResults.setString("page_range","");
+		mockPublicationResults.setString("publication_date","");
+		mockPublicationResults.setString("publication_year","");
+		mockPublicationResults.setString("doi","");
+		mockPublicationResults.setString("generated_id","");
+        mockPublicationResults.setString("curation_status","");
+        mockPublicationResults.setString("curation_update","");
+
+	}
 
 	public MockConnection() {
 		// TODO Auto-generated constructor stub
@@ -36,14 +62,18 @@ public class MockConnection implements AbstractConnection {
 
 	@Override
 	public Publication getPublication(int get_publication) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		Publication result = new Publication();
+        result.fill(mockPublicationResults);
+		return result;
 	}
 
 	@Override
 	public Set<Publication> getPublications() throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		Set<Publication> results = new HashSet<Publication>();
+		Publication p1 = new Publication();
+		p1.fill(mockPublicationResults);
+		results.add(p1);
+		return results;
 	}
 
 	@Override
@@ -71,7 +101,7 @@ public class MockConnection implements AbstractConnection {
 	}
 
 	@Override
-	public Map<String, String> loadOntologyNamesForLoading() throws Exception {
+	public Map<String, String> loadOntologyNamesForLoading() throws SQLException {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -86,6 +116,30 @@ public class MockConnection implements AbstractConnection {
 	public void updateTaxon(Taxon t) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public Term getTerm(int i) throws SQLException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void updateTerm(Term testTerm) throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public Set<Term> getTerms() throws SQLException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Assertion getAssertion(int i) throws SQLException {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

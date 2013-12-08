@@ -119,10 +119,11 @@ public class DBConnection implements AbstractConnection{
 	public Publication getPublication(int id) throws SQLException{
 		PreparedStatement publicationStatement = c.prepareStatement(Publication.getRowQuery());
 		publicationStatement.setInt(1, id);
-		ResultSet publicationSet = publicationStatement.executeQuery();
-		if (publicationSet.next()){
+		ResultSet rawResults = publicationStatement.executeQuery();
+		AbstractResults publicationResults = new DBResults(rawResults);
+		if (publicationResults.next()){
 			Publication result = new Publication();
-			result.fill(publicationSet);
+			result.fill(publicationResults);
 			return result;
 		}
 		else {
@@ -133,10 +134,11 @@ public class DBConnection implements AbstractConnection{
 	public Set<Publication> getPublications() throws SQLException{
 		final Set<Publication> result = new HashSet<Publication>();
 		Statement allpubStatement = c.createStatement();
-		ResultSet publicationSet = allpubStatement.executeQuery(Publication.getTableQuery());
-		while (publicationSet.next()){
+		ResultSet rawResults = allpubStatement.executeQuery(Publication.getTableQuery());
+        AbstractResults publicationResults = new DBResults(rawResults);
+		while (publicationResults.next()){
 			Publication pub = new Publication();
-			pub.fill(publicationSet);
+			pub.fill(publicationResults);
 			result.add(pub);
 		}
 		return result;
@@ -157,9 +159,10 @@ public class DBConnection implements AbstractConnection{
 		PreparedStatement termStatement = c.prepareStatement(Term.getRowQuery());
 		termStatement.setInt(1, id);
 		ResultSet termSet = termStatement.executeQuery();
+		AbstractResults termResults = new DBResults(termSet);
 		if (termSet.next()){
 			Term result = new Term();
-			result.fill(termSet);
+			result.fill(termResults);
 			return result;
 		}
 		else {
@@ -171,9 +174,10 @@ public class DBConnection implements AbstractConnection{
 		final Set<Term> result = new HashSet<Term>();
 		final Statement allTermStatement = c.createStatement();
 		final ResultSet termSet = allTermStatement.executeQuery(Term.getTableQuery());
+		final AbstractResults termResults = new DBResults(termSet);
 		while (termSet.next()){
 			Term t = new Term();
-			t.fill(termSet);
+			t.fill(termResults);
 			result.add(t);
 		}
 		return result;
@@ -245,9 +249,10 @@ public class DBConnection implements AbstractConnection{
 		PreparedStatement taxonStatement = c.prepareStatement(Taxon.getRowQuery());
 		taxonStatement.setInt(1, id);
 		ResultSet taxonSet = taxonStatement.executeQuery();
+		AbstractResults taxonResults = new DBResults(taxonSet);
 		if (taxonSet.next()){
 			Taxon result = new Taxon();
-			result.fill(taxonSet);
+			result.fill(taxonResults);
 			return result;
 		}
 		else {
@@ -259,9 +264,10 @@ public class DBConnection implements AbstractConnection{
 		final Set<Taxon> result = new HashSet<Taxon>();
 		final Statement allTaxonStatement = c.createStatement();
 		final ResultSet taxonSet = allTaxonStatement.executeQuery(Taxon.getTableQuery());
+		final AbstractResults taxonResults = new DBResults(taxonSet);
 		while (taxonSet.next()){
 			Taxon t = new Taxon();
-			t.fill(taxonSet);
+			t.fill(taxonResults);
 			result.add(t);
 		}
 		return result;
@@ -299,7 +305,7 @@ public class DBConnection implements AbstractConnection{
 	 * @return maps source_urls, which are unique, to domain identifiers
 	 * @throws Exception
 	 */
-	public Map<String,String>loadOntologyNamesForLoading() throws Exception{
+	public Map<String,String>loadOntologyNamesForLoading() throws SQLException{
 		final Map<String,String> result = new HashMap<String,String>();
 		Statement sourceOntStatement = c.createStatement();
 		ResultSet sourceOntSet = sourceOntStatement.executeQuery(ONTOLOGYNAMEQUERY);

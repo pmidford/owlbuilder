@@ -38,7 +38,7 @@ public class Term {
 	}
 
 	//maybe make this a constructor
-	protected void fill(ResultSet record) throws SQLException{
+	protected void fill(AbstractResults record) throws SQLException{
 		id = record.getInt("id");
 		source_id = record.getString("source_id");
 		domain = record.getInt("domain");

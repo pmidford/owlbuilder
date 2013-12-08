@@ -55,7 +55,7 @@ public class Publication {
 
 	
 	//maybe make this a constructor
-	protected void fill(ResultSet record) throws SQLException{
+	protected void fill(AbstractResults record) throws SQLException{
 		id = record.getInt("id");
 		publication_type = record.getString("publication_type");
 		dispensation = record.getString("dispensation");
