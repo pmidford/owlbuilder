@@ -46,14 +46,14 @@ public class TestDBConnection {
 	public void testupdatePublication() throws SQLException{
 		Publication testPub = testConnection.getPublication(1);
 		assertNotNull(testPub);
-//		testPub.set_generated_id(testID);
-//		testConnection.updatePublication(testPub);
-//		Publication updatedPub = testConnection.getPublication(1);
-//		assertEquals(testID,updatedPub.get_generated_id());
-//		updatedPub.set_generated_id("");
-//		testConnection.updatePublication(updatedPub);
-//		Publication updatePub2 = testConnection.getPublication(1);
-//		assertEquals("",updatePub2.get_generated_id());
+		testPub.set_generated_id(testID);
+		testConnection.updatePublication(testPub);
+		Publication updatedPub = testConnection.getPublication(1);
+		assertEquals(testID,updatedPub.get_generated_id());
+		updatedPub.set_generated_id("");
+		testConnection.updatePublication(updatedPub);
+		Publication updatePub2 = testConnection.getPublication(1);
+		assertEquals("",updatePub2.get_generated_id());
 	}
 	
 	@Test 

@@ -77,6 +77,14 @@ public class MockConnection implements AbstractConnection {
 	}
 
 	@Override
+	public void updatePublication(Publication pub) throws SQLException {
+		mockPublicationResults.setString("generated_id", pub.get_generated_id());
+		// TODO Auto-generated method stub
+		
+	}
+
+	
+	@Override
 	public Set<Taxon> getTaxa() throws SQLException {
 		// TODO Auto-generated method stub
 		return null;
@@ -106,11 +114,6 @@ public class MockConnection implements AbstractConnection {
 		return null;
 	}
 
-	@Override
-	public void updatePublication(Publication pub) throws SQLException {
-		// TODO Auto-generated method stub
-		
-	}
 
 	@Override
 	public void updateTaxon(Taxon t) {
