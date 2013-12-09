@@ -58,8 +58,9 @@ public class TestDBConnection {
 	
 	@Test 
 	public void testgetTerm() throws SQLException{
-//		Term testTerm = testConnection.getTerm(1);
-//		assertNotNull(testTerm);
+		Term testTerm = testConnection.getTerm(1);
+		assertNotNull(testTerm);
+        assertEquals(1,testTerm.get_id());
 //		testTerm.set_generated_id(testID);
 //		testConnection.updateTerm(testTerm);
 	}

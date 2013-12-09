@@ -31,6 +31,18 @@ public class MockConnection implements AbstractConnection {
         mockPublicationResults.setString("curation_update","");
 
 	}
+	
+	private static MockResults mockTermResults = new MockResults();
+	static {
+		mockTermResults.setInteger("id",1);
+		mockTermResults.setString("source_id","");
+		mockTermResults.setInteger("domain",1);
+		mockTermResults.setInteger("authority",1);
+		mockTermResults.setString("label","");
+		mockTermResults.setString("generated_id","");
+		mockTermResults.setString("comment","");
+	}
+	
 
 	public MockConnection() {
 		// TODO Auto-generated constructor stub
@@ -123,8 +135,9 @@ public class MockConnection implements AbstractConnection {
 
 	@Override
 	public Term getTerm(int i) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		Term result = new Term();
+        result.fill(mockTermResults);
+		return result;
 	}
 
 	@Override
