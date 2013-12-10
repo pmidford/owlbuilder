@@ -61,29 +61,30 @@ public class TestDBConnection {
 		Term testTerm = testConnection.getTerm(1);
 		assertNotNull(testTerm);
         assertEquals(1,testTerm.get_id());
-//		testTerm.set_generated_id(testID);
-//		testConnection.updateTerm(testTerm);
+		testTerm.set_generated_id(testID);
+		testConnection.updateTerm(testTerm);
 	}
 	
 	@Test
 	public void testgetTerms() throws SQLException{
-//		Set<Term> testSet = testConnection.getTerms();
-//		assertNotNull(testSet);
-//		assertEquals(1,testSet.size());
+		Set<Term> testSet = testConnection.getTerms();
+		assertNotNull(testSet);
+		assertEquals(1,testSet.size());
 	}
 
 	@Test
 	public void testupdateTerm() throws SQLException{
-//		Term testTerm = testConnection.getTerm(1);
-//		assertNotNull(testTerm);
-//		testTerm.set_generated_id(testID);
-//		testConnection.updateTerm(testTerm);
-//		Term updatedTerm = testConnection.getTerm(1);
-//		assertEquals(testID,updatedTerm.get_generated_id());
-//		updatedTerm.set_generated_id("");
-//		testConnection.updateTerm(updatedTerm);
-//		Term updatedTerm2 = testConnection.getTerm(1);
-//		assertEquals("",updatedTerm2.get_generated_id());
+		Term testTerm = testConnection.getTerm(1);
+		assertNotNull(testTerm);
+        String old_id = testTerm.get_generated_id();
+		testTerm.set_generated_id(testID);
+		testConnection.updateTerm(testTerm);
+		Term updatedTerm = testConnection.getTerm(1);
+		assertEquals(testID,updatedTerm.get_generated_id());
+		updatedTerm.set_generated_id(old_id);
+		testConnection.updateTerm(updatedTerm);
+		Term updatedTerm2 = testConnection.getTerm(1);
+		assertEquals(old_id,updatedTerm2.get_generated_id());
 	}
 
 	@Test

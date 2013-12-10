@@ -142,14 +142,16 @@ public class MockConnection implements AbstractConnection {
 
 	@Override
 	public void updateTerm(Term testTerm) throws SQLException {
-		// TODO Auto-generated method stub
-		
+		mockTermResults.setString("generated_id", testTerm.get_generated_id());
 	}
 
 	@Override
 	public Set<Term> getTerms() throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		Set<Term> results = new HashSet<Term>();
+		Term t1 = new Term();
+		t1.fill(mockTermResults);
+		results.add(t1);
+		return results;
 	}
 
 	@Override

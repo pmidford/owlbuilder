@@ -6,12 +6,9 @@ package org.arachb.owlbuilder;
  */
 
 import java.io.File;
-import java.net.URI;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -32,16 +29,13 @@ import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassAssertionAxiom;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataFactory;
-import org.semanticweb.owlapi.model.OWLEquivalentClassesAxiom;
 import org.semanticweb.owlapi.model.OWLIndividual;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLObjectPropertyAssertionAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyFormat;
-import org.semanticweb.owlapi.model.OWLOntologyIRIMapper;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.util.SimpleIRIMapper;
-import org.semanticweb.owlapi.vocab.PrefixOWLOntologyFormat;
 
 public class Owlbuilder {
 
@@ -52,7 +46,7 @@ public class Owlbuilder {
 	private final AbstractConnection connection;
 	private final Mireot mireot;
 	
-	private Map<String,OWLOntology>supportOntologies;
+	private final Map<String,OWLOntology>supportOntologies = new HashMap<String,OWLOntology>();
 	
 		
 	
@@ -152,17 +146,20 @@ public class Owlbuilder {
 		final Set<Publication> pubs = connection.getPublications();
 		for (Publication pub : pubs){
 			IRI pubID;
-			if(pub.get_doi() != null && pub.get_doi() != ""){
+			if(pub.get_doi() != null){
 				IRI clean = cleanupDOI(pub.get_doi());
 				pubID = clean;
-				if (pub.get_generated_id() != null && pub.get_generated_id() != ""){
+				if (pub.get_generated_id() != null){
 				//TODO check for existing arachb id - generate owl:sameas
 				}
 			}
-			else{ //generate arachb IRI (maybe temporary)
+			else if (pub.get_generated_id() == null){ //generate arachb IRI (maybe temporary)
 				pubID = iriManager.getARACHB_IRI();
 				pub.set_generated_id(pubID.toString());
 				connection.updatePublication(pub);
+			}
+			else{
+				pubID = IRI.create(pub.get_generated_id());
 			}
 			OWLIndividual pub_ind = factory.getOWLNamedIndividual(pubID);
 			OWLClassAssertionAxiom classAssertion = 
@@ -177,13 +174,9 @@ public class Owlbuilder {
 		final OWLObjectProperty partofProperty = factory.getOWLObjectProperty(IRIManager.partOfProperty);
 		OWLClass behaviorProcess = factory.getOWLClass(IRI.create("http://purl.obolibrary.org/obo/NBO_0000313")); 
 		final Set<Assertion> assertions = connection.getAssertions();
-		final HashMap<IRI,String> nboTermMap = new HashMap<IRI,String>();
-		final HashMap<IRI,String> missingBehaviorMap = new HashMap<IRI,String>();
-		final HashMap<IRI,String> spdTermMap = new HashMap<IRI,String>();
-		final HashMap<IRI,String> missingAnatomyMap = new HashMap<IRI,String>();
 		for (Assertion a : assertions){
 			//TODO check for existing arachb id, don't generate new one
-			if (a.get_generated_id() == null || a.get_generated_id() == ""){
+			if (a.get_generated_id() == null){
 				final IRI assertID = iriManager.getARACHB_IRI();
 				a.set_generated_id(assertID.toString());
 				connection.updateAssertion(a);
@@ -244,7 +237,7 @@ public class Owlbuilder {
 		final HashMap<IRI,String> missingTaxonMap = new HashMap<IRI,String>();
 		for (Taxon t : taxa){
 			IRI taxonID;
-			if (t.get_ncbi_id() == null){
+			if (t.get_ncbi_id() == null && t.get_generated_id() == null){
 				taxonID = iriManager.getARACHB_IRI();
 				t.set_generated_id(taxonID.toString());
 				connection.updateTaxon(t);
@@ -281,6 +274,7 @@ public class Owlbuilder {
 	 * @throws Exception either MalformedURL or Encoding exceptions can be thrown
 	 */
 	private IRI cleanupDOI(String doi) throws Exception{
+		log.info("string is " + doi);
 		URL raw = new URL(doi);
 		String cleanpath = URLEncoder.encode(raw.getPath().substring(1),"UTF-8");
 		if (log.isDebugEnabled()){
