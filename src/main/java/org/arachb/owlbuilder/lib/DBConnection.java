@@ -195,9 +195,10 @@ public class DBConnection implements AbstractConnection{
 	}
 
 	public Assertion getAssertion(int id) throws SQLException{
-		PreparedStatement assertionStatement = c.prepareStatement(Assertion.getRowQuery());
+		final PreparedStatement assertionStatement = c.prepareStatement(Assertion.getRowQuery());
 		assertionStatement.setInt(1, id);
-		ResultSet assertionSet = assertionStatement.executeQuery();
+		final ResultSet r = assertionStatement.executeQuery();
+		final AbstractResults assertionSet = new DBResults(r);
 		if (assertionSet.next()){
 			Assertion result = new Assertion();
 			result.fill(assertionSet);
@@ -211,7 +212,8 @@ public class DBConnection implements AbstractConnection{
 	public Set<Assertion> getAssertions() throws SQLException {
 		final Set<Assertion> result = new HashSet<Assertion>();
 		final Statement allAssertionStatement = c.createStatement();
-		final ResultSet assertionSet = allAssertionStatement.executeQuery(Assertion.getTableQuery());
+		final ResultSet r = allAssertionStatement.executeQuery(Assertion.getTableQuery());
+		final AbstractResults assertionSet = new DBResults(r);
 		while (assertionSet.next()){
 			Assertion a = new Assertion();
 			a.fill(assertionSet);
@@ -245,37 +247,6 @@ public class DBConnection implements AbstractConnection{
 		
 	}
 	
-	public Taxon getTaxon(int id) throws SQLException{
-		PreparedStatement taxonStatement = c.prepareStatement(Taxon.getRowQuery());
-		taxonStatement.setInt(1, id);
-		ResultSet taxonSet = taxonStatement.executeQuery();
-		AbstractResults taxonResults = new DBResults(taxonSet);
-		if (taxonSet.next()){
-			Taxon result = new Taxon();
-			result.fill(taxonResults);
-			return result;
-		}
-		else {
-			return null;
-		}
-	}
-	
-	public Set<Taxon> getTaxa() throws SQLException {
-		final Set<Taxon> result = new HashSet<Taxon>();
-		final Statement allTaxonStatement = c.createStatement();
-		final ResultSet taxonSet = allTaxonStatement.executeQuery(Taxon.getTableQuery());
-		final AbstractResults taxonResults = new DBResults(taxonSet);
-		while (taxonSet.next()){
-			Taxon t = new Taxon();
-			t.fill(taxonResults);
-			result.add(t);
-		}
-		return result;
-	}
-	
-	public void updateTaxon(Taxon tx){
-		
-	}
 	
 	private final String ONTOLOGYSOURCEQUERY = "SELECT source_url,domain FROM ontology_source";
 

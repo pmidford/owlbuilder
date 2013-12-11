@@ -1,6 +1,7 @@
 package org.arachb.owlbuilder.lib;
 
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -71,6 +72,44 @@ public class MockConnection implements AbstractConnection {
 		mockSecondaryParticipantResults.setString("publication_substrate","");
 	}
 	
+	private static MockResults mockAssertionResults = new MockResults();
+	static{
+		mockAssertionResults.setInteger("id", 3);
+		mockAssertionResults.setInteger("publication",6);
+		mockAssertionResults.setInteger("behavior_term",9);
+		mockAssertionResults.setString("publication_behavior","behavior");
+		mockAssertionResults.setInteger("taxon", 12);
+		mockAssertionResults.setString("publication_taxon","Arachida");
+		mockAssertionResults.setString("publication_anatomy","whole body");
+		mockAssertionResults.setInteger("evidence",15);
+		mockAssertionResults.setString("generated_id","");
+
+	}
+	
+	private static Map<String,String> mockImportSourceMap = new HashMap<String,String>();
+	static{
+		mockImportSourceMap.put("http://purl.obolibrary.org/obo/eco.owl", "evidence");
+		mockImportSourceMap.put("http://purl.obolibrary.org/obo/ncbitaxon.owl", "taxonomy");
+		mockImportSourceMap.put("http://purl.obolibrary.org/obo/spd.owl", "anatomy");
+		mockImportSourceMap.put("http://behavior-ontology.googlecode.com/svn/trunk/behavior.owl", "behavior");
+		mockImportSourceMap.put("http://purl.obolibrary.org/obo/go.owl", "gene products");
+		mockImportSourceMap.put("http://purl.obolibrary.org/obo/pato.owl", "qualities");
+		mockImportSourceMap.put("http://purl.obolibrary.org/obo/chebi.owl", "chemistry");
+		mockImportSourceMap.put("http://purl.obolibrary.org/obo/uberon.owl", "bilateralian anatomy");
+	}
+
+	private static Map<String,String> mockOntologyNamesMap = new HashMap<String,String>();
+	static{
+		mockOntologyNamesMap.put("http://purl.obolibrary.org/obo/eco.owl", "Evidence Codes (ECO)");
+		mockOntologyNamesMap.put("http://purl.obolibrary.org/obo/ncbitaxon.owl", "NCBI Taxonomy");
+		mockOntologyNamesMap.put("http://purl.obolibrary.org/obo/spd.owl", "Spider Anatomy");
+		mockOntologyNamesMap.put("http://behavior-ontology.googlecode.com/svn/trunk/behavior.owl", 
+				                 "NeuroBehavior Ontology");
+		mockOntologyNamesMap.put("http://purl.obolibrary.org/obo/go.owl", "Gene Ontology");
+		mockOntologyNamesMap.put("http://purl.obolibrary.org/obo/pato.owl", "Phenotype and Trait Ontology");
+		mockOntologyNamesMap.put("http://purl.obolibrary.org/obo/chebi.owl", "CHEBI");
+		mockOntologyNamesMap.put("http://purl.obolibrary.org/obo/uberon.owl", "Uberon");
+	}
 
 	public MockConnection() {
 		// TODO Auto-generated constructor stub
@@ -151,33 +190,34 @@ public class MockConnection implements AbstractConnection {
 
 	@Override
 	public Assertion getAssertion(int i) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		Assertion result = new Assertion();
+        result.fill(mockAssertionResults);
+		return result;
 	}
 
 
 	@Override
 	public Set<Assertion> getAssertions() throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		Set<Assertion> results = new HashSet<Assertion>();
+		Assertion a1 = new Assertion();
+		a1.fill(mockAssertionResults);
+		results.add(a1);
+		return results;
 	}
 
 	@Override
 	public void updateAssertion(Assertion a) throws SQLException {
-		// TODO Auto-generated method stub
-		
+		mockAssertionResults.setString("generated_id", a.get_generated_id());		
 	}
 
 	@Override
 	public Map<String, String> loadImportSourceMap() throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		return mockImportSourceMap;
 	}
 
 	@Override
 	public Map<String, String> loadOntologyNamesForLoading() throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		return mockOntologyNamesMap;
 	}
 
 

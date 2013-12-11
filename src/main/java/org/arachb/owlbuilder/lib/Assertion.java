@@ -1,6 +1,5 @@
 package org.arachb.owlbuilder.lib;
 
-import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class Assertion {
@@ -47,7 +46,7 @@ public class Assertion {
 
 	
 	//maybe make this a constructor
-	protected void fill(ResultSet record) throws SQLException{
+	protected void fill(AbstractResults record) throws SQLException{
 		id = record.getInt("id");
 		publication = record.getInt("publication");
 		publication_behavior = record.getString("publication_behavior");

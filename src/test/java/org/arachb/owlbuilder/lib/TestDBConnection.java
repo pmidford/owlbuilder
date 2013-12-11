@@ -121,39 +121,45 @@ public class TestDBConnection {
 	
 	@Test
 	public void testgetAssertion() throws SQLException{
-//		Assertion testAssertion = testConnection.getAssertion(1);
-//		assertNotNull(testAssertion);
-//		assertEquals(1,testAssertion.get_id());
+		Assertion testAssertion = testConnection.getAssertion(1);
+		assertNotNull(testAssertion);
+		assertEquals(3,testAssertion.get_id());
 	}
 	
 	@Test
 	public void testgetAssertions() throws SQLException{
-//		Set<Assertion> testSet = testConnection.getAssertions();
-//		assertNotNull(testSet);
-//		assertEquals(1,testSet.size());
+		Set<Assertion> testSet = testConnection.getAssertions();
+		assertNotNull(testSet);
+		assertEquals(1,testSet.size());
 	}
 	
 	@Test
 	public void testupdateAssertion() throws SQLException{
-//		Assertion testAssertion = testConnection.getAssertion(1);
-//		assertNotNull(testAssertion);
-//		testAssertion.set_generated_id(testID);
-//		testConnection.updateAssertion(testAssertion);
-//		Assertion updatedAssertion = testConnection.getAssertion(1);
-//		assertEquals(testID,updatedAssertion.get_generated_id());
-//		updatedAssertion.set_generated_id("");
-//		testConnection.updateAssertion(updatedAssertion);
-//		Assertion updatedAssertion2 = testConnection.getAssertion(1);
-//		assertEquals("",updatedAssertion2.get_generated_id());
+		Assertion testAssertion = testConnection.getAssertion(1);
+		assertNotNull(testAssertion);
+		testAssertion.set_generated_id(testID);
+		testConnection.updateAssertion(testAssertion);
+		Assertion updatedAssertion = testConnection.getAssertion(1);
+		assertEquals(testID,updatedAssertion.get_generated_id());
+		updatedAssertion.set_generated_id("");
+		testConnection.updateAssertion(updatedAssertion);
+		Assertion updatedAssertion2 = testConnection.getAssertion(1);
+		assertEquals("",updatedAssertion2.get_generated_id());
 	}
 	
 	@Test
 	public void testloadImportSourceMap() throws Exception{
-//		Map<String,String> testmap = testConnection.loadImportSourceMap();
-//		assertNotNull(testmap);
-//		assertTrue(testmap.size()>0);
+		Map<String,String> testmap = testConnection.loadImportSourceMap();
+		assertNotNull(testmap);
+		assertTrue(testmap.size()==8);
 	}
 	
-	
+	@Test
+	public void testloadOntologyNamesForLoading() throws Exception{
+		Map<String,String> testmap = testConnection.loadImportSourceMap();
+		assertNotNull(testmap);
+		assertTrue(testmap.size()==8);
+		
+	}
 
 }
