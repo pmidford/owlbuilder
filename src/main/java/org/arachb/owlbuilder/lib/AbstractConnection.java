@@ -18,19 +18,15 @@ public interface AbstractConnection {
 
 	Set<Publication> getPublications() throws SQLException;
 
-	Set<Taxon> getTaxa() throws SQLException;
-
 	Participant getPrimaryParticipant(Assertion a) throws SQLException;
 
 	Set<Participant> getParticipants(Assertion a) throws SQLException;
 
-	Taxon getTaxon(int get_taxon) throws SQLException;
+	void updateParticipant(Participant p) throws SQLException;
 
 	Map<String, String> loadOntologyNamesForLoading() throws SQLException;
 
 	void updatePublication(Publication pub) throws SQLException;
-
-	void updateTaxon(Taxon t) throws SQLException;
 
 	Term getTerm(int i) throws SQLException;
 
@@ -39,5 +35,6 @@ public interface AbstractConnection {
 	Set<Term> getTerms() throws SQLException;
 
 	Assertion getAssertion(int i) throws SQLException;
+
 
 }

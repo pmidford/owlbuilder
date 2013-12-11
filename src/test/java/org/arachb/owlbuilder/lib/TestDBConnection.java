@@ -88,6 +88,38 @@ public class TestDBConnection {
 	}
 
 	@Test
+	public void testgetPrimaryParticipant() throws SQLException{
+		Assertion testAssertion = null;  //dummy
+		Participant testParticipant = testConnection.getPrimaryParticipant(testAssertion);
+		assertNotNull(testParticipant);
+		assertEquals(1,testParticipant.get_id());  //not really the best test...
+	}
+	
+	@Test
+	public void testgetParticipants() throws SQLException{
+		Assertion testAssertion = null; //dummy
+		Set<Participant> testSet = testConnection.getParticipants(testAssertion);
+		assertNotNull(testSet);
+		assertEquals(1,testSet.size());
+	}
+	
+	@Test
+	public void testupdateParticipant() throws SQLException{
+		Assertion testAssertion = null; //dummy
+		Participant testParticipant = testConnection.getPrimaryParticipant(testAssertion);
+		assertNotNull(testParticipant);
+		testParticipant.set_generated_id(testID);
+		testConnection.updateParticipant(testParticipant);
+		Participant updatedParticipant = testConnection.getPrimaryParticipant(testAssertion);
+		assertEquals(testID,updatedParticipant.get_generated_id());
+		updatedParticipant.set_generated_id("");
+		testConnection.updateParticipant(updatedParticipant);
+		Participant updatedParticipant2 = testConnection.getPrimaryParticipant(testAssertion);
+		assertEquals("",updatedParticipant2.get_generated_id());
+	}
+
+	
+	@Test
 	public void testgetAssertion() throws SQLException{
 //		Assertion testAssertion = testConnection.getAssertion(1);
 //		assertNotNull(testAssertion);

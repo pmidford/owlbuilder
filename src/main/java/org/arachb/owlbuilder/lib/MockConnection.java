@@ -43,31 +43,41 @@ public class MockConnection implements AbstractConnection {
 		mockTermResults.setString("comment","");
 	}
 	
+	private static MockResults mockPrimaryParticipantResults = new MockResults();
+	static {
+		mockPrimaryParticipantResults.setInteger("id",1);
+		mockPrimaryParticipantResults.setInteger("taxon",2);
+		mockPrimaryParticipantResults.setInteger("substrate",3);
+		mockPrimaryParticipantResults.setInteger("anatomy",4);
+		mockPrimaryParticipantResults.setString("quantification","some");
+		mockPrimaryParticipantResults.setString("generated_id","");
+		mockPrimaryParticipantResults.setString("label","");
+		mockPrimaryParticipantResults.setString("publication_taxon","");
+		mockPrimaryParticipantResults.setString("publication_anatomy","");
+		mockPrimaryParticipantResults.setString("publication_substrate","");
+	}
+
+	private static MockResults mockSecondaryParticipantResults = new MockResults();
+	static {
+		mockSecondaryParticipantResults.setInteger("id",2);
+		mockSecondaryParticipantResults.setInteger("taxon",4);
+		mockSecondaryParticipantResults.setInteger("substrate",6);
+		mockSecondaryParticipantResults.setInteger("anatomy",8);
+		mockSecondaryParticipantResults.setString("quantification","some");
+		mockSecondaryParticipantResults.setString("generated_id","");
+		mockSecondaryParticipantResults.setString("label","");
+		mockSecondaryParticipantResults.setString("publication_taxon","");
+		mockSecondaryParticipantResults.setString("publication_anatomy","");
+		mockSecondaryParticipantResults.setString("publication_substrate","");
+	}
+	
 
 	public MockConnection() {
 		// TODO Auto-generated constructor stub
 	}
 
 	@Override
-	public Map<String, String> loadImportSourceMap() throws Exception {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
 	public void close() throws Exception {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public Set<Assertion> getAssertions() throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void updateAssertion(Assertion a) throws SQLException {
 		// TODO Auto-generated method stub
 		
 	}
@@ -95,27 +105,71 @@ public class MockConnection implements AbstractConnection {
 		
 	}
 
+	@Override
+	public Term getTerm(int i) throws SQLException {
+		Term result = new Term();
+        result.fill(mockTermResults);
+		return result;
+	}
+
+	@Override
+	public Set<Term> getTerms() throws SQLException {
+		Set<Term> results = new HashSet<Term>();
+		Term t1 = new Term();
+		t1.fill(mockTermResults);
+		results.add(t1);
+		return results;
+		
+	}
+
+	@Override
+	public void updateTerm(Term testTerm) throws SQLException {
+		mockTermResults.setString("generated_id", testTerm.get_generated_id());
+	}
+
 	
 	@Override
-	public Set<Taxon> getTaxa() throws SQLException {
+	public Participant getPrimaryParticipant(Assertion a) throws SQLException {
+		Participant result = new Participant();
+        result.fill(mockPrimaryParticipantResults);
+		return result;
+	}
+
+	@Override
+	public Set<Participant> getParticipants(Assertion a) throws SQLException {
+		Set<Participant> results = new HashSet<Participant>();
+		Participant p1 = new Participant();
+		p1.fill(mockSecondaryParticipantResults);
+		results.add(p1);
+		return results;
+	}
+
+	@Override
+	public void updateParticipant(Participant p) throws SQLException{
+		mockPrimaryParticipantResults.setString("generated_id", p.get_generated_id());
+	}
+
+	@Override
+	public Assertion getAssertion(int i) throws SQLException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	@Override
+	public Set<Assertion> getAssertions() throws SQLException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Participant getPrimaryParticipant(Assertion a) {
+	public void updateAssertion(Assertion a) throws SQLException {
 		// TODO Auto-generated method stub
-		return null;
+		
 	}
 
 	@Override
-	public Set<Participant> getParticipants(Assertion a) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Taxon getTaxon(int get_taxon) throws SQLException {
+	public Map<String, String> loadImportSourceMap() throws Exception {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -126,38 +180,5 @@ public class MockConnection implements AbstractConnection {
 		return null;
 	}
 
-
-	@Override
-	public void updateTaxon(Taxon t) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public Term getTerm(int i) throws SQLException {
-		Term result = new Term();
-        result.fill(mockTermResults);
-		return result;
-	}
-
-	@Override
-	public void updateTerm(Term testTerm) throws SQLException {
-		mockTermResults.setString("generated_id", testTerm.get_generated_id());
-	}
-
-	@Override
-	public Set<Term> getTerms() throws SQLException {
-		Set<Term> results = new HashSet<Term>();
-		Term t1 = new Term();
-		t1.fill(mockTermResults);
-		results.add(t1);
-		return results;
-	}
-
-	@Override
-	public Assertion getAssertion(int i) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 }

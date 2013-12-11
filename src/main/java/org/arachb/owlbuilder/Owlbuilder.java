@@ -99,7 +99,8 @@ public class Owlbuilder {
 		log.info("Saving ontology");
 		File f = new File(temporaryOutput);
 		manager.saveOntology(ontology, IRI.create(f.toURI()));
-
+        log.info("Generating HTML pages");
+        log.info("Done");
 	}
 	
 	void shutdown() throws Exception{
@@ -111,8 +112,6 @@ public class Owlbuilder {
 		processPublications(ontology);
 		log.info("Processing assertions");
 		processAssertions(ontology);
-		log.info("Processing taxonomy");
-		processTaxonomy(ontology);
 	}
 	
 	/**
@@ -186,15 +185,6 @@ public class Owlbuilder {
 			for (Participant p : participants){
 				
 			}
-			//find the taxon id
-			IRI taxon_id;
-			final Taxon t  = connection.getTaxon(a.get_taxon());
-			if (t != null){
-				taxon_id = IRI.create(t.get_available_id());
-			}
-			else {
-				taxon_id = null;
-			}
 			//find the behavior id
 			
 			//find the publication id
@@ -231,29 +221,6 @@ public class Owlbuilder {
 	
 	
 	
-	void processTaxonomy(OWLOntology ontology) throws Exception{
-		final Set<Taxon> taxa = connection.getTaxa();
-		final HashMap<IRI,String> ncbiTaxonMap = new HashMap<IRI,String>();
-		final HashMap<IRI,String> missingTaxonMap = new HashMap<IRI,String>();
-		for (Taxon t : taxa){
-			IRI taxonID;
-			if (t.get_ncbi_id() == null && t.get_generated_id() == null){
-				taxonID = iriManager.getARACHB_IRI();
-				t.set_generated_id(taxonID.toString());
-				connection.updateTaxon(t);
-				missingTaxonMap.put(taxonID,t.get_name());
-			}
-			else {
-				IRI ncbiIRI = iriManager.getNCBI_IRI(t.get_ncbi_id());
-				ncbiTaxonMap.put(ncbiIRI, t.get_name());
-			}
-		}
-		
-		generateTaxonMiriotReport(ncbiTaxonMap);
-		generateMissingTaxaPage();
-		
-	}
-	
 	private void generateTaxonMiriotReport(HashMap<IRI,String> taxonomyMap) throws Exception{
 		mireot.setSourceTerms(taxonomyMap);
 		mireot.setSourceOntology("NCBITaxon");
@@ -263,9 +230,6 @@ public class Owlbuilder {
 		
 	}
 	
-	private void generateMissingTaxaPage(){
-		
-	}
 	
 	/**
 	 * This cleans up doi's (which tend to have lots of URI unfriendly characters) and returns a properly prefixed doi
@@ -274,7 +238,6 @@ public class Owlbuilder {
 	 * @throws Exception either MalformedURL or Encoding exceptions can be thrown
 	 */
 	private IRI cleanupDOI(String doi) throws Exception{
-		log.info("string is " + doi);
 		URL raw = new URL(doi);
 		String cleanpath = URLEncoder.encode(raw.getPath().substring(1),"UTF-8");
 		if (log.isDebugEnabled()){

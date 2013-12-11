@@ -1,6 +1,5 @@
 package org.arachb.owlbuilder.lib;
 
-import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class Participant {
@@ -49,9 +48,9 @@ public class Participant {
 	}
 	
 	//maybe make this a constructor
-	protected void fill(ResultSet record) throws SQLException{
+	protected void fill(AbstractResults record) throws SQLException{
 		id = record.getInt("id");
-		taxon = record.getInt("source_id");
+		taxon = record.getInt("taxon");
 		substrate = record.getInt("substrate");
 		anatomy = record.getInt("anatomy");
 		quantification = record.getString("quantification");
@@ -70,6 +69,10 @@ public class Participant {
 		return generated_id;
 	}
 	
+	public void set_generated_id(String s){
+		generated_id = s;
+	}
+
 	public String get_available_id(){
 		return get_generated_id();
 	}
