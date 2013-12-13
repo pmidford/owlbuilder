@@ -168,6 +168,9 @@ public class MockConnection implements AbstractConnection {
 		Term t1 = new Term();
 		t1.fill(mockTermResults);
 		results.add(t1);
+		Term t2 = new Term();
+		t2.fill(mockTermResults2);
+		results.add(t2);
 		return results;
 		
 	}

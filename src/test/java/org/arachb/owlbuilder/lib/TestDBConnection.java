@@ -100,7 +100,7 @@ public class TestDBConnection {
 		Assertion testAssertion = testConnection.getAssertion(1);
 		Set<Participant> testSet = testConnection.getParticipants(testAssertion);
 		assertNotNull(testSet);
-		assertEquals(0,testSet.size());
+		assertEquals(1,testSet.size());
 	}
 	
 	@Test
