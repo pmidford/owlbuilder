@@ -233,18 +233,54 @@ public class DBConnection implements AbstractConnection{
 		}
 	}
 	
-	public Participant getPrimaryParticipant(Assertion a){
-		return null;
+	
+	public Participant getPrimaryParticipant(Assertion a) throws SQLException{
+		PreparedStatement participantStatement =
+				c.prepareStatement(Participant.getPrimaryQuery());
+		participantStatement.setInt(1, a.get_id());
+		final ResultSet r = participantStatement.executeQuery();
+		final AbstractResults participantSet = new DBResults(r);
+		if (participantSet.next()){
+			Participant result = new Participant();
+			result.fill(participantSet);
+			if (participantSet.next()){
+				log.error("Assertion " + a.get_id() + " has more than one primary participant");
+				throw new RuntimeException("Assertion " + a.get_id() + " has more than one primary participant");
+			}
+			else{
+				return result;
+			}
+		}
+		else {
+			return null;
+		}
 	}
 	
-	public Set<Participant> getParticipants(Assertion a) {
+	public Set<Participant> getParticipants(Assertion a) throws SQLException {
 		final Set<Participant> result = new HashSet<Participant>();
 		int assertion_id = a.get_id();
+		PreparedStatement participantsStatement =
+				c.prepareStatement(Participant.getRestQuery());
+		participantsStatement.setInt(1, assertion_id);
+		final ResultSet r = participantsStatement.executeQuery();
+		final AbstractResults participantSet = new DBResults(r);
+		while (participantSet.next()){
+			Participant p = new Participant();
+			p.fill(participantSet);
+			result.add(p);
+		}
 		return result;
 	}
 
 	public void updateParticipant(Participant p) throws SQLException{
-		
+		PreparedStatement updateStatement = 
+				c.prepareStatement(Participant.getUpdateStatement());
+		updateStatement.setString(1, p.get_generated_id());
+		updateStatement.setInt(2,p.get_id());
+		int count = updateStatement.executeUpdate();
+		if (count != 1){
+			logger.error("term update failed; row count = " + count);
+		}
 	}
 	
 	

@@ -32,17 +32,28 @@ public class MockConnection implements AbstractConnection {
         mockPublicationResults.setString("curation_update","");
 
 	}
-	
 	private static MockResults mockTermResults = new MockResults();
 	static {
 		mockTermResults.setInteger("id",1);
-		mockTermResults.setString("source_id","");
-		mockTermResults.setInteger("domain",1);
+		mockTermResults.setString("source_id","http://purl.obolibrary.org/obo/NCBITaxon_336608");
+		mockTermResults.setInteger("domain",3);
 		mockTermResults.setInteger("authority",1);
-		mockTermResults.setString("label","");
+		mockTermResults.setString("label","Tetragnatha straminea");
 		mockTermResults.setString("generated_id","");
 		mockTermResults.setString("comment","");
 	}
+
+	private static MockResults mockTermResults2 = new MockResults();
+	static {
+		mockTermResults2.setInteger("id",2);
+		mockTermResults2.setString("source_id","http://purl.obolibrary.org/obo/SPD_0000001");
+		mockTermResults2.setInteger("domain",2);
+		mockTermResults2.setInteger("authority",1);
+		mockTermResults2.setString("label","whole organism");
+		mockTermResults2.setString("generated_id","");
+		mockTermResults2.setString("comment","");
+	}
+
 	
 	private static MockResults mockPrimaryParticipantResults = new MockResults();
 	static {
@@ -74,7 +85,7 @@ public class MockConnection implements AbstractConnection {
 	
 	private static MockResults mockAssertionResults = new MockResults();
 	static{
-		mockAssertionResults.setInteger("id", 3);
+		mockAssertionResults.setInteger("id", 1);
 		mockAssertionResults.setInteger("publication",6);
 		mockAssertionResults.setInteger("behavior_term",9);
 		mockAssertionResults.setString("publication_behavior","behavior");

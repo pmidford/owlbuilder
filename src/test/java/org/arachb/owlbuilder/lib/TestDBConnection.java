@@ -69,7 +69,7 @@ public class TestDBConnection {
 	public void testgetTerms() throws SQLException{
 		Set<Term> testSet = testConnection.getTerms();
 		assertNotNull(testSet);
-		assertEquals(1,testSet.size());
+		assertEquals(2,testSet.size());
 	}
 
 	@Test
@@ -89,7 +89,7 @@ public class TestDBConnection {
 
 	@Test
 	public void testgetPrimaryParticipant() throws SQLException{
-		Assertion testAssertion = null;  //dummy
+		Assertion testAssertion = testConnection.getAssertion(1);
 		Participant testParticipant = testConnection.getPrimaryParticipant(testAssertion);
 		assertNotNull(testParticipant);
 		assertEquals(1,testParticipant.get_id());  //not really the best test...
@@ -97,15 +97,15 @@ public class TestDBConnection {
 	
 	@Test
 	public void testgetParticipants() throws SQLException{
-		Assertion testAssertion = null; //dummy
+		Assertion testAssertion = testConnection.getAssertion(1);
 		Set<Participant> testSet = testConnection.getParticipants(testAssertion);
 		assertNotNull(testSet);
-		assertEquals(1,testSet.size());
+		assertEquals(0,testSet.size());
 	}
 	
 	@Test
 	public void testupdateParticipant() throws SQLException{
-		Assertion testAssertion = null; //dummy
+		Assertion testAssertion = testConnection.getAssertion(1);
 		Participant testParticipant = testConnection.getPrimaryParticipant(testAssertion);
 		assertNotNull(testParticipant);
 		testParticipant.set_generated_id(testID);
@@ -123,7 +123,7 @@ public class TestDBConnection {
 	public void testgetAssertion() throws SQLException{
 		Assertion testAssertion = testConnection.getAssertion(1);
 		assertNotNull(testAssertion);
-		assertEquals(3,testAssertion.get_id());
+		assertEquals(1,testAssertion.get_id());
 	}
 	
 	@Test
@@ -151,14 +151,14 @@ public class TestDBConnection {
 	public void testloadImportSourceMap() throws Exception{
 		Map<String,String> testmap = testConnection.loadImportSourceMap();
 		assertNotNull(testmap);
-		assertTrue(testmap.size()==8);
+		assertEquals(8,testmap.size());
 	}
 	
 	@Test
 	public void testloadOntologyNamesForLoading() throws Exception{
 		Map<String,String> testmap = testConnection.loadImportSourceMap();
 		assertNotNull(testmap);
-		assertTrue(testmap.size()==8);
+		assertEquals(8,testmap.size());
 		
 	}
 
