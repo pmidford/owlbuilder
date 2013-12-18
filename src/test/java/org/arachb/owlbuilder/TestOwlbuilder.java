@@ -1,16 +1,11 @@
 package org.arachb.owlbuilder;
 
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
-import java.io.File;
-
-import org.junit.Before;
-import org.junit.Test;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
-import org.arachb.owlbuilder.lib.DBConnection;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * Unit test for simple App.

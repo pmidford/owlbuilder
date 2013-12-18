@@ -2,7 +2,9 @@ package org.arachb.owlbuilder.lib;
 
 import java.sql.SQLException;
 
-public class Participant {
+import org.apache.log4j.Logger;
+
+public abstract class Participant implements AbstractEntity{
 
 	
 	static final private String PRIMARYQUERY = "SELECT part.id, " + 
@@ -20,9 +22,6 @@ public class Participant {
 	"FROM participant2assertion as p2a " + 
 	"JOIN participant AS part ON (p2a.participant = part.id) " +
 	"WHERE p2a.assertion = ? AND p2a.participant_index > 1";
-	
-	static final private String ROWUPDATE = "UPDATE participant " +
-	"SET generated_id = ? WHERE id = ?";
 	
 	int id;
 	int taxon;
@@ -43,38 +42,34 @@ public class Participant {
 		return Participant.RESTQUERY;
 	}
 	
-	public static String getUpdateStatement(){
-		return Participant.ROWUPDATE;
+	private static String INDIVIDUALQUANTIFIER = "INDIVIDUAL";
+	private static String SOMEQUANTIFIER = "SOME";
+	
+	private static Logger log = Logger.getLogger(Participant.class);
+
+	
+	public static Participant makeParticipant(AbstractResults record) throws SQLException{
+		final String quantification = record.getString("quantification");
+		if (INDIVIDUALQUANTIFIER.equalsIgnoreCase(quantification)){
+			IndividualParticipant result = new IndividualParticipant();
+			result.fill(record);
+			return result;
+		}
+		else if (SOMEQUANTIFIER.equalsIgnoreCase(quantification)){
+			QuantifiedParticipant result = new QuantifiedParticipant();
+			result.fill(record);
+			return result;
+		}
+		else{
+			final String msg = "Participant had bad quantification: " + quantification;
+			log.error(msg);
+			throw new IllegalArgumentException(msg);
+		}
 	}
 	
-	//maybe make this a constructor
-	protected void fill(AbstractResults record) throws SQLException{
-		id = record.getInt("id");
-		taxon = record.getInt("taxon");
-		substrate = record.getInt("substrate");
-		anatomy = record.getInt("anatomy");
-		quantification = record.getString("quantification");
-		label = record.getString("label");
-		generated_id = record.getString("generated_id");
-		publication_taxon = record.getString("publication_taxon");
-		publication_anatomy = record.getString("publication_anatomy");
-		publication_substrate = record.getString("publication_substrate");
-	}
 
 	public int get_id(){
 		return id;
-	}
-	
-	public String get_generated_id(){
-		return generated_id;
-	}
-	
-	public void set_generated_id(String s){
-		generated_id = s;
-	}
-
-	public String get_available_id(){
-		return get_generated_id();
 	}
 	
 	public int get_taxon(){

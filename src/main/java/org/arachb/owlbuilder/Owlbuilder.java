@@ -6,8 +6,7 @@ package org.arachb.owlbuilder;
  */
 
 import java.io.File;
-import java.net.URL;
-import java.net.URLEncoder;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -19,10 +18,12 @@ import org.arachb.owlbuilder.lib.Assertion;
 import org.arachb.owlbuilder.lib.Config;
 import org.arachb.owlbuilder.lib.DBConnection;
 import org.arachb.owlbuilder.lib.IRIManager;
+import org.arachb.owlbuilder.lib.IndividualParticipant;
 import org.arachb.owlbuilder.lib.Mireot;
 import org.arachb.owlbuilder.lib.Participant;
 import org.arachb.owlbuilder.lib.Publication;
-import org.arachb.owlbuilder.lib.Taxon;
+import org.arachb.owlbuilder.lib.QuantifiedParticipant;
+import org.arachb.owlbuilder.lib.Term;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLClass;
@@ -30,6 +31,7 @@ import org.semanticweb.owlapi.model.OWLClassAssertionAxiom;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLIndividual;
+import org.semanticweb.owlapi.model.OWLObject;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLObjectPropertyAssertionAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
@@ -144,22 +146,7 @@ public class Owlbuilder {
 		final OWLClass pubAboutInvestigationClass = factory.getOWLClass(IRIManager.pubAboutInvestigation);
 		final Set<Publication> pubs = connection.getPublications();
 		for (Publication pub : pubs){
-			IRI pubID;
-			if(pub.get_doi() != null){
-				IRI clean = cleanupDOI(pub.get_doi());
-				pubID = clean;
-				if (pub.get_generated_id() != null){
-				//TODO check for existing arachb id - generate owl:sameas
-				}
-			}
-			else if (pub.get_generated_id() == null){ //generate arachb IRI (maybe temporary)
-				pubID = iriManager.getARACHB_IRI();
-				pub.set_generated_id(pubID.toString());
-				connection.updatePublication(pub);
-			}
-			else{
-				pubID = IRI.create(pub.get_generated_id());
-			}
+			IRI pubID = IRI.create(pub.getIRI_String());
 			OWLIndividual pub_ind = factory.getOWLNamedIndividual(pubID);
 			OWLClassAssertionAxiom classAssertion = 
 					factory.getOWLClassAssertionAxiom(pubAboutInvestigationClass, pub_ind); 
@@ -174,39 +161,24 @@ public class Owlbuilder {
 		OWLClass behaviorProcess = factory.getOWLClass(IRI.create("http://purl.obolibrary.org/obo/NBO_0000313")); 
 		final Set<Assertion> assertions = connection.getAssertions();
 		for (Assertion a : assertions){
-			//TODO check for existing arachb id, don't generate new one
-			if (a.get_generated_id() == null){
-				final IRI assertID = iriManager.getARACHB_IRI();
-				a.set_generated_id(assertID.toString());
-				connection.updateAssertion(a);
-			}
+			iriManager.validateIRI(a);
 			final Participant primary = connection.getPrimaryParticipant(a);
-			final Set<Participant> participants = connection.getParticipants(a);
-			for (Participant p : participants){
-				
+			OWLObject owlPrimary = primary.generateOWL(ontology,factory,iriManager);
+			final Set<Participant> otherParticipants = connection.getParticipants(a);
+			for (Participant p : otherParticipants){
+				OWLObject owlRep = p.generateOWL(ontology,factory,iriManager);
 			}
 			//find the behavior id
 			
 			//find the publication id
-			IRI publication_id;
 			Publication p = connection.getPublication(a.get_publication());
-			if (p != null){
-				if(p.get_doi() != null && p.get_doi() != ""){
-					IRI clean = cleanupDOI(p.get_doi());
-					publication_id = clean;
-				}
-				else
-					publication_id = IRI.create(p.get_available_id());
-			}
-			else {
-				publication_id = null;
-			}
+			IRI publication_id = IRI.create(p.getIRI_String());
 			//Complete hack - denotes some behavior process
 			OWLClassExpression denotesExpr = 
  			   factory.getOWLObjectSomeValuesFrom(denotesProp,behaviorProcess); 
 			OWLClassExpression intersectExpr =
 					factory.getOWLObjectIntersectionOf(textualEntityClass,denotesExpr);
-			OWLIndividual assert_ind = factory.getOWLNamedIndividual(IRI.create(a.get_generated_id()));
+			OWLIndividual assert_ind = factory.getOWLNamedIndividual(IRI.create(a.getIRI_String()));
 			OWLClassAssertionAxiom textClassAssertion = 
 					factory.getOWLClassAssertionAxiom(intersectExpr, assert_ind); 
 			manager.addAxiom(ontology, textClassAssertion);
@@ -219,35 +191,26 @@ public class Owlbuilder {
  		}		
 	}
 	
+	OWLObject addIndividualParticipant(IndividualParticipant p, OWLOntology o) throws SQLException{
+		//TODO check for existing arachb id, don't generate new one
+		OWLClassExpression headClass = null;
+		if (p.get_taxon() != 0){
+			Term taxon_term = connection.getTerm(p.get_taxon());
+			taxon_term.get_id();
+		}
+			OWLIndividual assert_ind = factory.getOWLNamedIndividual(IRI.create(p.getIRI_String()));
+		return null;
+	}
 	
-	
-	private void generateTaxonMiriotReport(HashMap<IRI,String> taxonomyMap) throws Exception{
-		mireot.setSourceTerms(taxonomyMap);
-		mireot.setSourceOntology("NCBITaxon");
-		mireot.setTargetOntology(IRI.create(taxonomyTarget));
-		mireot.setTop("http://purl.obolibrary.org/obo/NCBITaxon_6893", "Araneae");
-		mireot.generateRequest();
-		
+	OWLObject addQuantifiedParticipant(QuantifiedParticipant p, OWLOntology o) throws SQLException{
+		//OWLPropertyExpression prop = factory.getOWLObjectSomeValuesFrom(arg0, arg1);  //placeholder
+		//OWLClassExpression assert_some_expr = 
+		//	factory.getOWLObjectSomeValuesFrom(prop, null); // arg1);
+		return null;
 	}
 	
 	
-	/**
-	 * This cleans up doi's (which tend to have lots of URI unfriendly characters) and returns a properly prefixed doi
-	 * @param doi
-	 * @return IRI using using doi prefix
-	 * @throws Exception either MalformedURL or Encoding exceptions can be thrown
-	 */
-	private IRI cleanupDOI(String doi) throws Exception{
-		URL raw = new URL(doi);
-		String cleanpath = URLEncoder.encode(raw.getPath().substring(1),"UTF-8");
-		if (log.isDebugEnabled()){
-			log.debug("raw is " + raw);
-		}
-		if (log.isDebugEnabled()){
-			log.debug("clean path is " + cleanpath);
-		}
-		return IRI.create("http://dx.doi.org/",cleanpath);
-	}
+	
 	
 	OWLOntologyManager getOntologyManager(){
 		return manager;

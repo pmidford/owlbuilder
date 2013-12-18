@@ -1,9 +1,12 @@
 package org.arachb.owlbuilder.lib;
 
-import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class Term {
+import org.semanticweb.owlapi.model.OWLDataFactory;
+import org.semanticweb.owlapi.model.OWLObject;
+import org.semanticweb.owlapi.model.OWLOntology;
+
+public class Term implements AbstractNamedEntity{
 
 	private int id;
 	private String source_id;
@@ -33,12 +36,12 @@ public class Term {
 		return Term.TABLEQUERY;
 	}
 	
-	public static String getUpdateStatement(){
+	public String getUpdateStatement(){
 		return Term.ROWUPDATE;
 	}
 
 	//maybe make this a constructor
-	protected void fill(AbstractResults record) throws SQLException{
+	public void fill(AbstractResults record) throws SQLException{
 		id = record.getInt("id");
 		source_id = record.getString("source_id");
 		domain = record.getInt("domain");
@@ -53,7 +56,7 @@ public class Term {
 		return id;
 	}
 	
-	public String get_available_id(){
+	public String getIRI_String(){
 		if (get_source_id() == null){
 			return get_generated_id();
 		}
@@ -62,6 +65,7 @@ public class Term {
 		}
 	}
 
+	
 	public String get_source_id(){
 		return source_id;
 	}
@@ -86,9 +90,16 @@ public class Term {
 		return generated_id;
 	}
 
-	//Just updates the id in the bean - method for updating db is in DBConnection
-	public void set_generated_id(String new_id){
+	public void setGeneratedID(String new_id){
 		generated_id = new_id;
 	}
+	
+	@Override
+	public OWLObject generateOWL(OWLOntology o, OWLDataFactory factory,
+			IRIManager iriManager) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 
 }

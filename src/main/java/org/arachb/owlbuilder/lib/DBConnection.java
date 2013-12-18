@@ -15,7 +15,6 @@ import java.util.Properties;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.arachb.owlbuilder.Owlbuilder;
 
 
 
@@ -144,14 +143,14 @@ public class DBConnection implements AbstractConnection{
 		return result;
 	}
 	
-	public void updatePublication(Publication pub) throws SQLException{
+	public void updateNamedEntity(AbstractNamedEntity e) throws SQLException{
 		PreparedStatement updateStatement = 
-				c.prepareStatement(Publication.getUpdateStatement());
-		updateStatement.setString(1, pub.get_generated_id());
-		updateStatement.setInt(2,pub.get_id());
+				c.prepareStatement(e.getUpdateStatement());
+		updateStatement.setString(1, e.getIRI_String());
+		updateStatement.setInt(2,e.get_id());
 		int count = updateStatement.executeUpdate();
 		if (count != 1){
-			logger.error("publication update failed; row count = " + count);
+			logger.error("entity update failed; row count = " + count);
 		}
 	}
 	
@@ -183,17 +182,6 @@ public class DBConnection implements AbstractConnection{
 		return result;
 	}
 	
-	public void updateTerm(Term a) throws SQLException{
-		PreparedStatement updateStatement = 
-				c.prepareStatement(Term.getUpdateStatement());
-		updateStatement.setString(1, a.get_generated_id());
-		updateStatement.setInt(2,a.get_id());
-		int count = updateStatement.executeUpdate();
-		if (count != 1){
-			logger.error("term update failed; row count = " + count);
-		}
-	}
-
 	public Assertion getAssertion(int id) throws SQLException{
 		final PreparedStatement assertionStatement = c.prepareStatement(Assertion.getRowQuery());
 		assertionStatement.setInt(1, id);
@@ -221,18 +209,7 @@ public class DBConnection implements AbstractConnection{
 		}
 		return result;
 	}
-	
-	public void updateAssertion(Assertion a) throws SQLException{
-		PreparedStatement updateStatement = 
-				c.prepareStatement(Assertion.getUpdateStatement());
-		updateStatement.setString(1, a.get_generated_id());
-		updateStatement.setInt(2,a.get_id());
-		int count = updateStatement.executeUpdate();
-		if (count != 1){
-			logger.error("assertion update failed; row count = " + count);
-		}
-	}
-	
+		
 	
 	public Participant getPrimaryParticipant(Assertion a) throws SQLException{
 		PreparedStatement participantStatement =
@@ -241,7 +218,7 @@ public class DBConnection implements AbstractConnection{
 		final ResultSet r = participantStatement.executeQuery();
 		final AbstractResults participantSet = new DBResults(r);
 		if (participantSet.next()){
-			Participant result = new Participant();
+			Participant result = Participant.makeParticipant(participantSet);
 			result.fill(participantSet);
 			if (participantSet.next()){
 				log.error("Assertion " + a.get_id() + " has more than one primary participant");
@@ -265,23 +242,13 @@ public class DBConnection implements AbstractConnection{
 		final ResultSet r = participantsStatement.executeQuery();
 		final AbstractResults participantSet = new DBResults(r);
 		while (participantSet.next()){
-			Participant p = new Participant();
-			p.fill(participantSet);
+			Participant p = Participant.makeParticipant(participantSet);
 			result.add(p);
 		}
 		return result;
 	}
 
-	public void updateParticipant(Participant p) throws SQLException{
-		PreparedStatement updateStatement = 
-				c.prepareStatement(Participant.getUpdateStatement());
-		updateStatement.setString(1, p.get_generated_id());
-		updateStatement.setInt(2,p.get_id());
-		int count = updateStatement.executeUpdate();
-		if (count != 1){
-			logger.error("term update failed; row count = " + count);
-		}
-	}
+	
 	
 	
 	private final String ONTOLOGYSOURCEQUERY = "SELECT source_url,domain FROM ontology_source";

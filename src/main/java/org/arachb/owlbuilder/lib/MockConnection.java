@@ -58,9 +58,9 @@ public class MockConnection implements AbstractConnection {
 	private static MockResults mockPrimaryParticipantResults = new MockResults();
 	static {
 		mockPrimaryParticipantResults.setInteger("id",1);
-		mockPrimaryParticipantResults.setInteger("taxon",2);
+		mockPrimaryParticipantResults.setInteger("taxon",1);
 		mockPrimaryParticipantResults.setInteger("substrate",3);
-		mockPrimaryParticipantResults.setInteger("anatomy",4);
+		mockPrimaryParticipantResults.setInteger("anatomy",2);
 		mockPrimaryParticipantResults.setString("quantification","some");
 		mockPrimaryParticipantResults.setString("generated_id","");
 		mockPrimaryParticipantResults.setString("label","");
@@ -148,12 +148,6 @@ public class MockConnection implements AbstractConnection {
 		return results;
 	}
 
-	@Override
-	public void updatePublication(Publication pub) throws SQLException {
-		mockPublicationResults.setString("generated_id", pub.get_generated_id());
-		// TODO Auto-generated method stub
-		
-	}
 
 	@Override
 	public Term getTerm(int i) throws SQLException {
@@ -175,30 +169,22 @@ public class MockConnection implements AbstractConnection {
 		
 	}
 
-	@Override
-	public void updateTerm(Term testTerm) throws SQLException {
-		mockTermResults.setString("generated_id", testTerm.get_generated_id());
-	}
-
 	
 	@Override
 	public Participant getPrimaryParticipant(Assertion a) throws SQLException {
-		Participant result = new Participant();
-        result.fill(mockPrimaryParticipantResults);
+		Participant result = Participant.makeParticipant(mockPrimaryParticipantResults);
 		return result;
 	}
 
 	@Override
 	public Set<Participant> getParticipants(Assertion a) throws SQLException {
 		Set<Participant> results = new HashSet<Participant>();
-		Participant p1 = new Participant();
-		p1.fill(mockSecondaryParticipantResults);
+		Participant p1 = Participant.makeParticipant(mockSecondaryParticipantResults);
 		results.add(p1);
 		return results;
 	}
 
-	@Override
-	public void updateParticipant(Participant p) throws SQLException{
+	public void updateParticipant(IndividualParticipant p) throws SQLException{
 		mockPrimaryParticipantResults.setString("generated_id", p.get_generated_id());
 	}
 
@@ -220,8 +206,8 @@ public class MockConnection implements AbstractConnection {
 	}
 
 	@Override
-	public void updateAssertion(Assertion a) throws SQLException {
-		mockAssertionResults.setString("generated_id", a.get_generated_id());		
+	public void updateNamedEntity(AbstractNamedEntity e) throws SQLException{
+		mockAssertionResults.setString("generated_id", e.getIRI_String());		
 	}
 
 	@Override
@@ -233,6 +219,7 @@ public class MockConnection implements AbstractConnection {
 	public Map<String, String> loadOntologyNamesForLoading() throws SQLException {
 		return mockOntologyNamesMap;
 	}
+
 
 
 }

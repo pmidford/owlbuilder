@@ -2,7 +2,11 @@ package org.arachb.owlbuilder.lib;
 
 import java.sql.SQLException;
 
-public class Assertion {
+import org.semanticweb.owlapi.model.OWLDataFactory;
+import org.semanticweb.owlapi.model.OWLObject;
+import org.semanticweb.owlapi.model.OWLOntology;
+
+public class Assertion implements AbstractNamedEntity{
 	
 	private int id;
 	private int publication;
@@ -12,7 +16,7 @@ public class Assertion {
 	private String publication_taxon;
 	private String publication_anatomy;
 	private int evidence;
-	private String generated_id;
+	private String generated_id = null;  //for validity checking
 	
 	static final Assertion dummy = new Assertion(); 
 	
@@ -29,7 +33,6 @@ public class Assertion {
 	static final private String ROWUPDATE = "UPDATE assertion " +
 			"SET generated_id = ? WHERE id = ?";
 	
-
 	
 	public static String getRowQuery(){
 		return Assertion.ROWQUERY;
@@ -39,14 +42,15 @@ public class Assertion {
 		return Assertion.TABLEQUERY;
 	}
 	
-	public static String getUpdateStatement(){
+	@Override
+	public String getUpdateStatement(){
 		return Assertion.ROWUPDATE;
 	}
 	
-
 	
 	//maybe make this a constructor
-	protected void fill(AbstractResults record) throws SQLException{
+	@Override
+	public void fill(AbstractResults record) throws SQLException{
 		id = record.getInt("id");
 		publication = record.getInt("publication");
 		publication_behavior = record.getString("publication_behavior");
@@ -58,7 +62,7 @@ public class Assertion {
 		generated_id = record.getString("generated_id");
 	}
 
-	
+	@Override
 	public int get_id(){
 		return id;
 	}
@@ -91,11 +95,24 @@ public class Assertion {
 		return evidence;
 	}
 	
-	public String get_generated_id(){
+	@Override
+	public String getIRI_String(){
+		if (generated_id == null){
+			throw new IllegalStateException("Publication has neither doi nor generated id");
+		}
 		return generated_id;
 	}
 
-	public void set_generated_id(String id){
+
+	@Override
+	public void setGeneratedID(String id){
 		generated_id = id;
+	}
+
+	@Override
+	public OWLObject generateOWL(OWLOntology o, OWLDataFactory factory,
+			IRIManager iriManager) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

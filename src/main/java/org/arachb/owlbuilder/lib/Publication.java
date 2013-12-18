@@ -1,8 +1,18 @@
 package org.arachb.owlbuilder.lib;
 
+import java.net.URL;
+import java.net.URLEncoder;
 import java.sql.SQLException;
 
-public class Publication {
+import org.apache.log4j.Logger;
+import org.arachb.owlbuilder.Owlbuilder;
+import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLDataFactory;
+import org.semanticweb.owlapi.model.OWLObject;
+import org.semanticweb.owlapi.model.OWLOntology;
+
+
+public class Publication implements AbstractNamedEntity{
 
 	private int id;
 	private String publication_type;
@@ -40,6 +50,9 @@ public class Publication {
 	static final private String ROWUPDATE = "UPDATE publication " +
 			"SET generated_id = ? WHERE id = ?";
 	
+	private static Logger log = Logger.getLogger(Owlbuilder.class);
+
+	
 	public static String getRowQuery(){
 		return Publication.ROWQUERY;
 	}
@@ -48,13 +61,13 @@ public class Publication {
 		return Publication.TABLEQUERY;
 	}
 	
-	public static String getUpdateStatement(){
+	public String getUpdateStatement(){
 		return Publication.ROWUPDATE;
 	}
 
 	
-	//maybe make this a constructor
-	protected void fill(AbstractResults record) throws SQLException{
+	@Override
+	public void fill(AbstractResults record) throws SQLException{
 		id = record.getInt("id");
 		publication_type = record.getString("publication_type");
 		dispensation = record.getString("dispensation");
@@ -81,14 +94,6 @@ public class Publication {
 		return id;
 	}
 	
-	public String get_available_id(){
-		if (get_doi() == null){
-			return get_generated_id();
-		}
-		else {
-			return get_doi();
-		}
-	}
 
 	
 	public String get_publication_type(){
@@ -168,8 +173,68 @@ public class Publication {
 	}
 	
 	//Just updates the id in the bean - method for updating db is in DBConnection
-	public void set_generated_id(String new_id){
-		generated_id = new_id;
+	@Override
+	public void setGeneratedID(String id) {
+		generated_id = id;
 	}
+
+	@Override
+	public String getIRI_String() {
+		if (get_doi() == null){
+			if (generated_id == null){
+				throw new IllegalStateException("Publication has neither doi nor generated id");
+			}
+			return get_generated_id();
+		}
+		else {
+			return get_doi();
+		}
+	}
+	
+	/**
+	 * This cleans up doi's (which tend to have lots of URI unfriendly characters) and returns a properly prefixed doi
+	 * @param doi
+	 * @return IRI using using doi prefix
+	 * @throws Exception either MalformedURL or Encoding exceptions can be thrown
+	 */
+	private String cleanupDOI(String doi) throws Exception{
+		URL raw = new URL(doi);
+		String cleanpath = URLEncoder.encode(raw.getPath().substring(1),"UTF-8");
+		if (log.isDebugEnabled()){
+			log.debug("raw is " + raw);
+		}
+		if (log.isDebugEnabled()){
+			log.debug("clean path is " + cleanpath);
+		}
+		return IRI.create("http://dx.doi.org/",cleanpath).toString();
+	}
+
+	private void processStuff(IRIManager iriManager,AbstractConnection connection) throws Exception{
+		String pubID;
+		if(get_doi() != null){
+			String clean = cleanupDOI(get_doi());
+			pubID = clean;
+			if (get_generated_id() != null){
+			//TODO check for existing arachb id - generate owl:sameas - general, should be somewhere else
+			}
+		}
+		else if (get_generated_id() == null){ //generate arachb IRI (maybe temporary)
+			pubID = iriManager.generateARACHB_IRI_String();
+			setGeneratedID(pubID);
+			//connection.updatePublication(this);
+		}
+		else{
+			pubID = get_generated_id();
+		}
+
+	}
+	
+	@Override
+	public OWLObject generateOWL(OWLOntology o, OWLDataFactory factory,
+			IRIManager iriManager) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 	
 }
