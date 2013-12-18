@@ -14,10 +14,11 @@ All original code is copyright 2013 Peter E. Midford
 
 ## Building
 
-Use maven (3.0 recommended, 2.x may work) to build.  It was developed under Java 6, has not been tested under Java 7 or 5.
+Use maven (3.0 recommended, 2.x may work) to build.  It was developed under Java 6, but at least builds and tests under Java 7 (using Travis-CI).
 
 ## Configuration
-This tool assumes you have an arachadmin database installed on a MySQL server.  
+This tool assumes you have an arachadmin database installed on a MySQL server.  See the arachadmin project for a tool to populate and maintain
+this database.
 
 ## Use
 
