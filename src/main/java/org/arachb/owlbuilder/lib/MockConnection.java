@@ -26,12 +26,37 @@ public class MockConnection implements AbstractConnection {
 		mockPublicationResults.setString("page_range","");
 		mockPublicationResults.setString("publication_date","");
 		mockPublicationResults.setString("publication_year","");
-		mockPublicationResults.setString("doi","");
-		mockPublicationResults.setString("generated_id","");
+		mockPublicationResults.setString("doi",
+				                         "http://dx.doi.org/10.1636/0161-8202(2000)028[0097:HDLHAB]2.0.CO;2");
+		mockPublicationResults.setString("generated_id",null);
         mockPublicationResults.setString("curation_status","");
         mockPublicationResults.setString("curation_update","");
-
 	}
+	
+	private static MockResults mockPublicationResults2 = new MockResults();
+	static {
+		mockPublicationResults2.setInteger("id", 2);
+		mockPublicationResults2.setString("publication_type","Journal");
+		mockPublicationResults2.setString("dispensation","");
+		mockPublicationResults2.setString("downloaded","");
+		mockPublicationResults2.setString("reviewed","");
+		mockPublicationResults2.setString("title","");
+		mockPublicationResults2.setString("alternate_title","");
+		mockPublicationResults2.setString("author_list","");
+		mockPublicationResults2.setString("editor_list","");
+		mockPublicationResults2.setString("source_publication","");
+		mockPublicationResults2.setInteger("volume",1);
+		mockPublicationResults2.setString("issue","");
+		mockPublicationResults2.setString("serial_identifier","");
+		mockPublicationResults2.setString("page_range","");
+		mockPublicationResults2.setString("publication_date","");
+		mockPublicationResults2.setString("publication_year","");
+		mockPublicationResults2.setString("doi", null);
+		mockPublicationResults2.setString("generated_id","http://arachb.org/arachb/TEST_0000001");
+        mockPublicationResults2.setString("curation_status","");
+        mockPublicationResults2.setString("curation_update","");
+	}
+
 	private static MockResults mockTermResults = new MockResults();
 	static {
 		mockTermResults.setInteger("id",1);
@@ -135,7 +160,12 @@ public class MockConnection implements AbstractConnection {
 	@Override
 	public Publication getPublication(int get_publication) throws SQLException {
 		Publication result = new Publication();
-        result.fill(mockPublicationResults);
+		if (get_publication == 1){
+			result.fill(mockPublicationResults);
+		}
+		else {
+			result.fill(mockPublicationResults2);			
+		}
 		return result;
 	}
 
@@ -145,6 +175,9 @@ public class MockConnection implements AbstractConnection {
 		Publication p1 = new Publication();
 		p1.fill(mockPublicationResults);
 		results.add(p1);
+		Publication p2 = new Publication();
+		p2.fill(mockPublicationResults);
+		results.add(p2);
 		return results;
 	}
 
@@ -205,9 +238,22 @@ public class MockConnection implements AbstractConnection {
 		return results;
 	}
 
+	// Sort of ugly (do better somehow?)
 	@Override
 	public void updateNamedEntity(AbstractNamedEntity e) throws SQLException{
-		mockAssertionResults.setString("generated_id", e.getIRI_String());		
+		if (e instanceof Publication){
+			if (e.get_id() == 2){
+				mockPublicationResults2.setString("generated_id", e.getIRI_String());
+			}
+		}
+		if (e instanceof Term){
+			if (e.get_id() == 1){
+				mockTermResults.setString("generated_id", e.getIRI_String());
+			}
+		}
+		else{
+			mockAssertionResults.setString("generated_id", e.getIRI_String());		
+		}
 	}
 
 	@Override

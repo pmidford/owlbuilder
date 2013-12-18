@@ -15,6 +15,7 @@ public class TestDBConnection {
 
     private AbstractConnection testConnection;
     private final static String testID = "http://arachb.org/arachb/TEST_0000001";
+    private final static String testTaxon = "http://purl.obolibrary.org/obo/NCBITaxon_336608";
     
 	@Before
 	public void setUp() throws Exception {
@@ -33,29 +34,30 @@ public class TestDBConnection {
 		assertNotNull(testPub);
 		assertEquals(1,testPub.get_id());
 		assertEquals("Journal",testPub.get_publication_type());
-		assertEquals(doi1,testPub.get_generated_id());
+		assertEquals(doi1,testPub.get_doi());
 	}
 
 	@Test
 	public void testgetPublications() throws SQLException{
 		Set<Publication> testSet = testConnection.getPublications();
 		assertNotNull(testSet);
-		assertEquals(1,testSet.size());
+		assertEquals(2,testSet.size());
 	}
 
 	@Test
 	public void testupdatePublication() throws SQLException{
 		Publication testPub = testConnection.getPublication(1);
 		assertNotNull(testPub);
-		String saved_id = testPub.get_generated_id();
-		testPub.setGeneratedID(testID);
-		testConnection.updateNamedEntity(testPub);
-		Publication updatedPub = testConnection.getPublication(1);
-		assertEquals(testID,updatedPub.get_generated_id());
+		assertEquals(null,testPub.get_generated_id());
+		Publication testPub2 = testConnection.getPublication(2);
+		assertEquals(testID,testPub2.get_generated_id());		
+		String saved_id = testPub2.get_generated_id();
+		testPub2.setGeneratedID(doi1);
+		testConnection.updateNamedEntity(testPub2);
+		Publication updatedPub = testConnection.getPublication(2);
+		assertEquals(doi1,updatedPub.getIRI_String());
 		updatedPub.setGeneratedID(saved_id);
 		testConnection.updateNamedEntity(updatedPub);
-		Publication updatePub2 = testConnection.getPublication(1);
-		assertEquals("",updatePub2.get_generated_id());
 	}
 	
 	@Test 
@@ -79,10 +81,10 @@ public class TestDBConnection {
 		Term testTerm = testConnection.getTerm(1);
 		assertNotNull(testTerm);
         String old_id = testTerm.get_generated_id();
-		testTerm.setGeneratedID(testID);
+		testTerm.setGeneratedID(testTaxon);
 		testConnection.updateNamedEntity(testTerm);
 		Term updatedTerm = testConnection.getTerm(1);
-		assertEquals(testID,updatedTerm.get_generated_id());
+		assertEquals(testTaxon,updatedTerm.get_generated_id());
 		updatedTerm.setGeneratedID(old_id);
 		testConnection.updateNamedEntity(updatedTerm);
 		Term updatedTerm2 = testConnection.getTerm(1);
@@ -95,7 +97,6 @@ public class TestDBConnection {
 		Participant testParticipant = testConnection.getPrimaryParticipant(testAssertion);
 		assertNotNull(testParticipant);
 		assertEquals(1,testParticipant.get_id());  //not really the best test...
-		assertEquals(0,testParticipant.get_substrate());
 		assertEquals(1,testParticipant.get_taxon());
 		assertEquals(2,testParticipant.get_anatomy());
 	}
