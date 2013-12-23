@@ -10,9 +10,14 @@ public abstract class Participant implements AbstractEntity{
 	static final private String PRIMARYQUERY = "SELECT part.id, " + 
 	"part.taxon, part.substrate, part.anatomy, " +
 	"part.quantification, part.generated_id, part.publication_taxon, " +
-	"part.label, part.publication_anatomy, part.publication_substrate " +
+	"part.label, part.publication_anatomy, part.publication_substrate, " +
+	"taxon.source_id, taxon.generated_id, substrate.source_id, substrate.generated_id, " +
+	"anatomy.source_id, anatomy.generated_id " +
 	"FROM participant2assertion as p2a " + 
 	"JOIN participant AS part ON (p2a.participant = part.id) " +
+	"LEFT JOIN term AS taxon ON (part.taxon = taxon.id) " +
+	"LEFT JOIN term AS substrate ON (part.substrate = substrate.id) " +
+	"LEFT JOIN term AS anatomy ON (part.anatomy = anatomy.id) " +
 	"WHERE p2a.assertion = ? AND p2a.participant_index = 1";
 	
 	static final private String RESTQUERY = "SELECT part.id, " + 
@@ -22,7 +27,15 @@ public abstract class Participant implements AbstractEntity{
 	"FROM participant2assertion as p2a " + 
 	"JOIN participant AS part ON (p2a.participant = part.id) " +
 	"WHERE p2a.assertion = ? AND p2a.participant_index > 1";
+
+	final static String BADTAXONIRI =
+			"Term without IRI referenced as participant taxon; ID = ";
+	final static String BADANATOMYIRI =
+			"Term without IRI referenced as participant anatomy; ID = ";
+	final static String BADSUBSTRATEIRI =
+			"Term without IRI referenced as participant substrate; ID = ";
 	
+
 	int id;
 	int taxon;
 	int substrate;
@@ -33,6 +46,9 @@ public abstract class Participant implements AbstractEntity{
 	String label;
 	String publication_anatomy;
 	String publication_substrate;
+	String taxonIRI;
+	String substrateIRI;
+	String anatomyIRI;
 	
 	public static String getPrimaryQuery(){
 		return Participant.PRIMARYQUERY;
@@ -102,6 +118,46 @@ public abstract class Participant implements AbstractEntity{
 	
 	public String get_publication_substrate(){
 		return publication_substrate;
+	}
+
+	public String get_taxonIRI(){
+		return taxonIRI;
+	}
+	
+	public void set_taxonIRI(String s){
+		taxonIRI = s;
+	}
+	
+	public String get_substrateIRI(){
+		return substrateIRI;
+	}
+	
+	public void set_substrateIRI(String s){
+		substrateIRI= s;
+	}
+	
+	public String get_anatomyIRI(){
+		return anatomyIRI;
+	}
+
+	public void set_anatomyIRI(String s){
+		anatomyIRI = s;
+	}
+	
+	public void updateTerms(DBConnection c) throws SQLException{
+		if (get_taxon() != 0){
+			Term taxonTerm = c.getTerm(get_taxon());
+			set_taxonIRI(taxonTerm.getIRI_String());
+			//now that we've pulled in the taxon, anything else to do?
+		}
+		if (get_anatomy() != 0){
+			Term anatomyTerm = c.getTerm(get_anatomy());
+			set_anatomyIRI(anatomyTerm.getIRI_String());
+		}
+		if (get_substrate() != 0){
+			Term substrateTerm = c.getTerm(get_substrate());
+			set_substrateIRI(substrateTerm.getIRI_String());
+		}
 	}
 
 

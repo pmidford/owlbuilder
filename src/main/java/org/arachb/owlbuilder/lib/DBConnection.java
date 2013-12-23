@@ -220,6 +220,7 @@ public class DBConnection implements AbstractConnection{
 		if (participantSet.next()){
 			Participant result = Participant.makeParticipant(participantSet);
 			result.fill(participantSet);
+			//result.updateTerms(c);
 			if (participantSet.next()){
 				log.error("Assertion " + a.get_id() + " has more than one primary participant");
 				throw new RuntimeException("Assertion " + a.get_id() + " has more than one primary participant");

@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLObject;
 import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyManager;
 
 public class Assertion implements AbstractNamedEntity{
 	
@@ -17,6 +18,9 @@ public class Assertion implements AbstractNamedEntity{
 	private String publication_anatomy;
 	private int evidence;
 	private String generated_id = null;  //for validity checking
+	private String publicationIRI;
+	private String behaviorIRI;
+	private String evidenceIRI;
 	
 	static final Assertion dummy = new Assertion(); 
 	
@@ -103,6 +107,29 @@ public class Assertion implements AbstractNamedEntity{
 		return generated_id;
 	}
 
+	private String get_publicationIRI(){
+		return publicationIRI;
+	}
+	
+	private void set_publicationIRI(String s){
+		publicationIRI = s;
+	}
+	
+	private String get_behaviorIRI(){
+		return behaviorIRI;
+	}
+	
+	private void set_behaviorIRI(String s){
+		behaviorIRI = s;
+	}
+	
+	private String get_evidenceIRI(){
+		return evidenceIRI;
+	}
+
+	private void set_evidenceIRI(String s){
+		evidenceIRI = s;
+	}
 
 	@Override
 	public void setGeneratedID(String id){
@@ -110,8 +137,7 @@ public class Assertion implements AbstractNamedEntity{
 	}
 
 	@Override
-	public OWLObject generateOWL(OWLOntology o, OWLDataFactory factory,
-			IRIManager iriManager) {
+	public OWLObject generateOWL(OWLOntology o, OWLOntologyManager manager,	IRIManager iriManager) {
 		// TODO Auto-generated method stub
 		return null;
 	}

@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLObject;
 import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyManager;
 
 public class Term implements AbstractNamedEntity{
 
@@ -38,6 +39,13 @@ public class Term implements AbstractNamedEntity{
 	
 	public String getUpdateStatement(){
 		return Term.ROWUPDATE;
+	}
+	
+	static final private String IRIQUERY = 
+			"SELECT id,source_id,generated_id FROM term where term.id = ?";
+
+	public String getIRIQuery(){
+		return Term.IRIQUERY;
 	}
 
 	//maybe make this a constructor
@@ -95,8 +103,7 @@ public class Term implements AbstractNamedEntity{
 	}
 	
 	@Override
-	public OWLObject generateOWL(OWLOntology o, OWLDataFactory factory,
-			IRIManager iriManager) {
+	public OWLObject generateOWL(OWLOntology o, OWLOntologyManager manager, IRIManager iriManager) {
 		// TODO Auto-generated method stub
 		return null;
 	}

@@ -10,6 +10,7 @@ import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLObject;
 import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyManager;
 
 
 public class Publication implements AbstractNamedEntity{
@@ -230,8 +231,7 @@ public class Publication implements AbstractNamedEntity{
 	}
 	
 	@Override
-	public OWLObject generateOWL(OWLOntology o, OWLDataFactory factory,
-			IRIManager iriManager) {
+	public OWLObject generateOWL(OWLOntology o, OWLOntologyManager manager, IRIManager iriManager) {
 		// TODO Auto-generated method stub
 		return null;
 	}

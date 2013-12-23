@@ -154,6 +154,8 @@ public class Owlbuilder {
 		}
 	}
 	
+	//when to get iri's for terms contained in participants?
+	
 	void processAssertions(OWLOntology ontology) throws Exception{
 		final OWLClass textualEntityClass = factory.getOWLClass(IRIManager.textualEntity);
 		final OWLObjectProperty denotesProp = factory.getOWLObjectProperty(IRIManager.denotesProperty);
@@ -163,10 +165,10 @@ public class Owlbuilder {
 		for (Assertion a : assertions){
 			iriManager.validateIRI(a);
 			final Participant primary = connection.getPrimaryParticipant(a);
-			OWLObject owlPrimary = primary.generateOWL(ontology,factory,iriManager);
+			OWLObject owlPrimary = primary.generateOWL(ontology,manager,iriManager);
 			final Set<Participant> otherParticipants = connection.getParticipants(a);
 			for (Participant p : otherParticipants){
-				OWLObject owlRep = p.generateOWL(ontology,factory,iriManager);
+				OWLObject owlRep = p.generateOWL(ontology,manager,iriManager);
 			}
 			//find the behavior id
 			
