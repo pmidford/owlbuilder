@@ -2,7 +2,6 @@ package org.arachb.owlbuilder.lib;
 
 import java.sql.SQLException;
 
-import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLObject;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
@@ -22,8 +21,8 @@ public class QuantifiedParticipant extends Participant {
 		publication_anatomy = record.getString("publication_anatomy");
 		publication_substrate = record.getString("publication_substrate");
 		if (taxon != 0){
-			String taxonSourceID = record.getString("taxon.source_id");
-			String taxonGenID = record.getString("taxon.generated_id");
+			final String taxonSourceID = record.getString("taxon.source_id");
+			final String taxonGenID = record.getString("taxon.generated_id");
 			if (taxonSourceID != null){
 				this.set_taxonIRI(taxonSourceID);
 			}
@@ -35,8 +34,8 @@ public class QuantifiedParticipant extends Participant {
 			}
 		}
 		if (anatomy != 0){
-			String anatomySourceID = record.getString("anatomy.source_id");
-			String anatomyGenID = record.getString("anatomy.generated_id");
+			final String anatomySourceID = record.getString("anatomy.source_id");
+			final String anatomyGenID = record.getString("anatomy.generated_id");
 			if (anatomySourceID != null){
 				this.set_anatomyIRI(anatomySourceID);
 			}

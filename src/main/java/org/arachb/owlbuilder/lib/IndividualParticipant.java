@@ -52,7 +52,7 @@ public class IndividualParticipant extends Participant implements AbstractNamedE
 				this.set_anatomyIRI(anatomyGenID);
 			}
 			else{
-				throw new IllegalStateException(BADANATOMYIRI + taxon);
+				throw new IllegalStateException(BADANATOMYIRI + anatomy);
 			}
 		}
 		if (substrate != 0){
@@ -65,13 +65,11 @@ public class IndividualParticipant extends Participant implements AbstractNamedE
 				this.set_substrateIRI(substrateGenID);
 			}
 			else{
-				throw new IllegalStateException(BADSUBSTRATEIRI + taxon);
+				throw new IllegalStateException(BADSUBSTRATEIRI + substrate);
 			}
 		}
 	}
-	
-	
-	
+		
 	public String getUpdateStatement(){
 		return IndividualParticipant.ROWUPDATE;
 	}
