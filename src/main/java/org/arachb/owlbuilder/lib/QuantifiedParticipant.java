@@ -10,50 +10,44 @@ public class QuantifiedParticipant extends Participant {
 
 	//maybe make this a constructor
 	public void fill(AbstractResults record) throws SQLException{
-		id = record.getInt("id");
-		taxon = record.getInt("taxon");
-		substrate = record.getInt("substrate");
-		anatomy = record.getInt("anatomy");
-		quantification = record.getString("quantification");
-		label = record.getString("label");
-		generated_id = record.getString("generated_id");
-		publication_taxon = record.getString("publication_taxon");
-		publication_anatomy = record.getString("publication_anatomy");
-		publication_substrate = record.getString("publication_substrate");
+		id = record.getInt(DBID);
+		taxon = record.getInt(DBTAXON);
+		substrate = record.getInt(DBSUBSTRATE);
+		anatomy = record.getInt(DBANATOMY);
+		quantification = record.getString(DBQUANTIFICATION);
+		label = record.getString(DBLABEL);
+		generated_id = record.getString(DBGENERATEDID);
+		publication_taxon = record.getString(DBPUBLICATIONTAXON);
+		publication_anatomy = record.getString(DBPUBLICATIONANATOMY);
+		publication_substrate = record.getString(DBPUBLICATIONSUBSTRATE);
 		if (taxon != 0){
-			final String taxonSourceID = record.getString("taxon.source_id");
-			final String taxonGenID = record.getString("taxon.generated_id");
-			if (taxonSourceID != null){
-				this.set_taxonIRI(taxonSourceID);
+			if (record.getString(DBTAXONSOURCEID) != null){
+				this.set_taxonIRI(record.getString(DBTAXONSOURCEID));
 			}
-			else if (taxonGenID != null){
-				this.set_taxonIRI(taxonGenID);
+			else if (record.getString(DBTAXONGENERATEDID) != null){
+				this.set_taxonIRI(record.getString(DBTAXONGENERATEDID));
 			}
 			else{
 				throw new IllegalStateException(BADTAXONIRI + taxon);
 			}
 		}
 		if (anatomy != 0){
-			final String anatomySourceID = record.getString("anatomy.source_id");
-			final String anatomyGenID = record.getString("anatomy.generated_id");
-			if (anatomySourceID != null){
-				this.set_anatomyIRI(anatomySourceID);
+			if (record.getString(DBANATOMYSOURCEID) != null){
+				this.set_anatomyIRI(record.getString(DBANATOMYSOURCEID));
 			}
-			else if (anatomyGenID != null){
-				this.set_anatomyIRI(anatomyGenID);
+			else if (record.getString(DBANATOMYGENERATEDID) != null){
+				this.set_anatomyIRI(record.getString(DBANATOMYGENERATEDID));
 			}
 			else{
 				throw new IllegalStateException(BADANATOMYIRI + taxon);
 			}
 		}
 		if (substrate != 0){
-			String substrateSourceID = record.getString("substrate.source_id");
-			String substrateGenID = record.getString("substrate.generated_id");
-			if (substrateSourceID != null){
-				this.set_substrateIRI(substrateSourceID);
+			if (record.getString(DBSUBSTRATESOURCEID) != null){
+				this.set_substrateIRI(record.getString(DBSUBSTRATESOURCEID));
 			}
-			else if (substrateGenID != null){
-				this.set_substrateIRI(substrateGenID);
+			else if (record.getString(DBSUBSTRATEGENERATEDID) != null){
+				this.set_substrateIRI(record.getString(DBSUBSTRATEGENERATEDID));
 			}
 			else{
 				throw new IllegalStateException(BADSUBSTRATEIRI + taxon);

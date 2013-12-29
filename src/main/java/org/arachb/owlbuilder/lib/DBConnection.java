@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -216,6 +217,13 @@ public class DBConnection implements AbstractConnection{
 				c.prepareStatement(Participant.getPrimaryQuery());
 		participantStatement.setInt(1, a.get_id());
 		final ResultSet r = participantStatement.executeQuery();
+		ResultSetMetaData m = r.getMetaData();
+		System.out.println("Column count = " + m.getColumnCount());
+		for (int i=1;i<=m.getColumnCount();i++){
+			String cl = m.getColumnLabel(i);
+			String cn = m.getColumnName(i);
+			System.out.println("column label = " + cl + "; column name = " + cn);
+		}
 		final AbstractResults participantSet = new DBResults(r);
 		if (participantSet.next()){
 			Participant result = Participant.makeParticipant(participantSet);

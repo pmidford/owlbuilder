@@ -15,6 +15,45 @@ import org.semanticweb.owlapi.model.OWLOntologyManager;
 
 public class Publication implements AbstractNamedEntity{
 
+
+	static final int DBID = 1;
+	static final int DBPUBLICATIONTYPE = 2;
+	static final int DBDISPENSATION = 3;
+	static final int DBDOWNLOADED = 4;
+	static final int DBREVIEWED = 5;
+	static final int DBTITLE = 6;
+	static final int DBALTERNATETITLE = 7;
+	static final int DBAUTHORLIST = 8;
+	static final int DBEDITORLIST = 9;
+	static final int DBSOURCEPUBLICATION = 10;
+	static final int DBVOLUME = 11;
+	static final int DBISSUE = 12;
+	static final int DBSERIALIDENTIFIER = 13;
+	static final int DBPAGERANGE = 14;
+	static final int DBPUBLICATIONDATE = 15;
+	static final int DBPUBLICATIONYEAR = 16;
+	static final int DBDOI = 17;
+	static final int DBGENERATEDID = 18;
+	static final int DBCURATIONSTATUS = 19;
+	static final int DBCURATIONUPDATE = 20;
+	
+
+	static final private String ROWQUERY = "SELECT id, publication_type,dispensation," +
+	"downloaded,reviewed,title,alternate_title,author_list,editor_list," +
+	"source_publication, volume,issue,serial_identifier,page_range,publication_date," +
+	"publication_year,doi,generated_id,curation_status,curation_update " +
+	"FROM publication where publication.id = ?";
+	
+	static final private String TABLEQUERY = "SELECT id, publication_type,dispensation," +
+	"downloaded,reviewed,title,alternate_title,author_list,editor_list," +
+	"source_publication,volume,issue,serial_identifier,page_range,publication_date," +
+	"publication_year,doi,generated_id,curation_status, curation_update " +
+	"FROM publication";
+
+	static final private String ROWUPDATE = "UPDATE publication " +
+			"SET generated_id = ? WHERE id = ?";
+	
+
 	private int id;
 	private String publication_type;
 	private String dispensation;
@@ -36,21 +75,6 @@ public class Publication implements AbstractNamedEntity{
 	private String curation_status;
 	private String curation_update;
 	
-	static final private String ROWQUERY = "SELECT id, publication_type,dispensation," +
-	"downloaded,reviewed,title,alternate_title,author_list,editor_list," +
-	"source_publication, volume,issue,serial_identifier,page_range,publication_date," +
-	"publication_year,doi,generated_id,curation_status,curation_update " +
-	"FROM publication where publication.id = ?";
-	
-	static final private String TABLEQUERY = "SELECT id, publication_type,dispensation," +
-	"downloaded,reviewed,title,alternate_title,author_list,editor_list," +
-	"source_publication,volume,issue,serial_identifier,page_range,publication_date," +
-	"publication_year,doi,generated_id,curation_status, curation_update " +
-	"FROM publication";
-	
-	static final private String ROWUPDATE = "UPDATE publication " +
-			"SET generated_id = ? WHERE id = ?";
-	
 	private static Logger log = Logger.getLogger(Owlbuilder.class);
 
 	
@@ -69,26 +93,26 @@ public class Publication implements AbstractNamedEntity{
 	
 	@Override
 	public void fill(AbstractResults record) throws SQLException{
-		id = record.getInt("id");
-		publication_type = record.getString("publication_type");
-		dispensation = record.getString("dispensation");
-		downloaded = record.getString("downloaded");
-		reviewed = record.getString("reviewed");
-		title = record.getString("title");
-		alternate_title = record.getString("alternate_title");
-		author_list = record.getString("author_list");
-		editor_list = record.getString("editor_list");
-		source_publication = record.getString("source_publication");
-		volume = record.getInt("volume");
-		issue = record.getString("issue");
-		serial_identifier = record.getString("serial_identifier");
-		page_range = record.getString("page_range");
-		publication_date = record.getString("publication_date");
-		publication_year = record.getString("publication_year");
-		doi = record.getString("doi");
-		generated_id = record.getString("generated_id");
-        curation_status = record.getString("curation_status");
-        curation_update = record.getString("curation_update");
+		id = record.getInt(DBID);
+		publication_type = record.getString(DBPUBLICATIONTYPE);
+		dispensation = record.getString(DBDISPENSATION);
+		downloaded = record.getString(DBDOWNLOADED);
+		reviewed = record.getString(DBREVIEWED);
+		title = record.getString(DBTITLE);
+		alternate_title = record.getString(DBALTERNATETITLE);
+		author_list = record.getString(DBAUTHORLIST);
+		editor_list = record.getString(DBEDITORLIST);
+		source_publication = record.getString(DBSOURCEPUBLICATION);
+		volume = record.getInt(DBVOLUME);
+		issue = record.getString(DBISSUE);
+		serial_identifier = record.getString(DBSERIALIDENTIFIER);
+		page_range = record.getString(DBPAGERANGE);
+		publication_date = record.getString(DBPUBLICATIONDATE);
+		publication_year = record.getString(DBPUBLICATIONYEAR);
+		doi = record.getString(DBDOI);
+		generated_id = record.getString(DBGENERATEDID);
+        curation_status = record.getString(DBCURATIONSTATUS);
+        curation_update = record.getString(DBCURATIONUPDATE);
 	}
 	
 	public int get_id(){

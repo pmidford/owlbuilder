@@ -9,6 +9,25 @@ import org.semanticweb.owlapi.model.OWLOntologyManager;
 
 public class Term implements AbstractNamedEntity{
 
+	static final private String ROWQUERY = "SELECT id,source_id,domain," +
+		    "authority,label,generated_id,comment " +
+		    "FROM term where term.id = ?";
+		
+	static final private String TABLEQUERY = "SELECT id,source_id,domain," +
+		    "authority,label,generated_id,comment " +
+		    "FROM term";
+			
+	static final private String ROWUPDATE = "UPDATE term " +
+			"SET generated_id = ? WHERE id = ?";
+
+	static final int DBID = 1;
+	static final int DBSOURCEID = 2;
+	static final int DBDOMAIN = 3;
+	static final int DBAUTHORITY = 4;
+	static final int DBLABEL = 5;
+	static final int DBGENERATEDID = 6;
+	static final int DBCOMMENT = 7;
+		
 	private int id;
 	private String source_id;
 	private int domain;
@@ -17,17 +36,6 @@ public class Term implements AbstractNamedEntity{
 	private String generated_id;
 	private String comment;
 	
-	
-	static final private String ROWQUERY = "SELECT id,source_id,domain," +
-	    "authority,label,generated_id,comment " +
-	    "FROM term where term.id = ?";
-	
-	static final private String TABLEQUERY = "SELECT id,source_id,domain," +
-	    "authority,label,generated_id,comment " +
-	    "FROM term";
-		
-	static final private String ROWUPDATE = "UPDATE term " +
-		"SET generated_id = ? WHERE id = ?";
 	
 	public static String getRowQuery(){
 		return Term.ROWQUERY;
@@ -50,13 +58,13 @@ public class Term implements AbstractNamedEntity{
 
 	//maybe make this a constructor
 	public void fill(AbstractResults record) throws SQLException{
-		id = record.getInt("id");
-		source_id = record.getString("source_id");
-		domain = record.getInt("domain");
-		authority = record.getInt("authority");
-		label = record.getString("label");
-		generated_id = record.getString("generated_id");
-		comment = record.getString("comment");
+		id = record.getInt(DBID);
+		source_id = record.getString(DBSOURCEID);
+		domain = record.getInt(DBDOMAIN);
+		authority = record.getInt(DBAUTHORITY);
+		label = record.getString(DBLABEL);
+		generated_id = record.getString(DBGENERATEDID);
+		comment = record.getString(DBCOMMENT);
 	}
 
 	

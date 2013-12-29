@@ -11,7 +11,8 @@ public abstract class Participant implements AbstractEntity{
 	"part.taxon, part.substrate, part.anatomy, " +
 	"part.quantification, part.generated_id, part.publication_taxon, " +
 	"part.label, part.publication_anatomy, part.publication_substrate, " +
-	"taxon.source_id, taxon.generated_id, substrate.source_id, substrate.generated_id, " +
+	"taxon.source_id, taxon.generated_id, " +
+	"substrate.source_id, substrate.generated_id, " +
 	"anatomy.source_id, anatomy.generated_id " +
 	"FROM participant2assertion as p2a " + 
 	"JOIN participant AS part ON (p2a.participant = part.id) " +
@@ -26,7 +27,28 @@ public abstract class Participant implements AbstractEntity{
 	"part.label, part.publication_anatomy, part.publication_substrate " +
 	"FROM participant2assertion as p2a " + 
 	"JOIN participant AS part ON (p2a.participant = part.id) " +
+	"LEFT JOIN term AS taxon ON (part.taxon = taxon.id) " +
+	"LEFT JOIN term AS substrate ON (part.substrate = substrate.id) " +
+	"LEFT JOIN term AS anatomy ON (part.anatomy = anatomy.id) " +
 	"WHERE p2a.assertion = ? AND p2a.participant_index > 1";
+
+	
+	final static int DBID = 1;
+	final static int DBTAXON = 2;
+	final static int DBSUBSTRATE = 3;
+	final static int DBANATOMY = 4;
+	final static int DBQUANTIFICATION = 5;
+	final static int DBLABEL = 6;
+	final static int DBGENERATEDID = 7;
+	final static int DBPUBLICATIONTAXON = 8;
+	final static int DBPUBLICATIONANATOMY = 9;
+	final static int DBPUBLICATIONSUBSTRATE = 10;
+	final static int DBTAXONSOURCEID = 11;
+	final static int DBTAXONGENERATEDID = 12;
+	final static int DBANATOMYSOURCEID = 13;
+    final static int DBANATOMYGENERATEDID = 14;
+    final static int DBSUBSTRATESOURCEID = 15;
+    final static int DBSUBSTRATEGENERATEDID = 16;
 
 	final static String BADTAXONIRI =
 			"Term without IRI referenced as participant taxon; ID = ";
@@ -34,8 +56,8 @@ public abstract class Participant implements AbstractEntity{
 			"Term without IRI referenced as participant anatomy; ID = ";
 	final static String BADSUBSTRATEIRI =
 			"Term without IRI referenced as participant substrate; ID = ";
-	
 
+    
 	int id;
 	int taxon;
 	int substrate;
@@ -65,7 +87,7 @@ public abstract class Participant implements AbstractEntity{
 
 	
 	public static Participant makeParticipant(AbstractResults record) throws SQLException{
-		final String quantification = record.getString("quantification");
+		final String quantification = record.getString(DBQUANTIFICATION);
 		if (INDIVIDUALQUANTIFIER.equalsIgnoreCase(quantification)){
 			IndividualParticipant result = new IndividualParticipant();
 			result.fill(record);

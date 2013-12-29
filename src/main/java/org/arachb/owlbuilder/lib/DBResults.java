@@ -12,12 +12,12 @@ public class DBResults implements AbstractResults {
 	}
 	
 	@Override
-	public int getInt(String field) throws SQLException{
+	public int getInt(int field) throws SQLException{
 		return results.getInt(field);
 	}
 
 	@Override
-	public String getString(String field) throws SQLException{
+	public String getString(int field) throws SQLException{
 		return results.getString(field);
 	}
 

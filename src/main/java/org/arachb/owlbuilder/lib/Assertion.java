@@ -8,6 +8,30 @@ import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 
 public class Assertion implements AbstractNamedEntity{
+
+	static final private String ROWQUERY = "SELECT id, publication, " +
+	"publication_behavior, behavior_term, publication_taxon, taxon," +
+	"publication_anatomy, evidence, generated_id " +
+    "FROM assertion where assertion.id = ?";
+
+	static final private String TABLEQUERY = "SELECT id, publication, " +
+	"publication_behavior, behavior_term, publication_taxon, taxon, " +
+    "publication_anatomy, evidence, generated_id " +
+	"FROM assertion";
+	
+	static final private String ROWUPDATE = "UPDATE assertion " +
+			"SET generated_id = ? WHERE id = ?";
+	
+
+	final static int DBID = 1;
+	final static int DBPUBLICATION = 2;
+	final static int DBPUBLICATIONBEHAVIOR = 3;
+	final static int DBBEHAVIORTERM = 4;
+	final static int DBPUBLICATIONTAXON = 5;
+	final static int DBTAXON = 6;
+	final static int DBPUBLICATIONANATOMY = 7;
+	final static int DBEVIDENCE = 8;
+	final static int DBGENERATEDID = 9;
 	
 	private int id;
 	private int publication;
@@ -23,19 +47,6 @@ public class Assertion implements AbstractNamedEntity{
 	private String evidenceIRI;
 	
 	static final Assertion dummy = new Assertion(); 
-	
-	static final private String ROWQUERY = "SELECT id, publication, " +
-	"publication_behavior, behavior_term, publication_taxon, taxon," +
-	"publication_anatomy, evidence, generated_id " +
-    "FROM assertion where assertion.id = ?";
-
-	static final private String TABLEQUERY = "SELECT id, publication, " +
-	"publication_behavior, behavior_term, publication_taxon, taxon, " +
-    "publication_anatomy, evidence, generated_id " +
-	"FROM assertion";
-	
-	static final private String ROWUPDATE = "UPDATE assertion " +
-			"SET generated_id = ? WHERE id = ?";
 	
 	
 	public static String getRowQuery(){
@@ -55,15 +66,15 @@ public class Assertion implements AbstractNamedEntity{
 	//maybe make this a constructor
 	@Override
 	public void fill(AbstractResults record) throws SQLException{
-		id = record.getInt("id");
-		publication = record.getInt("publication");
-		publication_behavior = record.getString("publication_behavior");
-		behavior_term = record.getInt("behavior_term");
-		publication_taxon = record.getString("publication_taxon");
-		taxon = record.getInt("taxon");
-		publication_anatomy = record.getString("publication_anatomy");
-		evidence = record.getInt("evidence");
-		generated_id = record.getString("generated_id");
+		id = record.getInt(DBID);
+		publication = record.getInt(DBPUBLICATION);
+		publication_behavior = record.getString(DBPUBLICATIONBEHAVIOR);
+		behavior_term = record.getInt(DBBEHAVIORTERM);
+		publication_taxon = record.getString(DBPUBLICATIONTAXON);
+		taxon = record.getInt(DBTAXON);
+		publication_anatomy = record.getString(DBPUBLICATIONANATOMY);
+		evidence = record.getInt(DBEVIDENCE);
+		generated_id = record.getString(DBGENERATEDID);
 	}
 
 	@Override

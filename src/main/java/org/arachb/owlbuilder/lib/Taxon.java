@@ -4,14 +4,6 @@ import java.sql.SQLException;
 
 public class Taxon{
 
-	int id;
-	String name;
-	String author;
-	String year;
-	String ottol_id;
-	String ncbi_id;
-	String generated_id;
-	
 	static final private String ROWQUERY = "SELECT id,name,author,year,ottol_id," +
 			"ncbi_id,generated_id " +
 			"FROM taxon where taxon.id = ?";
@@ -28,15 +20,32 @@ public class Taxon{
 		return Taxon.TABLEQUERY;
 	}
 
+	static final int DBID = 1;
+	static final int DBNAME = 2;
+	static final int DBAUTHOR = 3;
+	static final int DBYEAR = 4;
+	static final int DBOTTOLID = 5;
+	static final int DBNCBIID = 6;
+	static final int DBGENERATEDID = 7;
+	
+	int id;
+	String name;
+	String author;
+	String year;
+	String ottol_id;
+	String ncbi_id;
+	String generated_id;
+	
+
 	//maybe make this a constructor
 	protected void fill(AbstractResults record) throws SQLException{
-		id = record.getInt("id");
-		name = record.getString("name");
-		author = record.getString("author");
-		year = record.getString("year");
-		ottol_id = record.getString("ottol_id");
-		ncbi_id = record.getString("ncbi_id");
-		generated_id = record.getString("generated_id");
+		id = record.getInt(DBID);
+		name = record.getString(DBNAME);
+		author = record.getString(DBAUTHOR);
+		year = record.getString(DBYEAR);
+		ottol_id = record.getString(DBOTTOLID);
+		ncbi_id = record.getString(DBNCBIID);
+		generated_id = record.getString(DBGENERATEDID);
 	}
 	
 	public int get_id(){
