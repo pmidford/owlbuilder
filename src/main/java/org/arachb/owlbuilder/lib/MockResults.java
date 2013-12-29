@@ -6,13 +6,13 @@ import java.util.Map;
 
 public class MockResults implements AbstractResults {
 
-	private final Map<String,Integer> intResults = new HashMap<String,Integer>();
-	private final Map<String,String> stringResults = new HashMap<String,String>();
+	private final Map<Integer,Integer> intResults = new HashMap<Integer,Integer>();
+	private final Map<Integer,String> stringResults = new HashMap<Integer,String>();
 	private int count = 0;
 	private int size = 0;
 	
 	@Override
-	public int getInt(String field) throws SQLException {
+	public int getInt(int field) throws SQLException {
 		if (intResults.containsKey(field)){
 			return intResults.get(field);
 		}
@@ -22,7 +22,7 @@ public class MockResults implements AbstractResults {
 	}
 
 	@Override
-	public String getString(String field) throws SQLException {
+	public String getString(int field) throws SQLException {
 		if (stringResults.containsKey(field)){
 			return stringResults.get(field);
 		}
@@ -41,12 +41,12 @@ public class MockResults implements AbstractResults {
 	}
 	
 	
-	public void setInteger(String s,int i){
-		intResults.put(s, i);
+	public void setInteger(int f,int i){
+		intResults.put(f, i);
 	}
 	
-	public void setString(String s, String s2){
-		stringResults.put(s, s2);
+	public void setString(int f, String s){
+		stringResults.put(f, s);
 	}
 
 	public void setSize(int s){
