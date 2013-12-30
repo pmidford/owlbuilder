@@ -85,7 +85,7 @@ public class MockConnection implements AbstractConnection {
 	static {
 		mockPrimaryParticipantResults.setInteger(Participant.DBID,1);
 		mockPrimaryParticipantResults.setInteger(Participant.DBTAXON,1);
-		mockPrimaryParticipantResults.setInteger(Participant.DBSUBSTRATE,3);
+		mockPrimaryParticipantResults.setInteger(Participant.DBSUBSTRATE,0);
 		mockPrimaryParticipantResults.setInteger(Participant.DBANATOMY,2);
 		mockPrimaryParticipantResults.setString(Participant.DBQUANTIFICATION,"some");
 		mockPrimaryParticipantResults.setString(Participant.DBGENERATEDID,"");
@@ -104,9 +104,9 @@ public class MockConnection implements AbstractConnection {
 	private static MockResults mockSecondaryParticipantResults = new MockResults();
 	static {
 		mockSecondaryParticipantResults.setInteger(Participant.DBID,2);
-		mockSecondaryParticipantResults.setInteger(Participant.DBTAXON,4);
-		mockSecondaryParticipantResults.setInteger(Participant.DBSUBSTRATE,6);
-		mockSecondaryParticipantResults.setInteger(Participant.DBANATOMY,8);
+		mockSecondaryParticipantResults.setInteger(Participant.DBTAXON,3);
+		mockSecondaryParticipantResults.setInteger(Participant.DBSUBSTRATE,0);
+		mockSecondaryParticipantResults.setInteger(Participant.DBANATOMY,4);
 		mockSecondaryParticipantResults.setString(Participant.DBQUANTIFICATION,"some");
 		mockSecondaryParticipantResults.setString(Participant.DBGENERATEDID,"");
 		mockSecondaryParticipantResults.setString(Participant.DBLABEL,"");
@@ -218,14 +218,20 @@ public class MockConnection implements AbstractConnection {
 	
 	@Override
 	public Participant getPrimaryParticipant(Assertion a) throws SQLException {
-		Participant result = Participant.makeParticipant(mockPrimaryParticipantResults);
+		final MockResults primaryResults = mockPrimaryParticipantResults;
+		primaryResults.setString(Participant.DBTAXONSOURCEID, mockTermResults.getString(Term.DBSOURCEID));
+		primaryResults.setString(Participant.DBANATOMYSOURCEID, mockTermResults2.getString(Term.DBSOURCEID));
+		Participant result = Participant.makeParticipant(primaryResults);
 		return result;
 	}
 
 	@Override
 	public Set<Participant> getParticipants(Assertion a) throws SQLException {
 		Set<Participant> results = new HashSet<Participant>();
-		Participant p1 = Participant.makeParticipant(mockSecondaryParticipantResults);
+		final MockResults secondaryResults = mockSecondaryParticipantResults;
+		secondaryResults.setString(Participant.DBTAXONSOURCEID, mockTermResults.getString(Term.DBSOURCEID));
+		secondaryResults.setString(Participant.DBANATOMYSOURCEID, mockTermResults2.getString(Term.DBSOURCEID));
+		Participant p1 = Participant.makeParticipant(secondaryResults);
 		results.add(p1);
 		return results;
 	}
