@@ -24,7 +24,10 @@ public abstract class Participant implements AbstractEntity{
 	static final private String RESTQUERY = "SELECT part.id, " + 
 	"part.taxon, part.substrate, part.anatomy, " +
 	"part.quantification, part.generated_id, part.publication_taxon, " +
-	"part.label, part.publication_anatomy, part.publication_substrate " +
+	"part.label, part.publication_anatomy, part.publication_substrate, " +
+	"taxon.source_id, taxon.generated_id, " +
+	"substrate.source_id, substrate.generated_id, " +
+	"anatomy.source_id, anatomy.generated_id " +
 	"FROM participant2assertion as p2a " + 
 	"JOIN participant AS part ON (p2a.participant = part.id) " +
 	"LEFT JOIN term AS taxon ON (part.taxon = taxon.id) " +
@@ -45,18 +48,18 @@ public abstract class Participant implements AbstractEntity{
 	final static int DBPUBLICATIONSUBSTRATE = 10;
 	final static int DBTAXONSOURCEID = 11;
 	final static int DBTAXONGENERATEDID = 12;
-	final static int DBANATOMYSOURCEID = 13;
-    final static int DBANATOMYGENERATEDID = 14;
-    final static int DBSUBSTRATESOURCEID = 15;
-    final static int DBSUBSTRATEGENERATEDID = 16;
+    final static int DBSUBSTRATESOURCEID = 13;
+    final static int DBSUBSTRATEGENERATEDID = 14;
+	final static int DBANATOMYSOURCEID = 15;
+    final static int DBANATOMYGENERATEDID = 16;
 
 	final static String BADTAXONIRI =
-			"Term without IRI referenced as participant taxon; ID = ";
+			"Term without IRI referenced as participant taxon: participant id = %s; taxon id = %s";
 	final static String BADANATOMYIRI =
-			"Term without IRI referenced as participant anatomy; ID = ";
+			"Term without IRI referenced as participant anatomy: participant id = %s; anatomy id = %s";
 	final static String BADSUBSTRATEIRI =
-			"Term without IRI referenced as participant substrate; ID = ";
-
+			"Term without IRI referenced as participant substrate; participant id = %s; substrate id = %s";
+	
     
 	int id;
 	int taxon;
