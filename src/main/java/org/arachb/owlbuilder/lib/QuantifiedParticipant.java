@@ -28,7 +28,8 @@ public class QuantifiedParticipant extends Participant {
 				this.set_taxonIRI(record.getString(DBTAXONGENERATEDID));
 			}
 			else{
-				throw new IllegalStateException(BADTAXONIRI + taxon);
+				final String msg = String.format(BADTAXONIRI, id, taxon);
+				throw new IllegalStateException(msg);
 			}
 		}
 		if (anatomy != 0){
@@ -39,7 +40,8 @@ public class QuantifiedParticipant extends Participant {
 				this.set_anatomyIRI(record.getString(DBANATOMYGENERATEDID));
 			}
 			else{
-				throw new IllegalStateException(BADANATOMYIRI + taxon);
+				final String msg = String.format(BADANATOMYIRI, id, anatomy);
+				throw new IllegalStateException(msg);
 			}
 		}
 		if (substrate != 0){
@@ -50,7 +52,8 @@ public class QuantifiedParticipant extends Participant {
 				this.set_substrateIRI(record.getString(DBSUBSTRATEGENERATEDID));
 			}
 			else{
-				throw new IllegalStateException(BADSUBSTRATEIRI + taxon);
+				final String msg = String.format(BADSUBSTRATEIRI, id, substrate);
+				throw new IllegalStateException(msg);
 			}
 		}
 	}
