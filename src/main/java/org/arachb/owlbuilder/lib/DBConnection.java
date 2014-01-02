@@ -25,6 +25,11 @@ public class DBConnection implements AbstractConnection{
 	
 	static final String TESTPROPERTIESFILE = "TestConnection.properties";
 	
+	
+	//Error strings
+	static final String MULTIPLEPRIMARYPARTICIPANTERROR =
+			"Assertion %s has more than one primary participant";
+	
 	static final Logger logger = Logger.getLogger(DBConnection.class.getName());
 
 	private Connection c;
@@ -217,21 +222,15 @@ public class DBConnection implements AbstractConnection{
 				c.prepareStatement(Participant.getPrimaryQuery());
 		participantStatement.setInt(1, a.get_id());
 		final ResultSet r = participantStatement.executeQuery();
-		ResultSetMetaData m = r.getMetaData();
-		System.out.println("Column count = " + m.getColumnCount());
-		for (int i=1;i<=m.getColumnCount();i++){
-			String cl = m.getColumnLabel(i);
-			String cn = m.getColumnName(i);
-			System.out.println("column label = " + cl + "; column name = " + cn);
-		}
 		final AbstractResults participantSet = new DBResults(r);
 		if (participantSet.next()){
 			Participant result = Participant.makeParticipant(participantSet);
 			result.fill(participantSet);
-			//result.updateTerms(c);
+			
 			if (participantSet.next()){
-				log.error("Assertion " + a.get_id() + " has more than one primary participant");
-				throw new RuntimeException("Assertion " + a.get_id() + " has more than one primary participant");
+				final String msg = String.format(MULTIPLEPRIMARYPARTICIPANTERROR, a.get_id());
+				log.error(msg);
+				throw new RuntimeException(msg);
 			}
 			else{
 				return result;
@@ -286,7 +285,7 @@ public class DBConnection implements AbstractConnection{
 	/**
 	 * 
 	 * @return maps source_urls, which are unique, to domain identifiers
-	 * @throws Exception
+	 * @throws SQLException
 	 */
 	public Map<String,String>loadOntologyNamesForLoading() throws SQLException{
 		final Map<String,String> result = new HashMap<String,String>();
