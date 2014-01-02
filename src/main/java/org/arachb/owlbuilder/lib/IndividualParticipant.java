@@ -37,7 +37,8 @@ public class IndividualParticipant extends Participant implements AbstractNamedE
 				this.set_taxonIRI(record.getString(DBTAXONGENERATEDID));
 			}
 			else{
-				throw new IllegalStateException(BADTAXONIRI + taxon);
+				final String msg = String.format(BADTAXONIRI, id, taxon);
+				throw new IllegalStateException(msg);
 			}
 		}
 		if (anatomy != 0){
@@ -48,7 +49,8 @@ public class IndividualParticipant extends Participant implements AbstractNamedE
 				this.set_anatomyIRI(record.getString(DBANATOMYGENERATEDID));
 			}
 			else{
-				throw new IllegalStateException(BADANATOMYIRI + anatomy);
+				final String msg = String.format(BADANATOMYIRI, id, anatomy);
+				throw new IllegalStateException(msg);
 			}
 		}
 		if (substrate != 0){
@@ -59,7 +61,8 @@ public class IndividualParticipant extends Participant implements AbstractNamedE
 				this.set_substrateIRI(record.getString(DBSUBSTRATEGENERATEDID));
 			}
 			else{
-				throw new IllegalStateException(BADSUBSTRATEIRI + substrate);
+				final String msg = String.format(BADSUBSTRATEIRI, id, substrate);
+				throw new IllegalStateException(msg);
 			}
 		}
 	}
