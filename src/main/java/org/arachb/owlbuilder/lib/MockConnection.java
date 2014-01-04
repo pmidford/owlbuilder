@@ -12,6 +12,7 @@ public class MockConnection implements AbstractConnection {
 	final private static String TESTDOI = 
 			"http://dx.doi.org/10.1636/0161-8202(2000)028[0097:HDLHAB]2.0.CO;2";
 	final private static String TESTARACHBID = "http://arachb.org/arachb/TEST_0000001";
+	final private static String TESTBEHAVIOR = "http://purl.obolibrary.org/obo/NBO_0000355";
 	
 	private static MockResults mockPublicationResults = new MockResults();
 	static {
@@ -133,8 +134,10 @@ public class MockConnection implements AbstractConnection {
 		mockAssertionResults.setInteger(Assertion.DBTAXON, 12);
 		mockAssertionResults.setString(Assertion.DBPUBLICATIONTAXON,"Arachida");
 		mockAssertionResults.setString(Assertion.DBPUBLICATIONANATOMY,"whole body");
-		mockAssertionResults.setInteger(Assertion.DBEVIDENCE,15);
+		mockAssertionResults.setInteger(Assertion.DBEVIDENCE,0);
 		mockAssertionResults.setString(Assertion.DBGENERATEDID,"");
+		mockAssertionResults.setString(Assertion.DBPUBDOI, TESTDOI);
+		mockAssertionResults.setString(Assertion.DBBEHAVIORSOURCEID, TESTBEHAVIOR);
 
 	}
 	
