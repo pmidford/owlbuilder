@@ -67,7 +67,7 @@ public class Assertion implements AbstractNamedEntity{
 			"Term without IRI referenced as assertion evidence; assertion id = %s; evidence id = %s";
 
 	
-	private static Logger log = Logger.getLogger(Assertion.class);
+	private final static Logger log = Logger.getLogger(Assertion.class);
 
 	private int id;
 	private int publication;
@@ -220,6 +220,7 @@ public class Assertion implements AbstractNamedEntity{
 		final OWLClass textualEntityClass = factory.getOWLClass(IRIManager.textualEntity);
 		final OWLObjectProperty denotesProp = factory.getOWLObjectProperty(IRIManager.denotesProperty);
 		final OWLObjectProperty partofProperty = factory.getOWLObjectProperty(IRIManager.partOfProperty);
+		final OWLOntology mergedSupport = builder.getMergedSources();
 		final Participant primary = c.getPrimaryParticipant(this);
 		OWLObject owlPrimary = primary.generateOWL(builder);
 		final Set<Participant> otherParticipants = c.getParticipants(this);

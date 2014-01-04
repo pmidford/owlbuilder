@@ -28,8 +28,10 @@ import org.arachb.owlbuilder.lib.Term;
 import org.semanticweb.elk.owlapi.ElkReasonerFactory;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLAnnotationAssertionAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassAssertionAxiom;
+import org.semanticweb.owlapi.model.OWLClassAxiom;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLIndividual;
@@ -41,6 +43,7 @@ import org.semanticweb.owlapi.model.OWLOntologyFormat;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLOntologySetProvider;
 import org.semanticweb.owlapi.reasoner.InferenceType;
+import org.semanticweb.owlapi.reasoner.NodeSet;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 import org.semanticweb.owlapi.reasoner.structural.StructuralReasonerFactory;
@@ -58,6 +61,8 @@ public class Owlbuilder{
 	private OWLOntology target;
 	private OWLReasoner reasoner;
 	private final Mireot mireot;
+	
+	private final Map<String,IRI>nonNCBITaxa = new HashMap<String,IRI>();
 	
 	private final Map<String,OWLOntology>supportOntologies = new HashMap<String,OWLOntology>();
 	private OWLOntology mergedSources = null;
@@ -109,9 +114,6 @@ public class Owlbuilder{
 		loadImportedOntologies();
 		mergedSources = mergeImportedOntologies();
 		log.info("Initializing reasoner");
-
-
-
 		reasoner = rfactory.createReasoner(mergedSources);
 		log.info("Finished reasoner initialization");
         // Classify the ontology.
@@ -120,16 +122,21 @@ public class Owlbuilder{
         target = manager.createOntology(IRI.create(targetIRI));
 		OWLOntologyFormat format = manager.getOntologyFormat(target);
 		format.asPrefixOWLOntologyFormat().setPrefix("doi", "http://dx.doi.org/");
+		log.info("copying relevant taxonony to target ontology");
+		initializeTaxonomy();
 		processDatabase();
 		reasoner.flush();
 		log.info("Saving ontology");
 		File f = new File(temporaryOutput);
 		manager.saveOntology(target, IRI.create(f.toURI()));
         log.info("Generating HTML pages");
-        log.info("Done");
+        generateHTML();
 	}
 	
 	void shutdown() throws Exception{
+        log.info("Shutting down reasoner");
+        reasoner.dispose();
+        log.info("Done");
 		connection.close();
 	}
 
@@ -201,23 +208,38 @@ public class Owlbuilder{
  		}		
 	}
 	
-	OWLObject addIndividualParticipant(IndividualParticipant p, OWLOntology o) throws SQLException{
-		//TODO check for existing arachb id, don't generate new one
-		OWLClassExpression headClass = null;
-		if (p.get_taxon() != 0){
-			Term taxon_term = connection.getTerm(p.get_taxon());
-			taxon_term.get_id();
+	private void initializeTaxonomy(){
+		OWLClass arachnidaClass = factory.getOWLClass(IRIManager.arachnidaTaxon);
+		final NodeSet<OWLClass> arachnidaParents = reasoner.getSuperClasses(arachnidaClass, false);
+		final NodeSet<OWLClass> arachnidaChildren = reasoner.getSubClasses(arachnidaClass, false);
+		initializeTaxon(arachnidaClass);
+		for (OWLClass c : arachnidaParents.getFlattened()){
+			initializeTaxon(c);
 		}
-			OWLIndividual assert_ind = factory.getOWLNamedIndividual(IRI.create(p.getIRI_String()));
-		return null;
+		for (OWLClass c : arachnidaChildren.getFlattened()){
+			initializeTaxon(c);
+		}
 	}
 	
-	OWLObject addQuantifiedParticipant(QuantifiedParticipant p, OWLOntology o) throws SQLException{
-		//OWLPropertyExpression prop = factory.getOWLObjectSomeValuesFrom(arg0, arg1);  //placeholder
-		//OWLClassExpression assert_some_expr = 
-		//	factory.getOWLObjectSomeValuesFrom(prop, null); // arg1);
-		return null;
+	private void initializeTaxon(OWLClass taxon){
+		Set<OWLClassAxiom> taxonAxioms =  mergedSources.getAxioms(taxon);
+		manager.addAxioms(target, taxonAxioms);
+		//log.info("Annotations");
+		Set<OWLAnnotationAssertionAxiom> taxonAnnotations = 
+				mergedSources.getAnnotationAssertionAxioms(taxon.getIRI());
+		for (OWLAnnotationAssertionAxiom a : taxonAnnotations){
+			//log.info("   Annotation Axiom: " + a.toString());
+			if (a.getAnnotation().getProperty().isLabel()){
+				manager.addAxiom(target, a);
+			}
+		}
 	}
+	
+	
+	private void generateHTML(){
+		
+	}
+	
 	
 	
 	public OWLOntology getTarget(){
@@ -244,7 +266,13 @@ public class Owlbuilder{
 	public OWLOntology getMergedSources(){
 		return mergedSources;
 	}
+	
+	public OWLReasoner getReasoner(){
+		return reasoner;
+	}
 
-		
+	public void addNonNCBITaxon(IRI taxonIRI,String label){
+		nonNCBITaxa.put(label, taxonIRI);
+	}
 	
 }

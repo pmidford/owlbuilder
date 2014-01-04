@@ -35,6 +35,9 @@ public class IRIManager {
 		bfoImports.add(hasParticipantProperty);
 	}
 	
+	public static final IRI arachnidaTaxon = 
+			IRI.create("http://purl.obolibrary.org/obo/NCBITaxon_6854");
+	
 	private int idCounter=0;
 	private AbstractConnection c;
 	

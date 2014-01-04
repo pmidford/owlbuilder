@@ -1,8 +1,15 @@
 package org.arachb.owlbuilder.lib;
 
 import java.sql.SQLException;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.arachb.owlbuilder.Owlbuilder;
+import org.semanticweb.owlapi.model.OWLAnnotationAssertionAxiom;
+import org.semanticweb.owlapi.model.OWLClass;
+import org.semanticweb.owlapi.model.OWLClassAxiom;
+import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyManager;
 
 public abstract class Participant implements AbstractEntity{
 
@@ -71,9 +78,9 @@ public abstract class Participant implements AbstractEntity{
 	String label;
 	String publication_anatomy;
 	String publication_substrate;
-	String taxonIRI;
-	String substrateIRI;
-	String anatomyIRI;
+	String taxonIRI = null;
+	String substrateIRI = null;
+	String anatomyIRI = null;
 	
 	public static String getPrimaryQuery(){
 		return Participant.PRIMARYQUERY;
@@ -169,5 +176,30 @@ public abstract class Participant implements AbstractEntity{
 		anatomyIRI = s;
 	}
 	
+	
+	void processTaxon(Owlbuilder builder,OWLClass taxon){
+		final OWLOntologyManager manager = builder.getOntologyManager();
+		final OWLOntology merged = builder.getMergedSources();
+		final OWLOntology target = builder.getTarget();
+		if (true){  //add appropriate when figured out
+			log.info("Need to add taxon: " + taxon.getIRI());
+			//log.info("Defining Axioms");
+			Set<OWLClassAxiom> taxonAxioms =  merged.getAxioms(taxon);
+			for (OWLClassAxiom a : taxonAxioms){
+				//log.info("   Axiom: " + a.toString());
+			}
+			manager.addAxioms(target, taxonAxioms);
+			//log.info("Annotations");
+			Set<OWLAnnotationAssertionAxiom> taxonAnnotations = merged.getAnnotationAssertionAxioms(taxon.getIRI());
+			for (OWLAnnotationAssertionAxiom a : taxonAnnotations){
+				//log.info("   Annotation Axiom: " + a.toString());
+				if (a.getAnnotation().getProperty().isLabel()){
+					log.info("Label is " + a.getAnnotation().getValue().toString());
+					manager.addAxiom(target, a);
+				}
+			}
+		}
+	}
+
 
 }
