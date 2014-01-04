@@ -16,6 +16,7 @@ public class TestDBConnection {
     private AbstractConnection testConnection;
     private final static String testID = "http://arachb.org/arachb/TEST_0000001";
     private final static String testTaxon = "http://purl.obolibrary.org/obo/NCBITaxon_336608";
+    private final static String testAnatomy = "http://purl.obolibrary.org/obo/SPD_0000001";
     
 	@Before
 	public void setUp() throws Exception {
@@ -92,17 +93,19 @@ public class TestDBConnection {
 	}
 
 	@Test
-	public void testgetPrimaryParticipant() throws SQLException{
+	public void testgetPrimaryParticipant() throws Exception{
 		Assertion testAssertion = testConnection.getAssertion(1);
 		Participant testParticipant = testConnection.getPrimaryParticipant(testAssertion);
 		assertNotNull(testParticipant);
 		assertEquals(1,testParticipant.get_id());  //not really the best test...
 		assertEquals(1,testParticipant.get_taxon());
 		assertEquals(2,testParticipant.get_anatomy());
+		assertEquals(testTaxon,testParticipant.get_taxonIRI());
+		assertEquals(testAnatomy,testParticipant.get_anatomyIRI());
 	}
 	
 	@Test
-	public void testgetParticipants() throws SQLException{
+	public void testgetParticipants() throws Exception{
 		Assertion testAssertion = testConnection.getAssertion(1);
 		Set<Participant> testSet = testConnection.getParticipants(testAssertion);
 		assertNotNull(testSet);
@@ -110,7 +113,7 @@ public class TestDBConnection {
 	}
 	
 	@Test
-	public void testupdateParticipant() throws SQLException{
+	public void testupdateParticipant() throws Exception{
 		Assertion testAssertion = testConnection.getAssertion(1);
 		Participant testParticipant = testConnection.getPrimaryParticipant(testAssertion);
 		assertNotNull(testParticipant);
@@ -126,21 +129,21 @@ public class TestDBConnection {
 
 	
 	@Test
-	public void testgetAssertion() throws SQLException{
+	public void testgetAssertion() throws Exception{
 		Assertion testAssertion = testConnection.getAssertion(1);
 		assertNotNull(testAssertion);
 		assertEquals(1,testAssertion.get_id());
 	}
 	
 	@Test
-	public void testgetAssertions() throws SQLException{
+	public void testgetAssertions() throws Exception{
 		Set<Assertion> testSet = testConnection.getAssertions();
 		assertNotNull(testSet);
 		assertEquals(1,testSet.size());
 	}
 	
 	@Test
-	public void testupdateAssertion() throws SQLException{
+	public void testupdateAssertion() throws Exception{
 		Assertion testAssertion = testConnection.getAssertion(1);
 		assertNotNull(testAssertion);
 		testAssertion.setGeneratedID(testID);
