@@ -2,6 +2,7 @@ package org.arachb.owlbuilder.lib;
 
 import java.sql.SQLException;
 
+import org.arachb.owlbuilder.Owlbuilder;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLDataFactory;
@@ -80,8 +81,8 @@ public class IndividualParticipant extends Participant implements AbstractNamedE
 	}
 
 	@Override
-	public OWLObject generateOWL(OWLOntology o, OWLOntologyManager manager, IRIManager iriManager) {
-		final OWLDataFactory factory = manager.getOWLDataFactory();
+	public OWLObject generateOWL(Owlbuilder builder) {
+		final OWLDataFactory factory = builder.getDataFactory();
 		final OWLObjectProperty partofProperty = factory.getOWLObjectProperty(IRIManager.partOfProperty);
 		IRI individual_id = IRI.create(getIRI_String());
 		OWLIndividual part = factory.getOWLNamedIndividual(individual_id);
@@ -95,6 +96,7 @@ public class IndividualParticipant extends Participant implements AbstractNamedE
 	}
 	
 	private OWLObject generateTaxonOWL(OWLOntology o, OWLOntologyManager manager, IRIManager iriManager){
+		final OWLDataFactory factory = manager.getOWLDataFactory();
 		return null;
 	}
 	

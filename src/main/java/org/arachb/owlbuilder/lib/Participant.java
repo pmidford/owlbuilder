@@ -169,21 +169,5 @@ public abstract class Participant implements AbstractEntity{
 		anatomyIRI = s;
 	}
 	
-	public void updateTerms(DBConnection c) throws SQLException{
-		if (get_taxon() != 0){
-			Term taxonTerm = c.getTerm(get_taxon());
-			set_taxonIRI(taxonTerm.getIRI_String());
-			//now that we've pulled in the taxon, anything else to do?
-		}
-		if (get_anatomy() != 0){
-			Term anatomyTerm = c.getTerm(get_anatomy());
-			set_anatomyIRI(anatomyTerm.getIRI_String());
-		}
-		if (get_substrate() != 0){
-			Term substrateTerm = c.getTerm(get_substrate());
-			set_substrateIRI(substrateTerm.getIRI_String());
-		}
-	}
-
 
 }

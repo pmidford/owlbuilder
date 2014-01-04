@@ -8,6 +8,7 @@ package org.arachb.owlbuilder;
 import java.io.File;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -24,6 +25,7 @@ import org.arachb.owlbuilder.lib.Participant;
 import org.arachb.owlbuilder.lib.Publication;
 import org.arachb.owlbuilder.lib.QuantifiedParticipant;
 import org.arachb.owlbuilder.lib.Term;
+import org.semanticweb.elk.owlapi.ElkReasonerFactory;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLClass;
@@ -37,19 +39,28 @@ import org.semanticweb.owlapi.model.OWLObjectPropertyAssertionAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyFormat;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.semanticweb.owlapi.model.OWLOntologySetProvider;
+import org.semanticweb.owlapi.reasoner.InferenceType;
+import org.semanticweb.owlapi.reasoner.OWLReasoner;
+import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
+import org.semanticweb.owlapi.reasoner.structural.StructuralReasonerFactory;
+import org.semanticweb.owlapi.util.OWLOntologyMerger;
 import org.semanticweb.owlapi.util.SimpleIRIMapper;
 
-public class Owlbuilder {
+public class Owlbuilder{
 
 	
 	private final OWLOntologyManager manager;
 	private final OWLDataFactory factory;
 	private final IRIManager iriManager;
 	private final AbstractConnection connection;
+	private final OWLReasonerFactory rfactory;
+	private OWLOntology target;
+	private OWLReasoner reasoner;
 	private final Mireot mireot;
 	
 	private final Map<String,OWLOntology>supportOntologies = new HashMap<String,OWLOntology>();
-	
+	private OWLOntology mergedSources = null;
 		
 	
 	public static final String targetIRI = "http://arachb.org/arachb/arachb.owl";
@@ -85,6 +96,8 @@ public class Owlbuilder {
 		}
 		manager = OWLManager.createOWLOntologyManager();
 		factory = manager.getOWLDataFactory();
+		//rfactory = new StructuralReasonerFactory();  //change when reasoner is upgraded
+		rfactory = new ElkReasonerFactory();
 		iriManager = new IRIManager(connection);
 		mireot = new Mireot();
 		mireot.setImportDir(config.getImportDir());
@@ -93,14 +106,25 @@ public class Owlbuilder {
 
 	void process() throws Exception{		
 		log.info("Loading ontologies");
-		loadImportedOntologies(connection,config);
-		OWLOntology ontology = manager.createOntology(IRI.create(targetIRI));
-		OWLOntologyFormat format = manager.getOntologyFormat(ontology);
+		loadImportedOntologies();
+		mergedSources = mergeImportedOntologies();
+		log.info("Initializing reasoner");
+
+
+
+		reasoner = rfactory.createReasoner(mergedSources);
+		log.info("Finished reasoner initialization");
+        // Classify the ontology.
+        reasoner.precomputeInferences(InferenceType.CLASS_HIERARCHY);
+        log.info("Finished precomputing class hierarchy");
+        target = manager.createOntology(IRI.create(targetIRI));
+		OWLOntologyFormat format = manager.getOntologyFormat(target);
 		format.asPrefixOWLOntologyFormat().setPrefix("doi", "http://dx.doi.org/");
-		processDatabase(ontology);
+		processDatabase();
+		reasoner.flush();
 		log.info("Saving ontology");
 		File f = new File(temporaryOutput);
-		manager.saveOntology(ontology, IRI.create(f.toURI()));
+		manager.saveOntology(target, IRI.create(f.toURI()));
         log.info("Generating HTML pages");
         log.info("Done");
 	}
@@ -109,27 +133,22 @@ public class Owlbuilder {
 		connection.close();
 	}
 
-	void processDatabase(OWLOntology ontology) throws Exception{
+	void processDatabase() throws Exception{
 		log.info("Processing publications");
-		processPublications(ontology);
+		processPublications();
 		log.info("Processing assertions");
-		processAssertions(ontology);
+		processAssertions();
 	}
 	
 	/**
 	 * This loads the support ontologies specified in the source_ontologies table
-	 * @param connection2
-	 * @param config - retrieve location of support ontology cache
 	 * @throws Exception
 	 */
-	void loadImportedOntologies(AbstractConnection connection, 
-		  	                    Config config) throws Exception{
+	void loadImportedOntologies() throws Exception{
 		final Map <String,String> sourceMap = connection.loadImportSourceMap();
 		final Map <String,String> namesForLoading = connection.loadOntologyNamesForLoading();
 		for (String source : sourceMap.keySet()){
-			String name = namesForLoading.get(source);
-			String msg = String.format("Loading %s from %s", name,source);
-			log.info(msg);
+			log.info(String.format("Loading %s from %s", namesForLoading.get(source), source));
 			IRI iri = IRI.create(source);
 			String sourcePath = iri.toURI().getPath();
 			String [] pathParts = sourcePath.split("/");
@@ -142,7 +161,19 @@ public class Owlbuilder {
 		}
 	}
 	
-	void processPublications(OWLOntology ontology) throws Exception{
+	
+	OWLOntology mergeImportedOntologies() throws Exception{
+		log.info("Starting ontology merge");
+		OWLOntologyMerger merger = new OWLOntologyMerger(manager);
+		IRI mergedOntologyIRI = IRI.create("http://www.semanticweb.com/mymergedont");
+        OWLOntology merged = merger.createMergedOntology(manager, mergedOntologyIRI);
+        log.info("Finished ontology merge; merged support ontologies axiom count = " + merged.getAxiomCount());
+		return merged;
+	}
+	
+	
+	
+	void processPublications() throws Exception{
 		final OWLClass pubAboutInvestigationClass = factory.getOWLClass(IRIManager.pubAboutInvestigation);
 		final Set<Publication> pubs = connection.getPublications();
 		for (Publication pub : pubs){
@@ -150,13 +181,13 @@ public class Owlbuilder {
 			OWLIndividual pub_ind = factory.getOWLNamedIndividual(pubID);
 			OWLClassAssertionAxiom classAssertion = 
 					factory.getOWLClassAssertionAxiom(pubAboutInvestigationClass, pub_ind); 
-			manager.addAxiom(ontology, classAssertion);
+			manager.addAxiom(target, classAssertion);
 		}
 	}
 	
 	//when to get iri's for terms contained in participants?
 	
-	void processAssertions(OWLOntology ontology) throws Exception{
+	void processAssertions() throws Exception{
 		final OWLClass textualEntityClass = factory.getOWLClass(IRIManager.textualEntity);
 		final OWLObjectProperty denotesProp = factory.getOWLObjectProperty(IRIManager.denotesProperty);
 		final OWLObjectProperty partofProperty = factory.getOWLObjectProperty(IRIManager.partOfProperty);
@@ -164,32 +195,9 @@ public class Owlbuilder {
 		final Set<Assertion> assertions = connection.getAssertions();
 		for (Assertion a : assertions){
 			iriManager.validateIRI(a);
-			final Participant primary = connection.getPrimaryParticipant(a);
-			OWLObject owlPrimary = primary.generateOWL(ontology,manager,iriManager);
-			final Set<Participant> otherParticipants = connection.getParticipants(a);
-			for (Participant p : otherParticipants){
-				OWLObject owlRep = p.generateOWL(ontology,manager,iriManager);
-			}
+			OWLObject owlAssertion = a.generateOWL(this);
 			//find the behavior id
 			
-			//find the publication id
-			Publication p = connection.getPublication(a.get_publication());
-			IRI publication_id = IRI.create(p.getIRI_String());
-			//Complete hack - denotes some behavior process
-			OWLClassExpression denotesExpr = 
- 			   factory.getOWLObjectSomeValuesFrom(denotesProp,behaviorProcess); 
-			OWLClassExpression intersectExpr =
-					factory.getOWLObjectIntersectionOf(textualEntityClass,denotesExpr);
-			OWLIndividual assert_ind = factory.getOWLNamedIndividual(IRI.create(a.getIRI_String()));
-			OWLClassAssertionAxiom textClassAssertion = 
-					factory.getOWLClassAssertionAxiom(intersectExpr, assert_ind); 
-			manager.addAxiom(ontology, textClassAssertion);
-			if (publication_id != null){
-				OWLIndividual pub_ind = factory.getOWLNamedIndividual(publication_id);
-				OWLObjectPropertyAssertionAxiom partofAssertion = 
-						factory.getOWLObjectPropertyAssertionAxiom(partofProperty, assert_ind, pub_ind);
-				manager.addAxiom(ontology, partofAssertion);
-			}
  		}		
 	}
 	
@@ -212,18 +220,31 @@ public class Owlbuilder {
 	}
 	
 	
+	public OWLOntology getTarget(){
+		return target;
+	}
 	
-	
-	OWLOntologyManager getOntologyManager(){
+	public OWLOntologyManager getOntologyManager(){
 		return manager;
 	}
 	
-	OWLDataFactory getDataFactory(){
+	
+	public OWLDataFactory getDataFactory(){
 		return factory;
 	}
 	
-	AbstractConnection getConnection(){
+	public IRIManager getIRIManager(){
+		return iriManager;
+	}
+	
+	public AbstractConnection getConnection(){
 		return connection;
 	}
+	
+	public OWLOntology getMergedSources(){
+		return mergedSources;
+	}
+
+		
 	
 }
