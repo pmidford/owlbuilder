@@ -188,7 +188,7 @@ public class DBConnection implements AbstractConnection{
 		return result;
 	}
 	
-	public Assertion getAssertion(int id) throws SQLException{
+	public Assertion getAssertion(int id) throws Exception{
 		final PreparedStatement assertionStatement = c.prepareStatement(Assertion.getRowQuery());
 		assertionStatement.setInt(1, id);
 		final ResultSet r = assertionStatement.executeQuery();
@@ -203,7 +203,7 @@ public class DBConnection implements AbstractConnection{
 		}
 	}
 	
-	public Set<Assertion> getAssertions() throws SQLException {
+	public Set<Assertion> getAssertions() throws Exception {
 		final Set<Assertion> result = new HashSet<Assertion>();
 		final Statement allAssertionStatement = c.createStatement();
 		final ResultSet r = allAssertionStatement.executeQuery(Assertion.getTableQuery());
@@ -217,7 +217,7 @@ public class DBConnection implements AbstractConnection{
 	}
 		
 	
-	public Participant getPrimaryParticipant(Assertion a) throws SQLException{
+	public Participant getPrimaryParticipant(Assertion a) throws Exception{
 		PreparedStatement participantStatement =
 				c.prepareStatement(Participant.getPrimaryQuery());
 		participantStatement.setInt(1, a.get_id());

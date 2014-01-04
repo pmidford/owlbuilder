@@ -8,10 +8,15 @@ import java.util.Set;
 
 public class MockConnection implements AbstractConnection {
 	
+	final private static String JOURNALTYPE = "Journal";
+	final private static String TESTDOI = 
+			"http://dx.doi.org/10.1636/0161-8202(2000)028[0097:HDLHAB]2.0.CO;2";
+	final private static String TESTARACHBID = "http://arachb.org/arachb/TEST_0000001";
+	
 	private static MockResults mockPublicationResults = new MockResults();
 	static {
 		mockPublicationResults.setInteger(Publication.DBID, 1);
-		mockPublicationResults.setString(Publication.DBPUBLICATIONTYPE,"Journal");
+		mockPublicationResults.setString(Publication.DBPUBLICATIONTYPE,JOURNALTYPE);
 		mockPublicationResults.setString(Publication.DBDISPENSATION,"");
 		mockPublicationResults.setString(Publication.DBDOWNLOADED,"");
 		mockPublicationResults.setString(Publication.DBREVIEWED,"");
@@ -26,8 +31,7 @@ public class MockConnection implements AbstractConnection {
 		mockPublicationResults.setString(Publication.DBPAGERANGE,"");
 		mockPublicationResults.setString(Publication.DBPUBLICATIONDATE,"");
 		mockPublicationResults.setString(Publication.DBPUBLICATIONYEAR,"");
-		mockPublicationResults.setString(Publication.DBDOI,
-				                         "http://dx.doi.org/10.1636/0161-8202(2000)028[0097:HDLHAB]2.0.CO;2");
+		mockPublicationResults.setString(Publication.DBDOI,TESTDOI);
 		mockPublicationResults.setString(Publication.DBGENERATEDID,null);
         mockPublicationResults.setString(Publication.DBCURATIONSTATUS,"");
         mockPublicationResults.setString(Publication.DBCURATIONUPDATE,"");
@@ -36,7 +40,7 @@ public class MockConnection implements AbstractConnection {
 	private static MockResults mockPublicationResults2 = new MockResults();
 	static {
 		mockPublicationResults2.setInteger(Publication.DBID, 2);
-		mockPublicationResults2.setString(Publication.DBPUBLICATIONTYPE,"Journal");
+		mockPublicationResults2.setString(Publication.DBPUBLICATIONTYPE,JOURNALTYPE);
 		mockPublicationResults2.setString(Publication.DBDISPENSATION,"");
 		mockPublicationResults2.setString(Publication.DBDOWNLOADED,"");
 		mockPublicationResults2.setString(Publication.DBREVIEWED,"");
@@ -52,8 +56,7 @@ public class MockConnection implements AbstractConnection {
 		mockPublicationResults2.setString(Publication.DBPUBLICATIONDATE,"");
 		mockPublicationResults2.setString(Publication.DBPUBLICATIONYEAR,"");
 		mockPublicationResults2.setString(Publication.DBDOI, null);
-		mockPublicationResults2.setString(Publication.DBGENERATEDID,
-				                          "http://arachb.org/arachb/TEST_0000001");
+		mockPublicationResults2.setString(Publication.DBGENERATEDID,TESTARACHBID);
         mockPublicationResults2.setString(Publication.DBCURATIONSTATUS,"");
         mockPublicationResults2.setString(Publication.DBCURATIONUPDATE,"");
 	}
@@ -241,7 +244,7 @@ public class MockConnection implements AbstractConnection {
 	}
 
 	@Override
-	public Assertion getAssertion(int i) throws SQLException {
+	public Assertion getAssertion(int i) throws Exception {
 		Assertion result = new Assertion();
         result.fill(mockAssertionResults);
 		return result;
@@ -249,7 +252,7 @@ public class MockConnection implements AbstractConnection {
 
 
 	@Override
-	public Set<Assertion> getAssertions() throws SQLException {
+	public Set<Assertion> getAssertions() throws Exception {
 		Set<Assertion> results = new HashSet<Assertion>();
 		Assertion a1 = new Assertion();
 		a1.fill(mockAssertionResults);

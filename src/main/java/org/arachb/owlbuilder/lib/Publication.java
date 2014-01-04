@@ -212,7 +212,13 @@ public class Publication implements AbstractNamedEntity{
 			return get_generated_id();
 		}
 		else {
-			return get_doi();
+			try {
+				return cleanupDOI(get_doi());
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				return "";
+			}
 		}
 	}
 	
@@ -222,7 +228,7 @@ public class Publication implements AbstractNamedEntity{
 	 * @return IRI using using doi prefix
 	 * @throws Exception either MalformedURL or Encoding exceptions can be thrown
 	 */
-	private String cleanupDOI(String doi) throws Exception{
+	public static String cleanupDOI(String doi) throws Exception{
 		URL raw = new URL(doi);
 		String cleanpath = URLEncoder.encode(raw.getPath().substring(1),"UTF-8");
 		if (log.isDebugEnabled()){
@@ -255,7 +261,7 @@ public class Publication implements AbstractNamedEntity{
 	}
 	
 	@Override
-	public OWLObject generateOWL(OWLOntology o, OWLOntologyManager manager, IRIManager iriManager) {
+	public OWLObject generateOWL(Owlbuilder builder) {
 		// TODO Auto-generated method stub
 		return null;
 	}
