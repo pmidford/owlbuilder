@@ -1,6 +1,7 @@
 package org.arachb.owlbuilder.lib;
 
 import java.sql.SQLException;
+import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -227,23 +228,33 @@ public class Assertion implements AbstractNamedEntity{
 		for (Participant p : otherParticipants){
 			OWLObject owlRep = p.generateOWL(builder);
 		}
-		//find the publication id
-		Publication p = c.getPublication(get_publication());
-		IRI publication_id = IRI.create(publicationIRI);
-		OWLClass behaviorclass = factory.getOWLClass(IRI.create(behaviorIRI)); 
-		OWLClassExpression denotesExpr = 
-			   factory.getOWLObjectSomeValuesFrom(denotesProp,behaviorclass); 
-		OWLClassExpression intersectExpr =
-				factory.getOWLObjectIntersectionOf(textualEntityClass,denotesExpr);
-		OWLIndividual assert_ind = factory.getOWLNamedIndividual(IRI.create(getIRI_String()));
-		OWLClassAssertionAxiom textClassAssertion = 
-				factory.getOWLClassAssertionAxiom(intersectExpr, assert_ind); 
-		manager.addAxiom(target, textClassAssertion);
-		if (publication_id != null){
-			OWLIndividual pub_ind = factory.getOWLNamedIndividual(publication_id);
-			OWLObjectPropertyAssertionAxiom partofAssertion = 
-					factory.getOWLObjectPropertyAssertionAxiom(partofProperty, assert_ind, pub_ind);
-			manager.addAxiom(target, partofAssertion);
+		OWLObjectProperty hasParticipant = factory.getOWLObjectProperty(IRIManager.hasParticipantProperty);
+        if (owlPrimary instanceof OWLClassExpression){
+        	Set<OWLClassExpression> supersets = new HashSet<OWLClassExpression>(); 
+        	supersets.add(textualEntityClass);
+        	OWLClassExpression hasParticipantPrimary = 
+        			factory.getOWLObjectSomeValuesFrom(hasParticipant,(OWLClassExpression) owlPrimary);
+        	supersets.add(hasParticipantPrimary);
+
+        	//find the publication id
+        	Publication p = c.getPublication(get_publication());
+        	IRI publication_id = IRI.create(publicationIRI);
+        	OWLClass behaviorclass = factory.getOWLClass(IRI.create(behaviorIRI)); 
+        	OWLClassExpression denotesExpr = 
+        			factory.getOWLObjectSomeValuesFrom(denotesProp,behaviorclass); 
+        	supersets.add(denotesExpr);
+        	OWLClassExpression intersectExpr =
+        			factory.getOWLObjectIntersectionOf(supersets);
+        	OWLIndividual assert_ind = factory.getOWLNamedIndividual(IRI.create(getIRI_String()));
+        	OWLClassAssertionAxiom textClassAssertion = 
+        			factory.getOWLClassAssertionAxiom(intersectExpr, assert_ind); 
+        	manager.addAxiom(target, textClassAssertion);
+        	if (publication_id != null){
+        		OWLIndividual pub_ind = factory.getOWLNamedIndividual(publication_id);
+        		OWLObjectPropertyAssertionAxiom partofAssertion = 
+        				factory.getOWLObjectPropertyAssertionAxiom(partofProperty, assert_ind, pub_ind);
+        		manager.addAxiom(target, partofAssertion);
+        	}
 		}
 
 

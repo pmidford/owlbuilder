@@ -201,5 +201,16 @@ public abstract class Participant implements AbstractEntity{
 		}
 	}
 
+	public void processAnatomy(Owlbuilder builder, OWLClass anatomyClass) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void processSubstrate(Owlbuilder builder, OWLClass anatomyClass) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	
 
 }

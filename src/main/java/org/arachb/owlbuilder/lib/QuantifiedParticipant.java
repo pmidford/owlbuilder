@@ -10,8 +10,10 @@ import org.semanticweb.owlapi.model.OWLAnnotationAssertionAxiom;
 import org.semanticweb.owlapi.model.OWLAnnotationProperty;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassAxiom;
+import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLObject;
+import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.reasoner.NodeSet;
@@ -73,24 +75,7 @@ public class QuantifiedParticipant extends Participant {
 
 	@Override
 	public OWLObject generateOWL(Owlbuilder builder) {
-		if (taxon != 0){
-			if (get_taxonIRI() != null){
-				processParticipantTaxon(builder,IRI.create(get_taxonIRI()));
-			}
-			else {
-				final String msg = String.format("No taxon IRI available; id = %s",id);
-				throw new IllegalStateException(msg);
-			}
-		}
-		if (anatomy != 0){
-			if (get_anatomyIRI() != null){
-				processParticipantAnatomy(builder,IRI.create(get_anatomyIRI()));
-			}
-			else{
-				final String msg = String.format("No anatomy IRI available; id = %s",id);
-				throw new IllegalStateException(msg);
-			}
-		}
+		final OWLDataFactory factory = builder.getDataFactory();
 		if (substrate != 0){
 			if (get_anatomyIRI() != null){
 				processParticipantSubstrate(builder,IRI.create(get_substrateIRI()));
@@ -100,21 +85,47 @@ public class QuantifiedParticipant extends Participant {
 				throw new IllegalStateException(msg);
 			}
 		}
-
-		return null;
+		OWLClass taxonClass = null;
+		if (taxon != 0){
+			if (get_taxonIRI() != null){
+				taxonClass = processParticipantTaxon(builder,IRI.create(get_taxonIRI()));
+			}
+			else {
+				final String msg = String.format("No taxon IRI available; id = %s",id);
+				throw new IllegalStateException(msg);
+			}
+		}
+		if (anatomy != 0){
+			if (get_anatomyIRI() != null){
+				OWLClass anatomyClass = processParticipantAnatomy(builder,IRI.create(get_anatomyIRI()));
+				if (taxonClass != null){
+					  OWLObjectProperty partOf = factory.getOWLObjectProperty(IRIManager.partOfProperty);
+					  OWLClassExpression partOfSomeTaxon = factory.getOWLObjectSomeValuesFrom(partOf,
+				                taxonClass);
+					  OWLClassExpression anatomyOfTaxon = 
+							  factory.getOWLObjectIntersectionOf(anatomyClass,partOfSomeTaxon);
+					  return anatomyOfTaxon;
+				}
+			}
+			else{
+				final String msg = String.format("No anatomy IRI available; id = %s",id);
+				throw new IllegalStateException(msg);
+			}
+		}
+		return taxonClass;
 	}
 	
-	void processParticipantTaxon(Owlbuilder builder,IRI taxonIRI){
+	OWLClass processParticipantTaxon(Owlbuilder builder,IRI iri){
 		final OWLOntology target = builder.getTarget();
 		final OWLOntology merged = builder.getMergedSources();
 		final OWLDataFactory factory = builder.getDataFactory();
 		final OWLReasoner reasoner = builder.getReasoner();
-		boolean taxon_duplicate = target.containsClassInSignature(taxonIRI);
+		boolean taxon_duplicate = target.containsClassInSignature(iri);
 		if (!taxon_duplicate){
-			boolean taxon_exists = merged.containsClassInSignature(taxonIRI);
+			boolean taxon_exists = merged.containsClassInSignature(iri);
 			if (taxon_exists){
-				log.info("Found class in signature of merged ontology for: " + taxonIRI);
-				OWLClass taxonClass = factory.getOWLClass(taxonIRI);
+				log.info("Found class in signature of merged ontology for: " + get_taxonIRI());
+				OWLClass taxonClass = factory.getOWLClass(iri);
 				final NodeSet<OWLClass> taxonParents = reasoner.getSuperClasses(taxonClass, false);
 				log.info("Node count = " + taxonParents.getNodes().size());
 				Set<OWLClass>parentList =  taxonParents.getFlattened();
@@ -123,28 +134,60 @@ public class QuantifiedParticipant extends Participant {
 				for (OWLClass taxon : parentList){
 					super.processTaxon(builder,taxon);
 				}
+				return taxonClass;
 			}
 			else{
 				log.info("Did not find class in signature of merged ontology for: " + get_taxonIRI());
+				return null;
 			}
+		}
+		else{
+			OWLClass taxonClass = factory.getOWLClass(iri);
+			return taxonClass;   // may not be right
 		}
 	}
 	
 	
-	void processParticipantAnatomy(Owlbuilder builder, IRI anatomyIRI){
+	OWLClass processParticipantAnatomy(Owlbuilder builder, IRI iri){
 		final OWLOntology target = builder.getTarget();
 		final OWLOntology merged = builder.getMergedSources();
 		final OWLDataFactory factory = builder.getDataFactory();
-		final OWLReasoner reasoner = builder.getReasoner();
+		boolean anatomy_duplicate = target.containsClassInSignature(iri);
+		if (!anatomy_duplicate){
+			boolean anatomy_exists = merged.containsClassInSignature(iri);
+			if (anatomy_exists){
+				log.info("Found class in signature of merged ontology for: " + iri);
+				OWLClass anatomyClass = factory.getOWLClass(iri);
+				super.processAnatomy(builder,anatomyClass);
+				return anatomyClass;
+			}
+			else{
+				log.info("Did not find class in signature of merged ontology for: " + get_anatomyIRI());
+				return null;
+			}
+
+		}
+		else{
+			OWLClass taxonClass = factory.getOWLClass(iri);
+			return taxonClass;   // may not be right
+		}
 
 	}
 
 	
-	void processParticipantSubstrate(Owlbuilder builder, IRI substrateIRI){
+	void processParticipantSubstrate(Owlbuilder builder, IRI iri){
 		final OWLOntology target = builder.getTarget();
 		final OWLOntology merged = builder.getMergedSources();
 		final OWLDataFactory factory = builder.getDataFactory();
-		final OWLReasoner reasoner = builder.getReasoner();
+		boolean substrate_duplicate = target.containsClassInSignature(iri);
+		if (!substrate_duplicate){
+			boolean substrate_exists = merged.containsClassInSignature(iri);
+			if (substrate_exists){
+				log.info("Found class in signature of merged ontology for: " + iri);
+				OWLClass substrateClass = factory.getOWLClass(iri);
+				super.processSubstrate(builder,substrateClass);
+			}
+		}
 
 	}
 	

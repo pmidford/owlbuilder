@@ -117,25 +117,29 @@ public class Owlbuilder{
 		reasoner = rfactory.createReasoner(mergedSources);
 		log.info("Finished reasoner initialization");
         // Classify the ontology.
-        reasoner.precomputeInferences(InferenceType.CLASS_HIERARCHY);
-        log.info("Finished precomputing class hierarchy");
-        target = manager.createOntology(IRI.create(targetIRI));
-		OWLOntologyFormat format = manager.getOntologyFormat(target);
-		format.asPrefixOWLOntologyFormat().setPrefix("doi", "http://dx.doi.org/");
-		log.info("copying relevant taxonony to target ontology");
-		initializeTaxonomy();
-		processDatabase();
-		reasoner.flush();
-		log.info("Saving ontology");
-		File f = new File(temporaryOutput);
-		manager.saveOntology(target, IRI.create(f.toURI()));
-        log.info("Generating HTML pages");
-        generateHTML();
+		try{
+			reasoner.precomputeInferences(InferenceType.CLASS_HIERARCHY);
+			log.info("Finished precomputing class hierarchy");
+			target = manager.createOntology(IRI.create(targetIRI));
+			OWLOntologyFormat format = manager.getOntologyFormat(target);
+			format.asPrefixOWLOntologyFormat().setPrefix("doi", "http://dx.doi.org/");
+			log.info("copying relevant taxonony to target ontology");
+			initializeTaxonomy();
+			processDatabase();
+			reasoner.flush();
+			log.info("Saving ontology");
+			File f = new File(temporaryOutput);
+			manager.saveOntology(target, IRI.create(f.toURI()));
+			log.info("Generating HTML pages");
+			generateHTML();
+			log.info("Shutting down reasoner");
+		}
+		finally{
+			reasoner.dispose();
+		}
 	}
 	
 	void shutdown() throws Exception{
-        log.info("Shutting down reasoner");
-        reasoner.dispose();
         log.info("Done");
 		connection.close();
 	}

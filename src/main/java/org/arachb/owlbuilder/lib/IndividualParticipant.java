@@ -122,17 +122,17 @@ public class IndividualParticipant extends Participant implements AbstractNamedE
 	}
 
 	
-	void processParticipantTaxon(Owlbuilder builder,IRI taxonIRI){
+	void processParticipantTaxon(Owlbuilder builder,IRI iri){
 		final OWLOntology target = builder.getTarget();
 		final OWLOntology merged = builder.getMergedSources();
 		final OWLDataFactory factory = builder.getDataFactory();
 		final OWLReasoner reasoner = builder.getReasoner();
-		boolean taxon_duplicate = target.containsClassInSignature(taxonIRI);
+		boolean taxon_duplicate = target.containsClassInSignature(iri);
 		if (!taxon_duplicate){
-			boolean taxon_exists = merged.containsClassInSignature(taxonIRI);
+			boolean taxon_exists = merged.containsClassInSignature(iri);
 			if (taxon_exists){
-				log.info("Found class in signature of merged ontology for: " + taxonIRI);
-				OWLClass taxonClass = factory.getOWLClass(taxonIRI);
+				log.info("Found class in signature of merged ontology for: " + iri);
+				OWLClass taxonClass = factory.getOWLClass(iri);
 				final NodeSet<OWLClass> taxonParents = reasoner.getSuperClasses(taxonClass, false);
 				log.info("Node count = " + taxonParents.getNodes().size());
 				Set<OWLClass>parentList =  taxonParents.getFlattened();
@@ -148,21 +148,35 @@ public class IndividualParticipant extends Participant implements AbstractNamedE
 		}
 	}
 
-	void processParticipantAnatomy(Owlbuilder builder, IRI anatomyIRI){
+	void processParticipantAnatomy(Owlbuilder builder, IRI iri){
 		final OWLOntology target = builder.getTarget();
 		final OWLOntology merged = builder.getMergedSources();
 		final OWLDataFactory factory = builder.getDataFactory();
-		final OWLReasoner reasoner = builder.getReasoner();
-
+		boolean anatomy_duplicate = target.containsClassInSignature(iri);
+		if (!anatomy_duplicate){
+			boolean anatomy_exists = merged.containsClassInSignature(iri);
+			if (anatomy_exists){
+				log.info("Found class in signature of merged ontology for: " + iri);
+				OWLClass anatomyClass = factory.getOWLClass(iri);
+				super.processAnatomy(builder,anatomyClass);
+			}
+		}
 	}
 
 	
-	void processParticipantSubstrate(Owlbuilder builder, IRI substrateIRI){
+	void processParticipantSubstrate(Owlbuilder builder, IRI iri){
 		final OWLOntology target = builder.getTarget();
 		final OWLOntology merged = builder.getMergedSources();
 		final OWLDataFactory factory = builder.getDataFactory();
-		final OWLReasoner reasoner = builder.getReasoner();
-
+		boolean substrate_duplicate = target.containsClassInSignature(iri);
+		if (!substrate_duplicate){
+			boolean substrate_exists = merged.containsClassInSignature(iri);
+			if (substrate_exists){
+				log.info("Found class in signature of merged ontology for: " + iri);
+				OWLClass substrateClass = factory.getOWLClass(iri);
+				super.processSubstrate(builder,substrateClass);
+			}
+		}
 	}
 	
 
