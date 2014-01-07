@@ -8,16 +8,18 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * Unit test for simple App.
+ * Unit tests for owlbuilder tool
  */
 public class TestOwlbuilder 
 {
 
     private static Logger log = Logger.getLogger(TestOwlbuilder.class);
 
+    /**
+     * currently just initializes the logging system for tests 
+     */
     @Before
     public void setup(){
-	//configure log4j
         PropertyConfigurator.configure(TestOwlbuilder.class.getClassLoader().getResource("log4j.properties"));
     }
 
@@ -32,4 +34,6 @@ public class TestOwlbuilder
     	assertNotNull(b.getConnection());
     	b.shutdown();
     }
+    
+    
 }

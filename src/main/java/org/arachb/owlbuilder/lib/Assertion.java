@@ -113,42 +113,55 @@ public class Assertion implements AbstractNamedEntity{
 		evidence = record.getInt(DBEVIDENCE);
 		generated_id = record.getString(DBGENERATEDID);
 		if (publication != 0){
-			if (record.getString(DBPUBDOI) != null){
-				this.set_publicationIRI(Publication.cleanupDOI(record.getString(DBPUBDOI)));
-			}
-			else if (record.getString(DBPUBGENERATEDID) != null){
-				this.set_publicationIRI(record.getString(DBPUBGENERATEDID));
-			}
-			else{
-				final String msg = String.format(BADPUBLICATIONIRI, id, publication);
-				throw new IllegalStateException(msg);
-			}
+			updatePublicationIRI(record);
 		}
 		if (behavior != 0){
-			if (record.getString(DBBEHAVIORSOURCEID) != null){
-				this.set_behaviorIRI(record.getString(DBBEHAVIORSOURCEID));
-			}
-			else if (record.getString(DBBEHAVIORGENERATEDID) != null){
-				this.set_behaviorIRI(record.getString(DBBEHAVIORGENERATEDID));
-			}
-			else{
-				final String msg = String.format(BADBEHAVIORIRI, id, behavior);
-				throw new IllegalStateException(msg);
-			}
+			updateBehaviorIRI(record);
 		}
 		if (evidence != 0){
-			if (record.getString(DBEVIDENCESOURCEID) != null){
-				this.set_evidenceIRI(record.getString(DBEVIDENCESOURCEID));
-			}
-			else if (record.getString(DBEVIDENCEGENERATEDID) != null){
-				this.set_evidenceIRI(record.getString(DBEVIDENCEGENERATEDID));
-			}
-			else{
-				final String msg = String.format(BADEVIDENCEIRI, id, evidence);
-				throw new IllegalStateException(msg);
-			}
+			updateEvidenceIRI(record);
 		}
+	}
+	
+	private void updatePublicationIRI(AbstractResults record) throws Exception{
+		if (record.getString(DBPUBDOI) != null){
+			this.set_publicationIRI(Publication.cleanupDOI(record.getString(DBPUBDOI)));
+		}
+		else if (record.getString(DBPUBGENERATEDID) != null){
+			this.set_publicationIRI(record.getString(DBPUBGENERATEDID));
+		}
+		else{
+			throwBadState(BADPUBLICATIONIRI);
+		}
+	}
 
+	private void updateBehaviorIRI(AbstractResults record) throws Exception{
+		if (record.getString(DBBEHAVIORSOURCEID) != null){
+			this.set_behaviorIRI(record.getString(DBBEHAVIORSOURCEID));
+		}
+		else if (record.getString(DBBEHAVIORGENERATEDID) != null){
+			this.set_behaviorIRI(record.getString(DBBEHAVIORGENERATEDID));
+		}
+		else{
+			throwBadState(BADBEHAVIORIRI);
+		}
+	}
+
+	private void updateEvidenceIRI(AbstractResults record) throws Exception{
+		if (record.getString(DBEVIDENCESOURCEID) != null){
+			this.set_evidenceIRI(record.getString(DBEVIDENCESOURCEID));
+		}
+		else if (record.getString(DBEVIDENCEGENERATEDID) != null){
+			this.set_evidenceIRI(record.getString(DBEVIDENCEGENERATEDID));
+		}
+		else{
+			throwBadState(BADEVIDENCEIRI);
+		}
+	}
+	
+	private void throwBadState(String template){
+		final String msg = String.format(BADEVIDENCEIRI, id, evidence);
+		throw new IllegalStateException(msg);
 	}
 
 	@Override
@@ -217,11 +230,9 @@ public class Assertion implements AbstractNamedEntity{
 		OWLOntology target = builder.getTarget();
 		OWLOntologyManager manager = builder.getOntologyManager();
 		OWLDataFactory factory = builder.getDataFactory();
-		IRIManager iriManager = builder.getIRIManager(); 
 		final OWLClass textualEntityClass = factory.getOWLClass(IRIManager.textualEntity);
 		final OWLObjectProperty denotesProp = factory.getOWLObjectProperty(IRIManager.denotesProperty);
 		final OWLObjectProperty partofProperty = factory.getOWLObjectProperty(IRIManager.partOfProperty);
-		final OWLOntology mergedSupport = builder.getMergedSources();
 		final Participant primary = c.getPrimaryParticipant(this);
 		OWLObject owlPrimary = primary.generateOWL(builder);
 		final Set<Participant> otherParticipants = c.getParticipants(this);

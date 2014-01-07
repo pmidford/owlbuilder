@@ -20,7 +20,6 @@ import org.arachb.owlbuilder.lib.Config;
 import org.arachb.owlbuilder.lib.DBConnection;
 import org.arachb.owlbuilder.lib.IRIManager;
 import org.arachb.owlbuilder.lib.IndividualParticipant;
-import org.arachb.owlbuilder.lib.Mireot;
 import org.arachb.owlbuilder.lib.Participant;
 import org.arachb.owlbuilder.lib.Publication;
 import org.arachb.owlbuilder.lib.QuantifiedParticipant;
@@ -60,8 +59,6 @@ public class Owlbuilder{
 	private final OWLReasonerFactory rfactory;
 	private OWLOntology target;
 	private OWLReasoner reasoner;
-	private final Mireot mireot;
-	
 	private final Map<String,IRI>nonNCBITaxa = new HashMap<String,IRI>();
 	
 	private final Map<String,OWLOntology>supportOntologies = new HashMap<String,OWLOntology>();
@@ -104,9 +101,6 @@ public class Owlbuilder{
 		//rfactory = new StructuralReasonerFactory();  //change when reasoner is upgraded
 		rfactory = new ElkReasonerFactory();
 		iriManager = new IRIManager(connection);
-		mireot = new Mireot();
-		mireot.setImportDir(config.getImportDir());
-		mireot.setMireotDir(config.getMireotDir());
 	}
 
 	void process() throws Exception{		
