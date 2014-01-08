@@ -4,13 +4,16 @@ This is a java-based tool for generating owl files and web pages from an arachad
 
 ## Copyright and License
 
-All original code is copyright 2013 Peter E. Midford
+All original code is copyright 2013-2014 Peter E. Midford
 
 > This tool is available under the terms of the 'MIT' license, a copy of which is included in this repository.
 
 ## Contact:
    Peter E. Midford
    peter.midford@gmail.com
+   
+## Travis build status
+[![Build Status](https://travis-ci.org/pmidford/owlbuilder.png?branch=master)](https://travis-ci.org/pmidford/owlbuilder)
 
 ## Building
 
