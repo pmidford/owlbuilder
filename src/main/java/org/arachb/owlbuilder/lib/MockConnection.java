@@ -69,7 +69,7 @@ public class MockConnection implements AbstractConnection {
 		mockTermResults.setInteger(Term.DBDOMAIN,3);
 		mockTermResults.setInteger(Term.DBAUTHORITY,1);
 		mockTermResults.setString(Term.DBLABEL,"Tetragnatha straminea");
-		mockTermResults.setString(Term.DBGENERATEDID,"");
+		mockTermResults.setString(Term.DBGENERATEDID,"http://purl.obolibrary.org/obo/NCBITaxon_336608");
 		mockTermResults.setString(Term.DBCOMMENT,"");
 	}
 
@@ -80,7 +80,7 @@ public class MockConnection implements AbstractConnection {
 		mockTermResults2.setInteger(Term.DBDOMAIN,2);
 		mockTermResults2.setInteger(Term.DBAUTHORITY,1);
 		mockTermResults2.setString(Term.DBLABEL,"whole organism");
-		mockTermResults2.setString(Term.DBGENERATEDID,"");
+		mockTermResults2.setString(Term.DBGENERATEDID,null);
 		mockTermResults2.setString(Term.DBCOMMENT,"");
 	}
 
@@ -204,7 +204,13 @@ public class MockConnection implements AbstractConnection {
 	@Override
 	public Term getTerm(int i) throws SQLException {
 		Term result = new Term();
-        result.fill(mockTermResults);
+		switch (i){
+		case 1:
+			result.fill(mockTermResults);
+			break;
+		default:
+			result.fill(mockTermResults2);
+		}
 		return result;
 	}
 
@@ -272,8 +278,12 @@ public class MockConnection implements AbstractConnection {
 			}
 		}
 		if (e instanceof Term){
-			if (e.get_id() == 1){
+			switch (e.get_id()){
+			case 1:
 				mockTermResults.setString(Term.DBGENERATEDID, e.getIRI_String());
+				break;
+			default:
+				mockTermResults2.setString(Term.DBGENERATEDID, e.getIRI_String());
 			}
 		}
 		else{

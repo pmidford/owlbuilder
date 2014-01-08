@@ -6,12 +6,13 @@ import java.sql.SQLException;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
 
 public class TestDBConnection {
 
-    //private static Logger log = Logger.getLogger(TestDBConnection.class);
+    private static Logger log = Logger.getLogger(TestDBConnection.class);
 
     private AbstractConnection testConnection;
     private final static String testID = "http://arachb.org/arachb/TEST_0000001";
@@ -77,19 +78,25 @@ public class TestDBConnection {
 		assertEquals(2,testSet.size());
 	}
 
+	//Note that last test is against testAnatomy, not old_id
+	//That's because both implementers of 
+	//AbstractConnection.updateNamedEntity() set generated_id
+	//of the DB record (or mock record) to the value of get_IRI() -
+	//not the generate_id field.
 	@Test
 	public void testupdateTerm() throws SQLException{
-		Term testTerm = testConnection.getTerm(1);
+		Term testTerm = testConnection.getTerm(2);
 		assertNotNull(testTerm);
         String old_id = testTerm.get_generated_id();
-		testTerm.setGeneratedID(testTaxon);
+		testTerm.setGeneratedID(testAnatomy);
 		testConnection.updateNamedEntity(testTerm);
-		Term updatedTerm = testConnection.getTerm(1);
-		assertEquals(testTaxon,updatedTerm.get_generated_id());
+		Term updatedTerm = testConnection.getTerm(2);
+		assertEquals(testAnatomy,updatedTerm.get_generated_id());
 		updatedTerm.setGeneratedID(old_id);
 		testConnection.updateNamedEntity(updatedTerm);
-		Term updatedTerm2 = testConnection.getTerm(1);
-		assertEquals(old_id,updatedTerm2.get_generated_id());
+		Term updatedTerm2 = testConnection.getTerm(2);
+		assertFalse(old_id == updatedTerm2.get_generated_id());
+		assertEquals(testAnatomy,updatedTerm2.get_generated_id());
 	}
 
 	@Test
