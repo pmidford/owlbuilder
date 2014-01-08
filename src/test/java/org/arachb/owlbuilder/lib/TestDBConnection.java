@@ -34,9 +34,9 @@ public class TestDBConnection {
 	public void testgetPublication() throws SQLException {
 		Publication testPub = testConnection.getPublication(1);
 		assertNotNull(testPub);
-		assertEquals(1,testPub.get_id());
-		assertEquals("Journal",testPub.get_publication_type());
-		assertEquals(doi1,testPub.get_doi());
+		assertEquals(1,testPub.getId());
+		assertEquals("Journal",testPub.getPublicationType());
+		assertEquals(doi1,testPub.getDoi());
 	}
 
 	@Test
@@ -50,15 +50,15 @@ public class TestDBConnection {
 	public void testupdatePublication() throws SQLException{
 		Publication testPub = testConnection.getPublication(1);
 		assertNotNull(testPub);
-		assertEquals(null,testPub.get_generated_id());
+		assertEquals(null,testPub.getGeneratedId());
 		Publication testPub2 = testConnection.getPublication(2);
-		assertEquals(testID,testPub2.get_generated_id());		
-		String saved_id = testPub2.get_generated_id();
-		testPub2.setGeneratedID(doi1);
+		assertEquals(testID,testPub2.getGeneratedId());		
+		String saved_id = testPub2.getGeneratedId();
+		testPub2.setGeneratedId(doi1);
 		testConnection.updateNamedEntity(testPub2);
 		Publication updatedPub = testConnection.getPublication(2);
-		assertEquals(doi1,updatedPub.getIRI_String());
-		updatedPub.setGeneratedID(saved_id);
+		assertEquals(doi1,updatedPub.getIriString());
+		updatedPub.setGeneratedId(saved_id);
 		testConnection.updateNamedEntity(updatedPub);
 	}
 	
@@ -66,8 +66,8 @@ public class TestDBConnection {
 	public void testgetTerm() throws SQLException{
 		Term testTerm = testConnection.getTerm(1);
 		assertNotNull(testTerm);
-        assertEquals(1,testTerm.get_id());
-		testTerm.setGeneratedID(testID);
+        assertEquals(1,testTerm.getId());
+		testTerm.setGeneratedId(testID);
 		testConnection.updateNamedEntity(testTerm);
 	}
 	
@@ -78,25 +78,19 @@ public class TestDBConnection {
 		assertEquals(2,testSet.size());
 	}
 
-	//Note that last test is against testAnatomy, not old_id
-	//That's because both implementers of 
-	//AbstractConnection.updateNamedEntity() set generated_id
-	//of the DB record (or mock record) to the value of get_IRI() -
-	//not the generate_id field.
 	@Test
 	public void testupdateTerm() throws SQLException{
 		Term testTerm = testConnection.getTerm(2);
 		assertNotNull(testTerm);
-        String old_id = testTerm.get_generated_id();
-		testTerm.setGeneratedID(testAnatomy);
+        String old_id = testTerm.getGeneratedId();
+		testTerm.setGeneratedId(testAnatomy);
 		testConnection.updateNamedEntity(testTerm);
 		Term updatedTerm = testConnection.getTerm(2);
-		assertEquals(testAnatomy,updatedTerm.get_generated_id());
-		updatedTerm.setGeneratedID(old_id);
+		assertEquals(testAnatomy,updatedTerm.getGeneratedId());
+		updatedTerm.setGeneratedId(old_id);
 		testConnection.updateNamedEntity(updatedTerm);
 		Term updatedTerm2 = testConnection.getTerm(2);
-		assertFalse(old_id == updatedTerm2.get_generated_id());
-		assertEquals(testAnatomy,updatedTerm2.get_generated_id());
+		assertEquals(old_id, updatedTerm2.getGeneratedId());
 	}
 
 	@Test
@@ -104,11 +98,11 @@ public class TestDBConnection {
 		Assertion testAssertion = testConnection.getAssertion(1);
 		Participant testParticipant = testConnection.getPrimaryParticipant(testAssertion);
 		assertNotNull(testParticipant);
-		assertEquals(1,testParticipant.get_id());  //not really the best test...
-		assertEquals(1,testParticipant.get_taxon());
-		assertEquals(2,testParticipant.get_anatomy());
-		assertEquals(testTaxon,testParticipant.get_taxonIRI());
-		assertEquals(testAnatomy,testParticipant.get_anatomyIRI());
+		assertEquals(1,testParticipant.getId());  //not really the best test...
+		assertEquals(1,testParticipant.getTaxon());
+		assertEquals(2,testParticipant.getAnatomy());
+		assertEquals(testTaxon,testParticipant.getTaxonIri());
+		assertEquals(testAnatomy,testParticipant.getAnatomyIri());
 	}
 	
 	@Test
@@ -139,7 +133,7 @@ public class TestDBConnection {
 	public void testgetAssertion() throws Exception{
 		Assertion testAssertion = testConnection.getAssertion(1);
 		assertNotNull(testAssertion);
-		assertEquals(1,testAssertion.get_id());
+		assertEquals(1,testAssertion.getId());
 	}
 	
 	@Test
@@ -153,14 +147,14 @@ public class TestDBConnection {
 	public void testupdateAssertion() throws Exception{
 		Assertion testAssertion = testConnection.getAssertion(1);
 		assertNotNull(testAssertion);
-		testAssertion.setGeneratedID(testID);
+		testAssertion.setGeneratedId(testID);
 		testConnection.updateNamedEntity(testAssertion);
 		Assertion updatedAssertion = testConnection.getAssertion(1);
-		assertEquals(testID,updatedAssertion.getIRI_String());
-		updatedAssertion.setGeneratedID("");
+		assertEquals(testID,updatedAssertion.getIriString());
+		updatedAssertion.setGeneratedId("");
 		testConnection.updateNamedEntity(updatedAssertion);
 		Assertion updatedAssertion2 = testConnection.getAssertion(1);
-		assertEquals("",updatedAssertion2.getIRI_String());  //bogus test here
+		assertEquals("",updatedAssertion2.getIriString());  //bogus test here
 	}
 	
 	@Test

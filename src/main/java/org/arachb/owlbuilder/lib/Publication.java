@@ -115,105 +115,105 @@ public class Publication implements AbstractNamedEntity{
         curation_update = record.getString(DBCURATIONUPDATE);
 	}
 	
-	public int get_id(){
+	@Override
+	public int getId(){
 		return id;
 	}
 	
-
 	
-	public String get_publication_type(){
+	public String getPublicationType(){
 		return publication_type;
 	}
 	
-	public String get_dispensation(){
+	public String getDispensation(){
 		return dispensation;
 	}
 	
-	public String get_downloaded(){
+	public String getDownloaded(){
 		return downloaded;
 	}
 	
-	public String get_reviewed(){
+	public String getReviewed(){
 		return reviewed;
 	}
 	
-	public String get_title(){
+	public String getTitle(){
 		return title;
 	}
 	
-	public String get_alternate_title(){
+	public String getAlternateTitle(){
 		return alternate_title;
 	}
 	
-	public String get_author_list(){
+	public String getAuthorList(){
 		return author_list;
 	}
 	
-	public String get_editor_list(){
+	public String getEditorList(){
 		return editor_list;
 	}
 	
-	public String get_source_publication(){
+	public String getSourcePublication(){
 		return source_publication;
 	}
 	
-	public int get_volume(){
+	public int getVolume(){
 		return volume;
 	}
 	
-	public String get_issue(){
+	public String getIssue(){
 		return issue;
 	}
 	
-	public String get_serial_identifier(){
+	public String getSerialIdentifier(){
 		return serial_identifier;
 	}
 	
-	public String get_page_range(){
+	public String getPageRange(){
 		return page_range;
 	}
 	
-	public String get_publication_date(){
+	public String getPublicationDate(){
 		return publication_date;
 	}
 	
-	public String get_publication_year(){
+	public String getPublicationYear(){
 		return publication_year;
 	}
 	
-	public String get_doi(){
+	public String getDoi(){
 		return doi;
 	}
 
-	public String get_generated_id(){
+	public String getGeneratedId(){
 		return generated_id;
 	}
 
-	public String get_curation_status(){
+	public String getCurationStatus(){
 		return curation_status;
 	}
 	
-	public String get_curation_update(){
+	public String getCurationUpdate(){
 		return curation_update;
 	}
 	
 	//Just updates the id in the bean - method for updating db is in DBConnection
 	@Override
-	public void setGeneratedID(String id) {
+	public void setGeneratedId(String id) {
 		generated_id = id;
 	}
 
 	@Override
-	public String getIRI_String() {
-		if (get_doi() == null){
+	public String getIriString() {
+		if (getDoi() == null){
 			if (generated_id == null){
 				throw new IllegalStateException("Publication has neither doi nor generated id");
 			}
-			return get_generated_id();
+			return getGeneratedId();
 		}
 		else {
 			try {
-				return cleanupDOI(get_doi());
+				return cleanupDoi(getDoi());
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -228,7 +228,7 @@ public class Publication implements AbstractNamedEntity{
 	 * @return IRI using using doi prefix
 	 * @throws Exception either MalformedURL or Encoding exceptions can be thrown
 	 */
-	public static String cleanupDOI(String doi) throws Exception{
+	public static String cleanupDoi(String doi) throws Exception{
 		URL raw = new URL(doi);
 		String cleanpath = URLEncoder.encode(raw.getPath().substring(1),"UTF-8");
 		if (log.isDebugEnabled()){
@@ -242,20 +242,20 @@ public class Publication implements AbstractNamedEntity{
 
 	private void processStuff(IRIManager iriManager,AbstractConnection connection) throws Exception{
 		String pubID;
-		if(get_doi() != null){
-			String clean = cleanupDOI(get_doi());
+		if(getDoi() != null){
+			String clean = cleanupDoi(getDoi());
 			pubID = clean;
-			if (get_generated_id() != null){
+			if (getGeneratedId() != null){
 			//TODO check for existing arachb id - generate owl:sameas - general, should be somewhere else
 			}
 		}
-		else if (get_generated_id() == null){ //generate arachb IRI (maybe temporary)
+		else if (getGeneratedId() == null){ //generate arachb IRI (maybe temporary)
 			pubID = iriManager.generateARACHB_IRI_String();
-			setGeneratedID(pubID);
+			setGeneratedId(pubID);
 			//connection.updatePublication(this);
 		}
 		else{
-			pubID = get_generated_id();
+			pubID = getGeneratedId();
 		}
 
 	}

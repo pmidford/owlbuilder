@@ -69,48 +69,52 @@ public class Term implements AbstractNamedEntity{
 	}
 
 	
-	public int get_id(){
+	public int getId(){
 		return id;
 	}
 	
-	public String getIRI_String(){
-		if (get_source_id() == null){
-			return get_generated_id();
+	public String getIriString(){
+		if (getSourceId() == null){
+			return getGeneratedId();
 		}
 		else {
-			return get_source_id();
+			return getSourceId();
 		}
 	}
 
 	
-	public String get_source_id(){
+	public String getSourceId(){
 		return source_id;
 	}
 
-	public int get_domain(){
+	public int getDomain(){
 		return domain;
 	}
 	
-	public int get_authority(){
+	public int getAuthority(){
 		return authority;
 	}
 	
-	public String get_label(){
+	public String getLabel(){
 		return label;
 	}
 	
-	public String get_comment(){
+	public String getComment(){
 		return comment;
 	}
 	
-	public String get_generated_id(){
+	public String getGeneatedID(){
 		return generated_id;
 	}
 
-	public void setGeneratedID(String new_id){
+	public void setGeneratedId(String new_id){
 		generated_id = new_id;
 	}
 	
+	public String getGeneratedId(){
+		return generated_id;
+	}
+
 	@Override
 	public OWLObject generateOWL(Owlbuilder b) {
 		// TODO Auto-generated method stub

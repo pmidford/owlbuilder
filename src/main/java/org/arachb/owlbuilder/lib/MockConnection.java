@@ -249,7 +249,7 @@ public class MockConnection implements AbstractConnection {
 	}
 
 	public void updateParticipant(IndividualParticipant p) throws SQLException{
-		mockPrimaryParticipantResults.setString(Participant.DBGENERATEDID, p.get_generated_id());
+		mockPrimaryParticipantResults.setString(Participant.DBGENERATEDID, p.getGeneratedId());
 	}
 
 	@Override
@@ -273,21 +273,21 @@ public class MockConnection implements AbstractConnection {
 	@Override
 	public void updateNamedEntity(AbstractNamedEntity e) throws SQLException{
 		if (e instanceof Publication){
-			if (e.get_id() == 2){
-				mockPublicationResults2.setString(Publication.DBGENERATEDID, e.getIRI_String());
+			if (e.getId() == 2){
+				mockPublicationResults2.setString(Publication.DBGENERATEDID, e.getIriString());
 			}
 		}
 		if (e instanceof Term){
-			switch (e.get_id()){
+			switch (e.getId()){
 			case 1:
-				mockTermResults.setString(Term.DBGENERATEDID, e.getIRI_String());
+				mockTermResults.setString(Term.DBGENERATEDID, e.getIriString());
 				break;
 			default:
-				mockTermResults2.setString(Term.DBGENERATEDID, e.getIRI_String());
+				mockTermResults2.setString(Term.DBGENERATEDID, e.getIriString());
 			}
 		}
 		else{
-			mockAssertionResults.setString(Assertion.DBGENERATEDID, e.getIRI_String());		
+			mockAssertionResults.setString(Assertion.DBGENERATEDID, e.getIriString());		
 		}
 	}
 

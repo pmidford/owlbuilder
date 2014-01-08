@@ -182,7 +182,7 @@ public class Owlbuilder{
 		final OWLClass pubAboutInvestigationClass = factory.getOWLClass(IRIManager.pubAboutInvestigation);
 		final Set<Publication> pubs = connection.getPublications();
 		for (Publication pub : pubs){
-			IRI pubID = IRI.create(pub.getIRI_String());
+			IRI pubID = IRI.create(pub.getIriString());
 			OWLIndividual pub_ind = factory.getOWLNamedIndividual(pubID);
 			OWLClassAssertionAxiom classAssertion = 
 					factory.getOWLClassAssertionAxiom(pubAboutInvestigationClass, pub_ind); 

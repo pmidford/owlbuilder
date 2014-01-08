@@ -12,7 +12,7 @@ public interface AbstractConnection {
 
 	Set<Assertion> getAssertions() throws Exception;
 
-	Publication getPublication(int get_publication) throws SQLException;
+	Publication getPublication(int getPublication) throws SQLException;
 
 	Set<Publication> getPublications() throws SQLException;
 

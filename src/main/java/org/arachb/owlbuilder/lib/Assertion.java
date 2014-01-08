@@ -73,10 +73,10 @@ public class Assertion implements AbstractNamedEntity{
 	private int id;
 	private int publication;
 	private int behavior;
-	private String publication_behavior;
+	private String publicationBehavior;
 	private int taxon;
-	private String publication_taxon;
-	private String publication_anatomy;
+	private String publicationTaxon;
+	private String publicationAnatomy;
 	private int evidence;
 	private String generated_id = null;  //for validity checking
 	private String publicationIRI;
@@ -105,11 +105,11 @@ public class Assertion implements AbstractNamedEntity{
 	public void fill(AbstractResults record) throws Exception{
 		id = record.getInt(DBID);
 		publication = record.getInt(DBPUBLICATION);
-		publication_behavior = record.getString(DBPUBLICATIONBEHAVIOR);
+		publicationBehavior = record.getString(DBPUBLICATIONBEHAVIOR);
 		behavior = record.getInt(DBBEHAVIORTERM);
-		publication_taxon = record.getString(DBPUBLICATIONTAXON);
+		publicationTaxon = record.getString(DBPUBLICATIONTAXON);
 		taxon = record.getInt(DBTAXON);
-		publication_anatomy = record.getString(DBPUBLICATIONANATOMY);
+		publicationAnatomy = record.getString(DBPUBLICATIONANATOMY);
 		evidence = record.getInt(DBEVIDENCE);
 		generated_id = record.getString(DBGENERATEDID);
 		if (publication != 0){
@@ -125,10 +125,10 @@ public class Assertion implements AbstractNamedEntity{
 	
 	private void updatePublicationIRI(AbstractResults record) throws Exception{
 		if (record.getString(DBPUBDOI) != null){
-			this.set_publicationIRI(Publication.cleanupDOI(record.getString(DBPUBDOI)));
+			this.setPublicationIri(Publication.cleanupDoi(record.getString(DBPUBDOI)));
 		}
 		else if (record.getString(DBPUBGENERATEDID) != null){
-			this.set_publicationIRI(record.getString(DBPUBGENERATEDID));
+			this.setPublicationIri(record.getString(DBPUBGENERATEDID));
 		}
 		else{
 			throwBadState(BADPUBLICATIONIRI);
@@ -137,10 +137,10 @@ public class Assertion implements AbstractNamedEntity{
 
 	private void updateBehaviorIRI(AbstractResults record) throws Exception{
 		if (record.getString(DBBEHAVIORSOURCEID) != null){
-			this.set_behaviorIRI(record.getString(DBBEHAVIORSOURCEID));
+			this.setBehaviorIri(record.getString(DBBEHAVIORSOURCEID));
 		}
 		else if (record.getString(DBBEHAVIORGENERATEDID) != null){
-			this.set_behaviorIRI(record.getString(DBBEHAVIORGENERATEDID));
+			this.setBehaviorIri(record.getString(DBBEHAVIORGENERATEDID));
 		}
 		else{
 			throwBadState(BADBEHAVIORIRI);
@@ -149,10 +149,10 @@ public class Assertion implements AbstractNamedEntity{
 
 	private void updateEvidenceIRI(AbstractResults record) throws Exception{
 		if (record.getString(DBEVIDENCESOURCEID) != null){
-			this.set_evidenceIRI(record.getString(DBEVIDENCESOURCEID));
+			this.setEvidenceIri(record.getString(DBEVIDENCESOURCEID));
 		}
 		else if (record.getString(DBEVIDENCEGENERATEDID) != null){
-			this.set_evidenceIRI(record.getString(DBEVIDENCEGENERATEDID));
+			this.setEvidenceIri(record.getString(DBEVIDENCEGENERATEDID));
 		}
 		else{
 			throwBadState(BADEVIDENCEIRI);
@@ -165,40 +165,40 @@ public class Assertion implements AbstractNamedEntity{
 	}
 
 	@Override
-	public int get_id(){
+	public int getId(){
 		return id;
 	}
 	
-	public int get_publication(){
+	public int getPublication(){
 		return publication;
 	}
 	
-	public String get_publication_behavior(){
-		return publication_behavior;
+	public String getPublicationBehavior(){
+		return publicationBehavior;
 	}
 	
-	public int get_behavior(){
+	public int getBehavior(){
 		return behavior;
 	}
 	
-	public String get_publication_taxon(){
-		return publication_taxon;
+	public String getPublicationTaxon(){
+		return publicationTaxon;
 	}
 	
-	public int get_taxon(){
+	public int getTaxon(){
 		return taxon;
 	}
 	
-	public String get_publication_anatomy(){
-		return publication_anatomy;
+	public String getPublicationAnatomy(){
+		return publicationAnatomy;
 	}
 	
-	public int get_evidence(){
+	public int getEvidence(){
 		return evidence;
 	}
 	
 	@Override
-	public String getIRI_String(){
+	public String getIriString(){
 		if (generated_id == null){
 			throw new IllegalStateException("Publication has neither doi nor generated id");
 		}
@@ -206,22 +206,27 @@ public class Assertion implements AbstractNamedEntity{
 	}
 
 
-	public void set_publicationIRI(String s){
+	public void setPublicationIri(String s){
 		publicationIRI = s;
 	}
 
-	public void set_behaviorIRI(String s){
+	public void setBehaviorIri(String s){
 		behaviorIRI = s;
 	}
 
-	public void set_evidenceIRI(String s){
+	public void setEvidenceIri(String s){
 		evidenceIRI = s;
 	}
 
 	
 	@Override
-	public void setGeneratedID(String id){
+	public void setGeneratedId(String id){
 		generated_id = id;
+	}
+	
+	@Override
+	public String getGeneratedId(){
+		return generated_id;
 	}
 
 	@Override
@@ -248,7 +253,7 @@ public class Assertion implements AbstractNamedEntity{
         	supersets.add(hasParticipantPrimary);
 
         	//find the publication id
-        	Publication p = c.getPublication(get_publication());
+        	Publication p = c.getPublication(getPublication());
         	IRI publication_id = IRI.create(publicationIRI);
         	OWLClass behaviorclass = factory.getOWLClass(IRI.create(behaviorIRI)); 
         	OWLClassExpression denotesExpr = 
@@ -256,7 +261,7 @@ public class Assertion implements AbstractNamedEntity{
         	supersets.add(denotesExpr);
         	OWLClassExpression intersectExpr =
         			factory.getOWLObjectIntersectionOf(supersets);
-        	OWLIndividual assert_ind = factory.getOWLNamedIndividual(IRI.create(getIRI_String()));
+        	OWLIndividual assert_ind = factory.getOWLNamedIndividual(IRI.create(getIriString()));
         	OWLClassAssertionAxiom textClassAssertion = 
         			factory.getOWLClassAssertionAxiom(intersectExpr, assert_ind); 
         	manager.addAxiom(target, textClassAssertion);

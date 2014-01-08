@@ -62,11 +62,11 @@ public class IRIManager {
 	}
 	
 	public void validateIRI(AbstractNamedEntity e) throws SQLException{
-		if (e.getIRI_String() != null)
+		if (e.getIriString() != null)
 			return;
 		//need to generate
 		String newIRI = generateARACHB_IRI_String();
-		e.setGeneratedID(newIRI);
+		e.setGeneratedId(newIRI);
 		c.updateNamedEntity(e);			
 			
 	}

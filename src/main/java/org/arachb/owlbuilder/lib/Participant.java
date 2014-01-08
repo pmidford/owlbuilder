@@ -68,19 +68,19 @@ public abstract class Participant implements AbstractEntity{
 			"Term without IRI referenced as participant substrate; participant id = %s; substrate id = %s";
 	
     
-	int id;
-	int taxon;
-	int substrate;
-	int anatomy;
-	String quantification;
-	String generated_id;
-	String publication_taxon;
-	String label;
-	String publication_anatomy;
-	String publication_substrate;
-	String taxonIRI = null;
-	String substrateIRI = null;
-	String anatomyIRI = null;
+	private int id;
+	private int taxon;
+	private int substrate;
+	private int anatomy;
+	private String quantification;
+	private String generatedId;
+	private String publicationTaxon;
+	private String label;
+	private String publicationAnatomy;
+	private String publicationSubstrate;
+	private String taxonIRI = null;
+	private String substrateIRI = null;
+	private String anatomyIRI = null;
 	
 	public static String getPrimaryQuery(){
 		return Participant.PRIMARYQUERY;
@@ -115,65 +115,124 @@ public abstract class Participant implements AbstractEntity{
 		}
 	}
 	
+	
+	//maybe make this a constructor
+	public void fill(AbstractResults record) throws SQLException{
+		id = record.getInt(DBID);
+		taxon = record.getInt(DBTAXON);
+		substrate = record.getInt(DBSUBSTRATE);
+		anatomy = record.getInt(DBANATOMY);
+		quantification = record.getString(DBQUANTIFICATION);
+		label = record.getString(DBLABEL);
+		generatedId = record.getString(DBGENERATEDID);
+		publicationTaxon = record.getString(DBPUBLICATIONTAXON);
+		publicationAnatomy = record.getString(DBPUBLICATIONANATOMY);
+		publicationSubstrate = record.getString(DBPUBLICATIONSUBSTRATE);
+		if (taxon != 0){
+			if (record.getString(DBTAXONSOURCEID) != null){
+				this.setTaxonIri(record.getString(DBTAXONSOURCEID));
+			}
+			else if (record.getString(DBTAXONGENERATEDID) != null){
+				this.setTaxonIri(record.getString(DBTAXONGENERATEDID));
+			}
+			else{
+				final String msg = String.format(BADTAXONIRI, id, taxon);
+				throw new IllegalStateException(msg);
+			}
+		}
+		if (anatomy != 0){
+			if (record.getString(DBANATOMYSOURCEID) != null){
+				this.setAnatomyIri(record.getString(DBANATOMYSOURCEID));
+			}
+			else if (record.getString(DBANATOMYGENERATEDID) != null){
+				this.setAnatomyIri(record.getString(DBANATOMYGENERATEDID));
+			}
+			else{
+				final String msg = String.format(BADANATOMYIRI, id, anatomy);
+				throw new IllegalStateException(msg);
+			}
+		}
+		if (substrate != 0){
+			if (record.getString(DBSUBSTRATESOURCEID) != null){
+				this.setSubstrateIri(record.getString(DBSUBSTRATESOURCEID));
+			}
+			else if (record.getString(DBSUBSTRATEGENERATEDID) != null){
+				this.setSubstrateIri(record.getString(DBSUBSTRATEGENERATEDID));
+			}
+			else{
+				final String msg = String.format(BADSUBSTRATEIRI, id, substrate);
+				throw new IllegalStateException(msg);
+			}
+		}
+	}
 
-	public int get_id(){
+
+	public int getId(){
 		return id;
 	}
 	
-	public int get_taxon(){
+	public int getTaxon(){
 		return taxon;
 	}
 	
-	public int get_substrate(){
+	public int getSubstrate(){
 		return substrate;
 	}
 	
-	public int get_anatomy(){
+	public int getAnatomy(){
 		return anatomy;
 	}
 	
-	public String get_quantification(){
+	public String getQuantification(){
 		return quantification;
 	}
 	
-	public String get_publication_taxon(){
-		return publication_taxon;
+	public String getPublicationTaxon(){
+		return publicationTaxon;
 	}
 	
-	public String get_label(){
+	public String getLabel(){
 		return label;
 	}
 	
-	public String get_publication_anatomy(){
-		return publication_anatomy;
+	public String getPublicationAnatomy(){
+		return publicationAnatomy;
 	}
 	
-	public String get_publication_substrate(){
-		return publication_substrate;
+	public String getPublicationSubstrate(){
+		return publicationSubstrate;
 	}
 
-	public String get_taxonIRI(){
+	public String getTaxonIri(){
 		return taxonIRI;
 	}
 	
-	public void set_taxonIRI(String s){
+	public void setTaxonIri(String s){
 		taxonIRI = s;
 	}
 	
-	public String get_substrateIRI(){
+	public String getSubstrateIri(){
 		return substrateIRI;
 	}
 	
-	public void set_substrateIRI(String s){
+	public void setSubstrateIri(String s){
 		substrateIRI= s;
 	}
 	
-	public String get_anatomyIRI(){
+	public String getAnatomyIri(){
 		return anatomyIRI;
 	}
 
-	public void set_anatomyIRI(String s){
+	public void setAnatomyIri(String s){
 		anatomyIRI = s;
+	}
+	
+	public String getGeneratedId(){
+		return generatedId;
+	}
+	
+	public void setGeneratedId(String s){
+		generatedId = s;
 	}
 	
 	

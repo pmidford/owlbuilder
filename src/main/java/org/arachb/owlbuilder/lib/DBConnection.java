@@ -152,8 +152,8 @@ public class DBConnection implements AbstractConnection{
 	public void updateNamedEntity(AbstractNamedEntity e) throws SQLException{
 		PreparedStatement updateStatement = 
 				c.prepareStatement(e.getUpdateStatement());
-		updateStatement.setString(1, e.getIRI_String());
-		updateStatement.setInt(2,e.get_id());
+		updateStatement.setString(1, e.getGeneratedId());  //getIRI_String() is wrong - 
+		updateStatement.setInt(2,e.getId());
 		int count = updateStatement.executeUpdate();
 		if (count != 1){
 			logger.error("entity update failed; row count = " + count);
@@ -220,7 +220,7 @@ public class DBConnection implements AbstractConnection{
 	public Participant getPrimaryParticipant(Assertion a) throws Exception{
 		PreparedStatement participantStatement =
 				c.prepareStatement(Participant.getPrimaryQuery());
-		participantStatement.setInt(1, a.get_id());
+		participantStatement.setInt(1, a.getId());
 		final ResultSet r = participantStatement.executeQuery();
 		final AbstractResults participantSet = new DBResults(r);
 		if (participantSet.next()){
@@ -228,7 +228,7 @@ public class DBConnection implements AbstractConnection{
 			result.fill(participantSet);
 			
 			if (participantSet.next()){
-				final String msg = String.format(MULTIPLEPRIMARYPARTICIPANTERROR, a.get_id());
+				final String msg = String.format(MULTIPLEPRIMARYPARTICIPANTERROR, a.getId());
 				log.error(msg);
 				throw new RuntimeException(msg);
 			}
@@ -243,7 +243,7 @@ public class DBConnection implements AbstractConnection{
 	
 	public Set<Participant> getParticipants(Assertion a) throws SQLException {
 		final Set<Participant> result = new HashSet<Participant>();
-		int assertion_id = a.get_id();
+		int assertion_id = a.getId();
 		PreparedStatement participantsStatement =
 				c.prepareStatement(Participant.getRestQuery());
 		participantsStatement.setInt(1, assertion_id);

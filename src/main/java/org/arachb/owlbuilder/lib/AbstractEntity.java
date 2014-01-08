@@ -7,7 +7,7 @@ import org.semanticweb.owlapi.model.OWLObject;
 
 public interface AbstractEntity {
 
-	public int get_id();
+	public int getId();
 
 	void fill(AbstractResults record) throws Exception;
 	
