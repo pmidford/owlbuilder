@@ -280,10 +280,10 @@ public class MockConnection implements AbstractConnection {
 		if (e instanceof Term){
 			switch (e.getId()){
 			case 1:
-				mockTermResults.setString(Term.DBGENERATEDID, e.getIriString());
+				mockTermResults.setString(Term.DBGENERATEDID, e.getGeneratedId());
 				break;
 			default:
-				mockTermResults2.setString(Term.DBGENERATEDID, e.getIriString());
+				mockTermResults2.setString(Term.DBGENERATEDID, e.getGeneratedId());
 			}
 		}
 		else{
