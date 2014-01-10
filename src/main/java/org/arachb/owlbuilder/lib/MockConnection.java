@@ -13,6 +13,7 @@ public class MockConnection implements AbstractConnection {
 			"http://dx.doi.org/10.1636/0161-8202(2000)028[0097:HDLHAB]2.0.CO;2";
 	final private static String TESTARACHBID = "http://arachb.org/arachb/TEST_0000001";
 	final private static String TESTBEHAVIOR = "http://purl.obolibrary.org/obo/NBO_0000355";
+	final private static String TESTPUBTAXON = "Tetragnatha straminea";
 	
 	private static MockResults mockPublicationResults = new MockResults();
 	static {
@@ -94,7 +95,7 @@ public class MockConnection implements AbstractConnection {
 		mockPrimaryParticipantResults.setString(Participant.DBQUANTIFICATION,"some");
 		mockPrimaryParticipantResults.setString(Participant.DBGENERATEDID,"");
 		mockPrimaryParticipantResults.setString(Participant.DBLABEL,"");
-		mockPrimaryParticipantResults.setString(Participant.DBPUBLICATIONTAXON,"");
+		mockPrimaryParticipantResults.setString(Participant.DBPUBLICATIONTAXON,TESTPUBTAXON);
 		mockPrimaryParticipantResults.setString(Participant.DBPUBLICATIONANATOMY,"");
 		mockPrimaryParticipantResults.setString(Participant.DBPUBLICATIONSUBSTRATE,"");
 		mockPrimaryParticipantResults.setString(Participant.DBTAXONSOURCEID,null);
@@ -108,13 +109,13 @@ public class MockConnection implements AbstractConnection {
 	private static MockResults mockSecondaryParticipantResults = new MockResults();
 	static {
 		mockSecondaryParticipantResults.setInteger(Participant.DBID,2);
-		mockSecondaryParticipantResults.setInteger(Participant.DBTAXON,3);
+		mockSecondaryParticipantResults.setInteger(Participant.DBTAXON,1);
 		mockSecondaryParticipantResults.setInteger(Participant.DBSUBSTRATE,0);
 		mockSecondaryParticipantResults.setInteger(Participant.DBANATOMY,4);
 		mockSecondaryParticipantResults.setString(Participant.DBQUANTIFICATION,"some");
 		mockSecondaryParticipantResults.setString(Participant.DBGENERATEDID,"");
 		mockSecondaryParticipantResults.setString(Participant.DBLABEL,"");
-		mockSecondaryParticipantResults.setString(Participant.DBPUBLICATIONTAXON,"");
+		mockSecondaryParticipantResults.setString(Participant.DBPUBLICATIONTAXON,TESTPUBTAXON);
 		mockSecondaryParticipantResults.setString(Participant.DBPUBLICATIONANATOMY,"");
 		mockSecondaryParticipantResults.setString(Participant.DBPUBLICATIONSUBSTRATE,"");
 		mockPrimaryParticipantResults.setString(Participant.DBTAXONSOURCEID,null);

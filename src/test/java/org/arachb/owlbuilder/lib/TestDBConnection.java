@@ -17,6 +17,7 @@ public class TestDBConnection {
     private AbstractConnection testConnection;
     private final static String testID = "http://arachb.org/arachb/TEST_0000001";
     private final static String testTaxon = "http://purl.obolibrary.org/obo/NCBITaxon_336608";
+    private final static String testPubTaxon = "Tetragnatha straminea";
     private final static String testAnatomy = "http://purl.obolibrary.org/obo/SPD_0000001";
     
 	@Before
@@ -103,6 +104,7 @@ public class TestDBConnection {
 		assertEquals(2,testParticipant.getAnatomy());
 		assertEquals(testTaxon,testParticipant.getTaxonIri());
 		assertEquals(testAnatomy,testParticipant.getAnatomyIri());
+		assertEquals(testPubTaxon,testParticipant.getPublicationTaxon());
 	}
 	
 	@Test
@@ -111,6 +113,12 @@ public class TestDBConnection {
 		Set<Participant> testSet = testConnection.getParticipants(testAssertion);
 		assertNotNull(testSet);
 		assertEquals(1,testSet.size());
+		for (Participant p : testSet){
+			assertEquals(2,p.getId());
+			assertEquals(1,p.getTaxon());
+			assertEquals(testTaxon,p.getTaxonIri());
+			assertEquals(testPubTaxon,p.getPublicationTaxon());
+		}
 	}
 	
 	@Test
@@ -118,14 +126,6 @@ public class TestDBConnection {
 		Assertion testAssertion = testConnection.getAssertion(1);
 		Participant testParticipant = testConnection.getPrimaryParticipant(testAssertion);
 		assertNotNull(testParticipant);
-		//testParticipant. (testID);
-		//testConnection.updateParticipant(testParticipant);
-		//Participant updatedParticipant = testConnection.getPrimaryParticipant(testAssertion);
-		//assertEquals(testID,updatedParticipant.get_generated_id());
-		//updatedParticipant.set_generated_id("");
-		//testConnection.updateParticipant(updatedParticipant);
-		//Participant updatedParticipant2 = testConnection.getPrimaryParticipant(testAssertion);
-		//assertEquals("",updatedParticipant2.get_generated_id());
 	}
 
 	

@@ -48,9 +48,9 @@ public abstract class Participant implements AbstractEntity{
 	final static int DBSUBSTRATE = 3;
 	final static int DBANATOMY = 4;
 	final static int DBQUANTIFICATION = 5;
-	final static int DBLABEL = 6;
-	final static int DBGENERATEDID = 7;
-	final static int DBPUBLICATIONTAXON = 8;
+	final static int DBGENERATEDID = 6;
+	final static int DBPUBLICATIONTAXON = 7;
+	final static int DBLABEL = 8;
 	final static int DBPUBLICATIONANATOMY = 9;
 	final static int DBPUBLICATIONSUBSTRATE = 10;
 	final static int DBTAXONSOURCEID = 11;
