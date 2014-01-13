@@ -308,6 +308,69 @@ public class DBConnection implements AbstractConnection{
 	public int domainId(String name){
 		return domain2id.get(name);
 	}
+	
+	
+	private static final String PUBLICATIONIDCOUNTERQUERY = 
+			"SELECT generated_id FROM publication";
+	
+	private static final String ASSERTIONIDCOUNTERQUERY = 
+			"SELECT generated_id FROM assertion";
+	
+	private static final String INDIVIDUALIDCOUNTERQUERY = 
+			"SELECT generated_id FROM individual";
+
+	public int scanPrivateIDs() throws Exception{
+		int maxid=0;
+		Statement countStatement = c.createStatement();
+		ResultSet publicationSet = countStatement.executeQuery(PUBLICATIONIDCOUNTERQUERY);
+		while(publicationSet.next()){
+			final String source = publicationSet.getString("generated_id");
+			int count = extractCount(source);
+			if (count > maxid){
+				maxid = count;
+			}
+		}
+		publicationSet.close();
+		ResultSet assertionSet = countStatement.executeQuery(ASSERTIONIDCOUNTERQUERY);
+		while(assertionSet.next()){
+			final String source = assertionSet.getString("generated_id");
+			int count = extractCount(source);
+			if (count > maxid){
+				maxid = count;
+			}
+		}
+		assertionSet.close();
+		ResultSet individualSet = countStatement.executeQuery(INDIVIDUALIDCOUNTERQUERY);
+		while(individualSet.next()){
+			final String source = individualSet.getString("generated_id");
+			int count = extractCount(source);
+			if (count > maxid){
+				maxid = count;
+			}
+			
+		}
+		individualSet.close();
+		countStatement.close();
+		return maxid;
+	}
+	
+	private int extractCount(String id){
+		if (id != null && id.startsWith(IRIManager.ARACHBPREFIX)){
+			String raw = id.substring(IRIManager.ARACHBPREFIX.length());
+			try{
+				int result = Integer.parseInt(raw);
+				return result;
+				}
+			catch(NumberFormatException e){
+				log.warn("Bad id format: " + id);
+				return -1;
+			}
+		}
+		else {
+			return -1;
+		}
+	}
+
 
 	public void close() throws Exception {
 		c.close();

@@ -82,6 +82,21 @@ public class Term implements AbstractNamedEntity{
 		}
 	}
 
+	@Override
+	public String checkIriString(){
+		if (getSourceId() == null){
+			if (getGeneratedId() == null){
+				throw new IllegalStateException("Term has neither assigned nor generated id");
+			}
+			else {
+				return getGeneratedId();
+			}
+		}
+		else {
+			return getSourceId();
+		}
+	}
+
 	
 	public String getSourceId(){
 		return source_id;

@@ -14,6 +14,7 @@ public class MockConnection implements AbstractConnection {
 	final private static String TESTARACHBID = "http://arachb.org/arachb/TEST_0000001";
 	final private static String TESTBEHAVIOR = "http://purl.obolibrary.org/obo/NBO_0000355";
 	final private static String TESTPUBTAXON = "Tetragnatha straminea";
+	final private static int MAXMOCKIDVALUE = 10;  //might need to assign this realistically
 	
 	private static MockResults mockPublicationResults = new MockResults();
 	static {
@@ -300,6 +301,12 @@ public class MockConnection implements AbstractConnection {
 	@Override
 	public Map<String, String> loadOntologyNamesForLoading() throws SQLException {
 		return mockOntologyNamesMap;
+	}
+	
+
+	@Override
+	public int scanPrivateIDs(){
+		return MAXMOCKIDVALUE;
 	}
 
 

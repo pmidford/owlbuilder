@@ -30,5 +30,7 @@ public interface AbstractConnection {
 
 	void updateNamedEntity(AbstractNamedEntity e) throws SQLException;
 
+	int scanPrivateIDs() throws Exception;
+
 
 }

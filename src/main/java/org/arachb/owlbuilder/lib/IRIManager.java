@@ -1,9 +1,13 @@
 package org.arachb.owlbuilder.lib;
 
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
+import org.arachb.owlbuilder.Owlbuilder;
 import org.semanticweb.owlapi.model.IRI;
 
 public class IRIManager {
@@ -38,22 +42,25 @@ public class IRIManager {
 	public static final IRI arachnidaTaxon = 
 			IRI.create("http://purl.obolibrary.org/obo/NCBITaxon_6854");
 	
-	private int idCounter=0;
+	
+	private static final Logger log = Logger.getLogger(IRIManager.class);
+
+	
+	private int idCounter=-1;
 	private AbstractConnection c;
 	
-	public IRIManager(AbstractConnection connection){
-		idCounter = scanPrivateIDs();
+	public IRIManager(AbstractConnection connection) throws Exception{
+		idCounter = connection.scanPrivateIDs();
+		log.info("id counter is " + idCounter);
 		c = connection;
 	}
 	
-	private int scanPrivateIDs(){
-		return -1;
-	}
 	
-	final static String arachbprefix = "http://arachb.org/arachb/ARACHB_";
+	public final static String ARACHBPREFIX = "http://arachb.org/arachb/ARACHB_";
 	public String generateARACHB_IRI_String(){  //should be private
 		idCounter++;
-		return String.format("%s%07d",arachbprefix,idCounter);
+		log.info("id counter is " + idCounter);
+		return String.format("%s%07d",ARACHBPREFIX,idCounter);
 	}
 	
 	final static String ncbiprefix = "http://purl.obolibrary.org/obo/NCBITaxon_";
@@ -62,7 +69,7 @@ public class IRIManager {
 	}
 	
 	public void validateIRI(AbstractNamedEntity e) throws SQLException{
-		if (e.getIriString() != null)
+		if (e.checkIriString() != null)
 			return;
 		//need to generate
 		String newIRI = generateARACHB_IRI_String();

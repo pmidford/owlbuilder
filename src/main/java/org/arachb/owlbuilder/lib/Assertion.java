@@ -7,8 +7,10 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.arachb.owlbuilder.Owlbuilder;
 import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLAnnotationAssertionAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassAssertionAxiom;
+import org.semanticweb.owlapi.model.OWLClassAxiom;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLIndividual;
@@ -200,11 +202,15 @@ public class Assertion implements AbstractNamedEntity{
 	@Override
 	public String getIriString(){
 		if (generated_id == null){
-			throw new IllegalStateException("Publication has neither doi nor generated id");
+			throw new IllegalStateException("Assertion has no generated id");
 		}
 		return generated_id;
 	}
 
+	@Override
+	public String checkIriString(){
+		return generated_id;
+	}
 
 	public void setPublicationIri(String s){
 		publicationIRI = s;
@@ -250,14 +256,15 @@ public class Assertion implements AbstractNamedEntity{
         	supersets.add(textualEntityClass);
         	OWLClassExpression hasParticipantPrimary = 
         			factory.getOWLObjectSomeValuesFrom(hasParticipant,(OWLClassExpression) owlPrimary);
-        	supersets.add(hasParticipantPrimary);
-
-        	//find the publication id
+         	//find the publication id
         	Publication p = c.getPublication(getPublication());
         	IRI publication_id = IRI.create(publicationIRI);
-        	OWLClass behaviorclass = factory.getOWLClass(IRI.create(behaviorIRI)); 
+        	OWLClass behaviorClass = factory.getOWLClass(IRI.create(behaviorIRI));
+        	builder.initializeMiscTermAndParents(behaviorClass);
+        	OWLClassExpression behaviorWithParticipant =
+        			factory.getOWLObjectIntersectionOf(behaviorClass,hasParticipantPrimary);
         	OWLClassExpression denotesExpr = 
-        			factory.getOWLObjectSomeValuesFrom(denotesProp,behaviorclass); 
+        			factory.getOWLObjectSomeValuesFrom(denotesProp,behaviorWithParticipant); 
         	supersets.add(denotesExpr);
         	OWLClassExpression intersectExpr =
         			factory.getOWLObjectIntersectionOf(supersets);
@@ -277,4 +284,6 @@ public class Assertion implements AbstractNamedEntity{
 		// TODO Auto-generated method stub
 		return null;
 	}
+	
+
 }

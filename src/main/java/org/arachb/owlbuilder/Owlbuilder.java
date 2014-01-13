@@ -6,9 +6,7 @@ package org.arachb.owlbuilder;
  */
 
 import java.io.File;
-import java.sql.SQLException;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -19,11 +17,7 @@ import org.arachb.owlbuilder.lib.Assertion;
 import org.arachb.owlbuilder.lib.Config;
 import org.arachb.owlbuilder.lib.DBConnection;
 import org.arachb.owlbuilder.lib.IRIManager;
-import org.arachb.owlbuilder.lib.IndividualParticipant;
-import org.arachb.owlbuilder.lib.Participant;
 import org.arachb.owlbuilder.lib.Publication;
-import org.arachb.owlbuilder.lib.QuantifiedParticipant;
-import org.arachb.owlbuilder.lib.Term;
 import org.semanticweb.elk.owlapi.ElkReasonerFactory;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.IRI;
@@ -31,21 +25,19 @@ import org.semanticweb.owlapi.model.OWLAnnotationAssertionAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassAssertionAxiom;
 import org.semanticweb.owlapi.model.OWLClassAxiom;
-import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLIndividual;
 import org.semanticweb.owlapi.model.OWLObject;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
-import org.semanticweb.owlapi.model.OWLObjectPropertyAssertionAxiom;
+import org.semanticweb.owlapi.model.OWLObjectPropertyAxiom;
+import org.semanticweb.owlapi.model.OWLObjectPropertyExpression;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyFormat;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
-import org.semanticweb.owlapi.model.OWLOntologySetProvider;
 import org.semanticweb.owlapi.reasoner.InferenceType;
 import org.semanticweb.owlapi.reasoner.NodeSet;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
-import org.semanticweb.owlapi.reasoner.structural.StructuralReasonerFactory;
 import org.semanticweb.owlapi.util.OWLOntologyMerger;
 import org.semanticweb.owlapi.util.SimpleIRIMapper;
 
@@ -98,7 +90,6 @@ public class Owlbuilder{
 		}
 		manager = OWLManager.createOWLOntologyManager();
 		factory = manager.getOWLDataFactory();
-		//rfactory = new StructuralReasonerFactory();  //change when reasoner is upgraded
 		rfactory = new ElkReasonerFactory();
 		iriManager = new IRIManager(connection);
 	}
@@ -119,6 +110,8 @@ public class Owlbuilder{
 			format.asPrefixOWLOntologyFormat().setPrefix("doi", "http://dx.doi.org/");
 			log.info("copying relevant taxonony to target ontology");
 			initializeTaxonomy();
+			log.info("copying misc support terms to target ontology");
+			initializeMisc();
 			processDatabase();
 			reasoner.flush();
 			log.info("Saving ontology");
@@ -182,6 +175,7 @@ public class Owlbuilder{
 		final OWLClass pubAboutInvestigationClass = factory.getOWLClass(IRIManager.pubAboutInvestigation);
 		final Set<Publication> pubs = connection.getPublications();
 		for (Publication pub : pubs){
+			iriManager.validateIRI(pub);
 			IRI pubID = IRI.create(pub.getIriString());
 			OWLIndividual pub_ind = factory.getOWLNamedIndividual(pubID);
 			OWLClassAssertionAxiom classAssertion = 
@@ -196,7 +190,6 @@ public class Owlbuilder{
 		final OWLClass textualEntityClass = factory.getOWLClass(IRIManager.textualEntity);
 		final OWLObjectProperty denotesProp = factory.getOWLObjectProperty(IRIManager.denotesProperty);
 		final OWLObjectProperty partofProperty = factory.getOWLObjectProperty(IRIManager.partOfProperty);
-		OWLClass behaviorProcess = factory.getOWLClass(IRI.create("http://purl.obolibrary.org/obo/NBO_0000313")); 
 		final Set<Assertion> assertions = connection.getAssertions();
 		for (Assertion a : assertions){
 			iriManager.validateIRI(a);
@@ -232,7 +225,90 @@ public class Owlbuilder{
 			}
 		}
 	}
+
 	
+	static final IRI[] MISC_PROPERTIES = {
+		IRIManager.partOfProperty,
+		IRIManager.denotesProperty,
+		IRIManager.hasParticipantProperty
+	};
+	
+	static final IRI[] MISC_TERMS = {
+		IRIManager.informationContentEntity,
+		IRIManager.pubAboutInvestigation,
+		IRIManager.textualEntity
+	};
+	
+	private void initializeMisc(){
+		for (IRI mTerm : MISC_TERMS){
+			OWLClass mClass = factory.getOWLClass(mTerm);
+			initializeMiscTermAndParents(mClass);
+		}
+		for (IRI mProp : MISC_PROPERTIES){
+			OWLObjectProperty mprop = factory.getOWLObjectProperty(mProp);
+			initializeMiscObjPropertyAndParents(mprop);
+		}
+	}
+	
+	public void initializeMiscTermAndParents(OWLClass term){
+		initializeMiscTerm(term);
+		final NodeSet<OWLClass> termParents = reasoner.getSuperClasses(term, false);
+		for (OWLClass c : termParents.getFlattened()){
+			initializeMiscTerm(c);
+		}
+
+	}
+	
+	public void initializeMiscTerm(OWLClass term){
+		Set<OWLClassAxiom> taxonAxioms =  mergedSources.getAxioms(term);
+		if (taxonAxioms.isEmpty()){
+			log.error("No Axioms for term " + term);
+		}
+		else{
+			manager.addAxioms(target, taxonAxioms);
+		}
+		//log.info("Annotations");
+		Set<OWLAnnotationAssertionAxiom> termAnnotations = 
+				mergedSources.getAnnotationAssertionAxioms(term.getIRI());
+		for (OWLAnnotationAssertionAxiom a : termAnnotations){
+			//log.info("   Annotation Axiom: " + a.toString());
+			if (a.getAnnotation().getProperty().isLabel()){
+				manager.addAxiom(target, a);
+			}
+		}
+
+	}
+	public void initializeMiscObjPropertyAndParents(OWLObjectProperty prop){
+		initializeMiscObjProperty(prop);
+		//final NodeSet<OWLObjectPropertyExpression> propParents = reasoner.getSuperObjectProperties(prop,false);
+		//for (OWLObjectPropertyExpression c : propParents.getFlattened()){
+		//	initializeMiscObjProperty(c);
+		//}
+
+	}
+	
+	public void initializeMiscObjProperty(OWLObjectPropertyExpression prope){
+		Set<OWLObjectPropertyAxiom> propertyAxioms =  mergedSources.getAxioms(prope);
+		if (propertyAxioms.isEmpty()){
+			log.error("No Axioms for object property " + prope);
+		}
+		else{
+			manager.addAxioms(target, propertyAxioms);
+		}
+		//log.info("Annotations");
+		if (prope instanceof OWLObjectProperty){
+			OWLObjectProperty prop = (OWLObjectProperty) prope;
+		
+			Set<OWLAnnotationAssertionAxiom> termAnnotations = 
+					mergedSources.getAnnotationAssertionAxioms(prop.getIRI());
+			for (OWLAnnotationAssertionAxiom a : termAnnotations){
+				//log.info("   Annotation Axiom: " + a.toString());
+				if (a.getAnnotation().getProperty().isLabel()){
+					manager.addAxiom(target, a);
+				}
+			}
+		}
+	}
 	
 	private void generateHTML(){
 		

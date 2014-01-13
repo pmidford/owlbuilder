@@ -122,12 +122,19 @@ public class IndividualParticipant extends Participant implements AbstractNamedE
 		}
 	}
 	
-
-	
 	@Override
-	public String getIriString() {
+	public String getIriString(){
+		if (getGeneratedId() == null){
+			throw new IllegalStateException("Individual has neither assigned nor generated id");
+		}
 		return getGeneratedId();
 	}
+	
+	@Override
+	public String checkIriString() {
+		return getGeneratedId();
+	}
+
 	
 
 }

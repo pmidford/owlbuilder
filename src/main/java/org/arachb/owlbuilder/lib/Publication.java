@@ -222,6 +222,24 @@ public class Publication implements AbstractNamedEntity{
 		}
 	}
 	
+	
+	@Override
+	public String checkIriString() {
+		if (getDoi() == null){
+			return getGeneratedId();
+		}
+		else {
+			try {
+				return cleanupDoi(getDoi());
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				return "";
+			}
+		}
+	}
+
+
 	/**
 	 * This cleans up doi's (which tend to have lots of URI unfriendly characters) and returns a properly prefixed doi
 	 * @param doi
