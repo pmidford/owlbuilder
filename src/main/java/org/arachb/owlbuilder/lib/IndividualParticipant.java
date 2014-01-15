@@ -1,31 +1,23 @@
 package org.arachb.owlbuilder.lib;
 
-import java.sql.SQLException;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.arachb.owlbuilder.Owlbuilder;
-import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLClass;
-import org.semanticweb.owlapi.model.OWLClassAxiom;
 import org.semanticweb.owlapi.model.OWLDataFactory;
-import org.semanticweb.owlapi.model.OWLIndividual;
 import org.semanticweb.owlapi.model.OWLObject;
-import org.semanticweb.owlapi.model.OWLObjectProperty;
-import org.semanticweb.owlapi.model.OWLObjectPropertyAssertionAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
-import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.reasoner.NodeSet;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 
 public class IndividualParticipant extends Participant implements AbstractNamedEntity{
 
-	static final private String ROWUPDATE = "UPDATE participant " +
-	"SET generated_id = ? WHERE id = ?";
+	static final private String ROWUPDATE = 
+			"UPDATE participant SET generated_id = ? WHERE id = ?";
 	
 	private final static Logger log = Logger.getLogger(IndividualParticipant.class);
-
 		
 	public String getUpdateStatement(){
 		return IndividualParticipant.ROWUPDATE;
@@ -106,7 +98,11 @@ public class IndividualParticipant extends Participant implements AbstractNamedE
 		}
 	}
 
-	
+	/**
+	 * 
+	 * @param builder
+	 * @param iri
+	 */
 	void processParticipantSubstrate(Owlbuilder builder, IRI iri){
 		final OWLOntology target = builder.getTarget();
 		final OWLOntology merged = builder.getMergedSources();

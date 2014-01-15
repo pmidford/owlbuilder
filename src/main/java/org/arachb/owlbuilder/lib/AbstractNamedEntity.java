@@ -4,6 +4,10 @@ public interface AbstractNamedEntity extends AbstractEntity{
 	
 	public void setGeneratedId(String id);
 	
+	/**
+	 * 
+	 * @return a statement for updating the generated-id field in an SQL table
+	 */
 	public String getUpdateStatement();
 	
 	/**
@@ -13,6 +17,10 @@ public interface AbstractNamedEntity extends AbstractEntity{
 	 **/
 	public String getGeneratedId();
 
+	/**
+	 * 
+	 * @return either assigned or generated identifier that can parse into an IRI
+	 */
 	public String getIriString();
 
 	/**

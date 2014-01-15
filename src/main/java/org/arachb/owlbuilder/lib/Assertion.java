@@ -1,16 +1,13 @@
 package org.arachb.owlbuilder.lib;
 
-import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.arachb.owlbuilder.Owlbuilder;
 import org.semanticweb.owlapi.model.IRI;
-import org.semanticweb.owlapi.model.OWLAnnotationAssertionAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassAssertionAxiom;
-import org.semanticweb.owlapi.model.OWLClassAxiom;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLIndividual;
@@ -69,6 +66,8 @@ public class Assertion implements AbstractNamedEntity{
 	final static String BADEVIDENCEIRI =
 			"Term without IRI referenced as assertion evidence; assertion id = %s; evidence id = %s";
 
+	final static String NOASSERTIONGENID = 
+			"Assertion has no generated id; db id = %s";
 	
 	private final static Logger log = Logger.getLogger(Assertion.class);
 
@@ -202,7 +201,8 @@ public class Assertion implements AbstractNamedEntity{
 	@Override
 	public String getIriString(){
 		if (generated_id == null){
-			throw new IllegalStateException("Assertion has no generated id");
+			final String msg = String.format(NOASSERTIONGENID, id);
+			throw new IllegalStateException(msg);
 		}
 		return generated_id;
 	}
@@ -244,11 +244,15 @@ public class Assertion implements AbstractNamedEntity{
 		final OWLClass textualEntityClass = factory.getOWLClass(IRIManager.textualEntity);
 		final OWLObjectProperty denotesProp = factory.getOWLObjectProperty(IRIManager.denotesProperty);
 		final OWLObjectProperty partofProperty = factory.getOWLObjectProperty(IRIManager.partOfProperty);
+    	final OWLIndividual assert_ind = factory.getOWLNamedIndividual(IRI.create(getIriString()));
+    	OWLClass behaviorClass = factory.getOWLClass(IRI.create(behaviorIRI));
 		final Participant primary = c.getPrimaryParticipant(this);
+    	builder.initializeMiscTermAndParents(behaviorClass);
 		OWLObject owlPrimary = primary.generateOWL(builder);
 		final Set<Participant> otherParticipants = c.getParticipants(this);
+		final Set<OWLObject> otherOWLParticipants = new HashSet<OWLObject>();
 		for (Participant p : otherParticipants){
-			OWLObject owlRep = p.generateOWL(builder);
+			otherOWLParticipants.add(p.generateOWL(builder));
 		}
 		OWLObjectProperty hasParticipant = factory.getOWLObjectProperty(IRIManager.hasParticipantProperty);
         if (owlPrimary instanceof OWLClassExpression){
@@ -256,11 +260,6 @@ public class Assertion implements AbstractNamedEntity{
         	supersets.add(textualEntityClass);
         	OWLClassExpression hasParticipantPrimary = 
         			factory.getOWLObjectSomeValuesFrom(hasParticipant,(OWLClassExpression) owlPrimary);
-         	//find the publication id
-        	Publication p = c.getPublication(getPublication());
-        	IRI publication_id = IRI.create(publicationIRI);
-        	OWLClass behaviorClass = factory.getOWLClass(IRI.create(behaviorIRI));
-        	builder.initializeMiscTermAndParents(behaviorClass);
         	OWLClassExpression behaviorWithParticipant =
         			factory.getOWLObjectIntersectionOf(behaviorClass,hasParticipantPrimary);
         	OWLClassExpression denotesExpr = 
@@ -268,21 +267,25 @@ public class Assertion implements AbstractNamedEntity{
         	supersets.add(denotesExpr);
         	OWLClassExpression intersectExpr =
         			factory.getOWLObjectIntersectionOf(supersets);
-        	OWLIndividual assert_ind = factory.getOWLNamedIndividual(IRI.create(getIriString()));
-        	OWLClassAssertionAxiom textClassAssertion = 
+            OWLClassAssertionAxiom textClassAssertion = 
         			factory.getOWLClassAssertionAxiom(intersectExpr, assert_ind); 
         	manager.addAxiom(target, textClassAssertion);
-        	if (publication_id != null){
-        		OWLIndividual pub_ind = factory.getOWLNamedIndividual(publication_id);
-        		OWLObjectPropertyAssertionAxiom partofAssertion = 
-        				factory.getOWLObjectPropertyAssertionAxiom(partofProperty, assert_ind, pub_ind);
-        		manager.addAxiom(target, partofAssertion);
-        	}
-		}
-
-
-		// TODO Auto-generated method stub
-		return null;
+        }
+        else if (owlPrimary instanceof OWLIndividual){
+        	//TODO fill this in
+        }
+        else {
+        	throw new RuntimeException("Assertion primary neither an individual or a class expression");
+        }
+ 	    Publication pub = c.getPublication(getPublication());
+    	IRI publication_id = IRI.create(publicationIRI);
+    	if (publication_id != null){
+    		OWLIndividual pub_ind = factory.getOWLNamedIndividual(publication_id);
+    		OWLObjectPropertyAssertionAxiom partofAssertion = 
+    				factory.getOWLObjectPropertyAssertionAxiom(partofProperty, assert_ind, pub_ind);
+    		manager.addAxiom(target, partofAssertion);
+    	}
+        return assert_ind;
 	}
 	
 

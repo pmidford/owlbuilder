@@ -1,13 +1,10 @@
 package org.arachb.owlbuilder.lib;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.arachb.owlbuilder.Owlbuilder;
 import org.semanticweb.owlapi.model.IRI;
 
 public class IRIManager {
@@ -51,7 +48,6 @@ public class IRIManager {
 	
 	public IRIManager(AbstractConnection connection) throws Exception{
 		idCounter = connection.scanPrivateIDs();
-		log.info("id counter is " + idCounter);
 		c = connection;
 	}
 	
@@ -59,7 +55,6 @@ public class IRIManager {
 	public final static String ARACHBPREFIX = "http://arachb.org/arachb/ARACHB_";
 	public String generateARACHB_IRI_String(){  //should be private
 		idCounter++;
-		log.info("id counter is " + idCounter);
 		return String.format("%s%07d",ARACHBPREFIX,idCounter);
 	}
 	

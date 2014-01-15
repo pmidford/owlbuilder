@@ -66,18 +66,14 @@ public class Owlbuilder{
 	private final Config config;
 	private static Logger log = Logger.getLogger(Owlbuilder.class);
 
-	public static void main( String[] args ) throws Exception {
+	public static void main(String[] args) throws Exception {
 		Owlbuilder builder = null;
-		//try{
-			// Configure log4j
-			PropertyConfigurator.configure(Owlbuilder.class.getClassLoader().getResource("log4j.properties"));
-			log.info("Trying to start");
-			builder = new Owlbuilder();
-			builder.process();
-		//}
-		//finally{
-			builder.shutdown();
-		//}
+		// Configure log4j
+		PropertyConfigurator.configure(Owlbuilder.class.getClassLoader().getResource("log4j.properties"));
+		log.info("Trying to start");
+		builder = new Owlbuilder();
+		builder.process();
+		builder.shutdown();
 	}
 	
 	Owlbuilder() throws Exception{
@@ -187,15 +183,10 @@ public class Owlbuilder{
 	//when to get iri's for terms contained in participants?
 	
 	void processAssertions() throws Exception{
-		final OWLClass textualEntityClass = factory.getOWLClass(IRIManager.textualEntity);
-		final OWLObjectProperty denotesProp = factory.getOWLObjectProperty(IRIManager.denotesProperty);
-		final OWLObjectProperty partofProperty = factory.getOWLObjectProperty(IRIManager.partOfProperty);
 		final Set<Assertion> assertions = connection.getAssertions();
 		for (Assertion a : assertions){
 			iriManager.validateIRI(a);
 			OWLObject owlAssertion = a.generateOWL(this);
-			//find the behavior id
-			
  		}		
 	}
 	
@@ -280,6 +271,7 @@ public class Owlbuilder{
 	}
 	public void initializeMiscObjPropertyAndParents(OWLObjectProperty prop){
 		initializeMiscObjProperty(prop);
+		//ELK doesn't support a hierarchy among Object properties
 		//final NodeSet<OWLObjectPropertyExpression> propParents = reasoner.getSuperObjectProperties(prop,false);
 		//for (OWLObjectPropertyExpression c : propParents.getFlattened()){
 		//	initializeMiscObjProperty(c);
@@ -315,7 +307,10 @@ public class Owlbuilder{
 	}
 	
 	
-	
+	/**
+	 * This returns the knowledge base (the ontology that this tool is generating)
+	 * @return the Ontology (TBox + ABox) that will be written
+	 */
 	public OWLOntology getTarget(){
 		return target;
 	}
