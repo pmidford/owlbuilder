@@ -247,6 +247,9 @@ public class Publication implements AbstractNamedEntity{
 	 * @throws Exception either MalformedURL or Encoding exceptions can be thrown
 	 */
 	public static String cleanupDoi(String doi) throws Exception{
+		if (doi == null || doi.length() == 0){
+			throw new RuntimeException("Invalid empty DOI in publication");
+		}
 		URL raw = new URL(doi);
 		String cleanpath = URLEncoder.encode(raw.getPath().substring(1),"UTF-8");
 		if (log.isDebugEnabled()){
