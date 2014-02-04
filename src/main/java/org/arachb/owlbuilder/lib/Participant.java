@@ -261,6 +261,23 @@ public abstract class Participant implements AbstractEntity{
 	}
 
 	public void processAnatomy(Owlbuilder builder, OWLClass anatomyClass) {
+		final OWLOntologyManager manager = builder.getOntologyManager();
+		final OWLOntology merged = builder.getMergedSources();
+		final OWLOntology target = builder.getTarget();
+		if (true){
+			log.info("Need to add anatomy: " + anatomyClass.getIRI());
+			Set<OWLClassAxiom> anatAxioms = merged.getAxioms(anatomyClass);
+			manager.addAxioms(target, anatAxioms);
+			Set<OWLAnnotationAssertionAxiom> anatAnnotations = 
+					merged.getAnnotationAssertionAxioms(anatomyClass.getIRI());
+			for (OWLAnnotationAssertionAxiom a : anatAnnotations){
+				//log.info("   Annotation Axiom: " + a.toString());
+				if (a.getAnnotation().getProperty().isLabel()){
+					log.info("Label is " + a.getAnnotation().getValue().toString());
+					manager.addAxiom(target, a);
+				}
+			}
+		}
     	builder.initializeMiscTermAndParents(anatomyClass);
 		
 	}
