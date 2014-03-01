@@ -20,9 +20,9 @@ import org.semanticweb.owlapi.model.OWLOntologyManager;
 public class Assertion implements AbstractNamedEntity{
 
 	static final private String ROWQUERY = "SELECT a.id, a.publication, " +
-	"a.publication_behavior, a.behavior_term, a.publication_taxon, a.taxon," +
-	"a.publication_anatomy, a.evidence, a.generated_id, " +
-	"pub.doi,pub.generated_id,behavior.source_id,behavior.generated_id " +
+	"a.publication_behavior, a.behavior_term, a.taxon," +
+	"a.evidence, a.generated_id, pub.doi, " +
+	"pub.generated_id, behavior.source_id, behavior.generated_id " +
     "FROM assertion AS a " +
 	"LEFT JOIN publication AS pub ON (a.publication = pub.id) " +
 	"LEFT JOIN term AS behavior ON (a.behavior_term = behavior.id) " +
@@ -31,9 +31,9 @@ public class Assertion implements AbstractNamedEntity{
 	
 
 	static final private String TABLEQUERY = "SELECT a.id, a.publication, " +
-	"a.publication_behavior, a.behavior_term, a.publication_taxon, a.taxon," +
-	"a.publication_anatomy, a.evidence, a.generated_id, " +
-	"pub.doi,pub.generated_id,behavior.source_id,behavior.generated_id " +
+	"a.publication_behavior, a.behavior_term, a.taxon, " +
+	"a.evidence, a.generated_id, pub.doi, " +
+	"pub.generated_id, behavior.source_id, behavior.generated_id " +
 	"FROM assertion AS a " +
 	"LEFT JOIN publication AS pub ON (a.publication = pub.id) " +
 	"LEFT JOIN term AS behavior ON (a.behavior_term = behavior.id) " +
@@ -47,17 +47,15 @@ public class Assertion implements AbstractNamedEntity{
 	final static int DBPUBLICATION = 2;
 	final static int DBPUBLICATIONBEHAVIOR = 3;
 	final static int DBBEHAVIORTERM = 4;
-	final static int DBPUBLICATIONTAXON = 5;
-	final static int DBTAXON = 6;
-	final static int DBPUBLICATIONANATOMY = 7;
-	final static int DBEVIDENCE = 8;
-	final static int DBGENERATEDID = 9;
-	final static int DBPUBDOI = 10;
-	final static int DBPUBGENERATEDID = 11;
-	final static int DBBEHAVIORSOURCEID = 12;
-	final static int DBBEHAVIORGENERATEDID = 13;
-	final static int DBEVIDENCESOURCEID = 14;
-	final static int DBEVIDENCEGENERATEDID = 15;
+	final static int DBTAXON = 5;
+	final static int DBEVIDENCE = 6;
+	final static int DBGENERATEDID = 7;
+	final static int DBPUBDOI = 8;
+	final static int DBPUBGENERATEDID = 9;
+	final static int DBBEHAVIORSOURCEID = 10;
+	final static int DBBEHAVIORGENERATEDID = 11;
+	final static int DBEVIDENCESOURCEID = 12;
+	final static int DBEVIDENCEGENERATEDID = 13;
 	
 	final static String BADPUBLICATIONIRI =
 			"Publication without IRI referenced as assertion publication: assertion id = %s; publication id = %s";
@@ -76,8 +74,6 @@ public class Assertion implements AbstractNamedEntity{
 	private int behavior;
 	private String publicationBehavior;
 	private int taxon;
-	private String publicationTaxon;
-	private String publicationAnatomy;
 	private int evidence;
 	private String generated_id = null;  //for validity checking
 	private String publicationIRI;
@@ -107,10 +103,8 @@ public class Assertion implements AbstractNamedEntity{
 		id = record.getInt(DBID);
 		publication = record.getInt(DBPUBLICATION);
 		publicationBehavior = record.getString(DBPUBLICATIONBEHAVIOR);
-		behavior = record.getInt(DBBEHAVIORTERM);
-		publicationTaxon = record.getString(DBPUBLICATIONTAXON);
+		behavior= record.getInt(DBBEHAVIORTERM);
 		taxon = record.getInt(DBTAXON);
-		publicationAnatomy = record.getString(DBPUBLICATIONANATOMY);
 		evidence = record.getInt(DBEVIDENCE);
 		generated_id = record.getString(DBGENERATEDID);
 		if (publication != 0){
@@ -181,18 +175,11 @@ public class Assertion implements AbstractNamedEntity{
 	public int getBehavior(){
 		return behavior;
 	}
-	
-	public String getPublicationTaxon(){
-		return publicationTaxon;
-	}
-	
+		
 	public int getTaxon(){
 		return taxon;
 	}
 	
-	public String getPublicationAnatomy(){
-		return publicationAnatomy;
-	}
 	
 	public int getEvidence(){
 		return evidence;
@@ -238,7 +225,7 @@ public class Assertion implements AbstractNamedEntity{
 	@Override
 	public OWLObject generateOWL(Owlbuilder builder) throws Exception{		
 		final AbstractConnection c = builder.getConnection();
-		OWLOntology target = builder.getTarget();
+		OWLOntology extracted = builder.getExtracted();
 		OWLOntologyManager manager = builder.getOntologyManager();
 		OWLDataFactory factory = builder.getDataFactory();
 		final OWLClass textualEntityClass = factory.getOWLClass(IRIManager.textualEntity);
@@ -269,7 +256,7 @@ public class Assertion implements AbstractNamedEntity{
         			factory.getOWLObjectIntersectionOf(supersets);
             OWLClassAssertionAxiom textClassAssertion = 
         			factory.getOWLClassAssertionAxiom(intersectExpr, assert_ind); 
-        	manager.addAxiom(target, textClassAssertion);
+        	manager.addAxiom(extracted, textClassAssertion);
         }
         else if (owlPrimary instanceof OWLIndividual){
         	//TODO fill this in
@@ -277,13 +264,20 @@ public class Assertion implements AbstractNamedEntity{
         else {
         	throw new RuntimeException("Assertion primary neither an individual or a class expression");
         }
+		final OWLClass pubAboutInvestigationClass = factory.getOWLClass(IRIManager.pubAboutInvestigation);
+        
+        
  	    Publication pub = c.getPublication(getPublication());
-    	IRI publication_id = IRI.create(publicationIRI);
+		builder.getIRIManager().validateIRI(pub);
+    	IRI publication_id = IRI.create(pub.getIriString());
     	if (publication_id != null){
     		OWLIndividual pub_ind = factory.getOWLNamedIndividual(publication_id);
+			OWLClassAssertionAxiom classAssertion = 
+					factory.getOWLClassAssertionAxiom(pubAboutInvestigationClass, pub_ind); 
+			manager.addAxiom(extracted, classAssertion);
     		OWLObjectPropertyAssertionAxiom partofAssertion = 
     				factory.getOWLObjectPropertyAssertionAxiom(partofProperty, assert_ind, pub_ind);
-    		manager.addAxiom(target, partofAssertion);
+    		manager.addAxiom(extracted, partofAssertion);
     	}
         return assert_ind;
 	}

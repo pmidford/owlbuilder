@@ -134,8 +134,6 @@ public class MockConnection implements AbstractConnection {
 		mockAssertionResults.setInteger(Assertion.DBBEHAVIORTERM,9);
 		mockAssertionResults.setString(Assertion.DBPUBLICATIONBEHAVIOR,"behavior");
 		mockAssertionResults.setInteger(Assertion.DBTAXON, 12);
-		mockAssertionResults.setString(Assertion.DBPUBLICATIONTAXON,"Arachida");
-		mockAssertionResults.setString(Assertion.DBPUBLICATIONANATOMY,"whole body");
 		mockAssertionResults.setInteger(Assertion.DBEVIDENCE,0);
 		mockAssertionResults.setString(Assertion.DBGENERATEDID,"");
 		mockAssertionResults.setString(Assertion.DBPUBDOI, TESTDOI);
