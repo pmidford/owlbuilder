@@ -239,7 +239,7 @@ public abstract class Participant implements AbstractEntity{
 	void processTaxon(Owlbuilder builder,OWLClass taxon){
 		final OWLOntologyManager manager = builder.getOntologyManager();
 		final OWLOntology merged = builder.getMergedSources();
-		final OWLOntology target = builder.getTarget();
+		final OWLOntology extracted = builder.getTarget();
 		if (true){  //add appropriate when figured out
 			log.info("Need to add taxon: " + taxon.getIRI());
 			//log.info("Defining Axioms");
@@ -247,14 +247,14 @@ public abstract class Participant implements AbstractEntity{
 			for (OWLClassAxiom a : taxonAxioms){
 				//log.info("   Axiom: " + a.toString());
 			}
-			manager.addAxioms(target, taxonAxioms);
+			manager.addAxioms(extracted, taxonAxioms);
 			//log.info("Annotations");
 			Set<OWLAnnotationAssertionAxiom> taxonAnnotations = merged.getAnnotationAssertionAxioms(taxon.getIRI());
 			for (OWLAnnotationAssertionAxiom a : taxonAnnotations){
 				//log.info("   Annotation Axiom: " + a.toString());
 				if (a.getAnnotation().getProperty().isLabel()){
 					log.info("Label is " + a.getAnnotation().getValue().toString());
-					manager.addAxiom(target, a);
+					manager.addAxiom(extracted, a);
 				}
 			}
 		}
@@ -263,18 +263,18 @@ public abstract class Participant implements AbstractEntity{
 	public void processAnatomy(Owlbuilder builder, OWLClass anatomyClass) {
 		final OWLOntologyManager manager = builder.getOntologyManager();
 		final OWLOntology merged = builder.getMergedSources();
-		final OWLOntology target = builder.getTarget();
+		final OWLOntology extracted = builder.getTarget();
 		if (true){
 			log.info("Need to add anatomy: " + anatomyClass.getIRI());
 			Set<OWLClassAxiom> anatAxioms = merged.getAxioms(anatomyClass);
-			manager.addAxioms(target, anatAxioms);
+			manager.addAxioms(extracted, anatAxioms);
 			Set<OWLAnnotationAssertionAxiom> anatAnnotations = 
 					merged.getAnnotationAssertionAxioms(anatomyClass.getIRI());
 			for (OWLAnnotationAssertionAxiom a : anatAnnotations){
 				//log.info("   Annotation Axiom: " + a.toString());
 				if (a.getAnnotation().getProperty().isLabel()){
 					log.info("Label is " + a.getAnnotation().getValue().toString());
-					manager.addAxiom(target, a);
+					manager.addAxiom(extracted, a);
 				}
 			}
 		}

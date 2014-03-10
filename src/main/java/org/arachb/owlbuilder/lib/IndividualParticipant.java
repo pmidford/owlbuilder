@@ -61,7 +61,7 @@ public class IndividualParticipant extends Participant implements AbstractNamedE
 		final OWLOntology target = builder.getTarget();
 		final OWLOntology merged = builder.getMergedSources();
 		final OWLDataFactory factory = builder.getDataFactory();
-		final OWLReasoner reasoner = builder.getReasoner();
+		final OWLReasoner reasoner = builder.getPreReasoner();
 		boolean taxon_duplicate = target.containsClassInSignature(iri);
 		if (!taxon_duplicate){
 			boolean taxon_exists = merged.containsClassInSignature(iri);

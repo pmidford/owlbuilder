@@ -70,7 +70,7 @@ public class QuantifiedParticipant extends Participant {
 		final OWLOntology target = builder.getTarget();
 		final OWLOntology merged = builder.getMergedSources();
 		final OWLDataFactory factory = builder.getDataFactory();
-		final OWLReasoner reasoner = builder.getReasoner();
+		final OWLReasoner reasoner = builder.getPreReasoner();
 		boolean taxon_duplicate = target.containsClassInSignature(iri);
 		if (!taxon_duplicate){
 			boolean taxon_exists = merged.containsClassInSignature(iri);
@@ -116,7 +116,6 @@ public class QuantifiedParticipant extends Participant {
 				log.info("Did not find class in signature of merged ontology for: " + getAnatomyIri());
 				return null;
 			}
-
 		}
 		else{
 			OWLClass taxonClass = factory.getOWLClass(iri);

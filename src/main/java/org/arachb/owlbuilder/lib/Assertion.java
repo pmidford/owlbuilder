@@ -76,8 +76,8 @@ public class Assertion implements AbstractNamedEntity{
 	private int taxon;
 	private int evidence;
 	private String generated_id = null;  //for validity checking
-	private String publicationIRI;
 	private String behaviorIRI;
+	private String publicationIRI;
 	private String evidenceIRI;
 	
 	static final Assertion dummy = new Assertion(); 
@@ -225,9 +225,9 @@ public class Assertion implements AbstractNamedEntity{
 	@Override
 	public OWLObject generateOWL(Owlbuilder builder) throws Exception{		
 		final AbstractConnection c = builder.getConnection();
-		OWLOntology extracted = builder.getExtracted();
+		OWLOntology target = builder.getTarget();
 		OWLOntologyManager manager = builder.getOntologyManager();
-		OWLDataFactory factory = builder.getDataFactory();
+		final OWLDataFactory factory = builder.getDataFactory();
 		final OWLClass textualEntityClass = factory.getOWLClass(IRIManager.textualEntity);
 		final OWLObjectProperty denotesProp = factory.getOWLObjectProperty(IRIManager.denotesProperty);
 		final OWLObjectProperty partofProperty = factory.getOWLObjectProperty(IRIManager.partOfProperty);
@@ -256,7 +256,7 @@ public class Assertion implements AbstractNamedEntity{
         			factory.getOWLObjectIntersectionOf(supersets);
             OWLClassAssertionAxiom textClassAssertion = 
         			factory.getOWLClassAssertionAxiom(intersectExpr, assert_ind); 
-        	manager.addAxiom(extracted, textClassAssertion);
+        	manager.addAxiom(target, textClassAssertion);
         }
         else if (owlPrimary instanceof OWLIndividual){
         	//TODO fill this in
@@ -264,20 +264,15 @@ public class Assertion implements AbstractNamedEntity{
         else {
         	throw new RuntimeException("Assertion primary neither an individual or a class expression");
         }
-		final OWLClass pubAboutInvestigationClass = factory.getOWLClass(IRIManager.pubAboutInvestigation);
-        
         
  	    Publication pub = c.getPublication(getPublication());
-		builder.getIRIManager().validateIRI(pub);
-    	IRI publication_id = IRI.create(pub.getIriString());
-    	if (publication_id != null){
-    		OWLIndividual pub_ind = factory.getOWLNamedIndividual(publication_id);
-			OWLClassAssertionAxiom classAssertion = 
-					factory.getOWLClassAssertionAxiom(pubAboutInvestigationClass, pub_ind); 
-			manager.addAxiom(extracted, classAssertion);
+ 	    
+ 	    OWLObject pub_obj = pub.generateOWL(builder);
+ 	    if (pub_obj instanceof OWLIndividual){
+ 	    	OWLIndividual pub_ind = (OWLIndividual)pub_obj;
     		OWLObjectPropertyAssertionAxiom partofAssertion = 
     				factory.getOWLObjectPropertyAssertionAxiom(partofProperty, assert_ind, pub_ind);
-    		manager.addAxiom(extracted, partofAssertion);
+    		manager.addAxiom(target, partofAssertion);
     	}
         return assert_ind;
 	}

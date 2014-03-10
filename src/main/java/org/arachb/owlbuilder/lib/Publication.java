@@ -7,7 +7,12 @@ import java.sql.SQLException;
 import org.apache.log4j.Logger;
 import org.arachb.owlbuilder.Owlbuilder;
 import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLAnnotation;
+import org.semanticweb.owlapi.model.OWLAxiom;
+import org.semanticweb.owlapi.model.OWLClass;
+import org.semanticweb.owlapi.model.OWLClassAssertionAxiom;
 import org.semanticweb.owlapi.model.OWLDataFactory;
+import org.semanticweb.owlapi.model.OWLIndividual;
 import org.semanticweb.owlapi.model.OWLObject;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
@@ -75,6 +80,8 @@ public class Publication implements AbstractNamedEntity{
 	private String curation_status;
 	private String curation_update;
 	
+	private String generated_label;
+	
 	private static Logger log = Logger.getLogger(Owlbuilder.class);
 
 	
@@ -112,7 +119,8 @@ public class Publication implements AbstractNamedEntity{
 		doi = record.getString(DBDOI);
 		generated_id = record.getString(DBGENERATEDID);
         curation_status = record.getString(DBCURATIONSTATUS);
-        curation_update = record.getString(DBCURATIONUPDATE);
+        curation_update = record.getString(DBCURATIONUPDATE);        
+        generated_label = generateLabel();
 	}
 	
 	@Override
@@ -203,6 +211,15 @@ public class Publication implements AbstractNamedEntity{
 		generated_id = id;
 	}
 
+    //generate a label; this should gradually get smarter
+	private String generateLabel(){
+		StringBuilder b = new StringBuilder(100);
+        b.append(author_list);
+        b.append(' ');
+        b.append(publication_year);
+		return b.toString();
+	}
+	
 	@Override
 	public String getIriString() {
 		if (getDoi() == null){
@@ -282,10 +299,28 @@ public class Publication implements AbstractNamedEntity{
 	}
 	
 	@Override
-	public OWLObject generateOWL(Owlbuilder builder) {
-		// TODO Auto-generated method stub
+	public OWLObject generateOWL(Owlbuilder builder) throws SQLException {
+		final OWLOntologyManager manager = builder.getOntologyManager();
+		final OWLDataFactory factory = builder.getDataFactory();
+		final OWLClass pubAboutInvestigationClass = 
+				factory.getOWLClass(IRIManager.pubAboutInvestigation);
+
+		builder.getIRIManager().validateIRI(this);
+		IRI publication_id = IRI.create(getIriString());
+		if (publication_id != null){
+			OWLIndividual pub_ind = factory.getOWLNamedIndividual(publication_id);
+			OWLClassAssertionAxiom classAssertion = 
+					factory.getOWLClassAssertionAxiom(pubAboutInvestigationClass, pub_ind); 
+			manager.addAxiom(builder.getTarget(), classAssertion);
+			if (generated_label != null){
+				OWLAnnotation labelAnno = factory.getOWLAnnotation(factory.getRDFSLabel(),
+						factory.getOWLLiteral(generated_label));
+				OWLAxiom ax = factory.getOWLAnnotationAssertionAxiom(publication_id, labelAnno);
+			    // Add the axiom to the ontology
+			    manager.addAxiom(builder.getTarget(),ax);
+			}	
+			return pub_ind;
+		}
 		return null;
 	}
-
-	
 }
