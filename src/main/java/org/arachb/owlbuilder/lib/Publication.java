@@ -14,7 +14,6 @@ import org.semanticweb.owlapi.model.OWLClassAssertionAxiom;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLIndividual;
 import org.semanticweb.owlapi.model.OWLObject;
-import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 
 
@@ -278,26 +277,6 @@ public class Publication implements AbstractNamedEntity{
 		return IRI.create("http://dx.doi.org/",cleanpath).toString();
 	}
 
-	private void processStuff(IRIManager iriManager,AbstractConnection connection) throws Exception{
-		String pubID;
-		if(getDoi() != null){
-			String clean = cleanupDoi(getDoi());
-			pubID = clean;
-			if (getGeneratedId() != null){
-			//TODO check for existing arachb id - generate owl:sameas - general, should be somewhere else
-			}
-		}
-		else if (getGeneratedId() == null){ //generate arachb IRI (maybe temporary)
-			pubID = iriManager.generateARACHB_IRI_String();
-			setGeneratedId(pubID);
-			//connection.updatePublication(this);
-		}
-		else{
-			pubID = getGeneratedId();
-		}
-
-	}
-	
 	@Override
 	public OWLObject generateOWL(Owlbuilder builder) throws SQLException {
 		final OWLOntologyManager manager = builder.getOntologyManager();
