@@ -36,6 +36,11 @@
       <artifactId>owlapi-distribution</artifactId>
       <version>3.4.9</version>
     </dependency>
+    <dependency>
+        <groupId>org.bbop</groupId>
+        <artifactId>owlTools-Core</artifactId>
+        <version>0.2.1-SNAPSHOT</version>
+    </dependency>
     <dependency> 
       <groupId>org.semanticweb.elk</groupId> 
       <artifactId>elk-owlapi</artifactId> 

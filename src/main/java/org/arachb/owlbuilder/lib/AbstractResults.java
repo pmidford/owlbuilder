@@ -8,6 +8,8 @@ public interface AbstractResults {
 	
 	String getString(int field) throws SQLException;
 	
+	boolean getBoolean(int field) throws SQLException;
+	
 	boolean next() throws SQLException;
 
 }

@@ -88,8 +88,9 @@ public class QuantifiedParticipant extends Participant {
 				return taxonClass;
 			}
 			else{
-				log.info("Did not find class in signature of merged ontology for: " + getTaxonIri());
-				return null;
+				log.info("Did not find taxon class in signature of merged ontology for: " + getTaxonIri());
+				OWLClass taxonClass = factory.getOWLClass(iri);
+				return taxonClass;
 			}
 		}
 		else{

@@ -41,6 +41,7 @@ import org.semanticweb.owlapi.model.OWLObjectPropertyExpression;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyFormat;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 import org.semanticweb.owlapi.reasoner.InferenceType;
 import org.semanticweb.owlapi.reasoner.NodeSet;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
@@ -54,11 +55,14 @@ import org.semanticweb.owlapi.util.InferredSubClassAxiomGenerator;
 import org.semanticweb.owlapi.util.OWLOntologyMerger;
 import org.semanticweb.owlapi.util.SimpleIRIMapper;
 
+import owltools.graph.OWLGraphWrapper;
+import owltools.graph.OWLGraphWrapperBasic;
+
 public class Owlbuilder{
 
 	
-	private final OWLOntologyManager manager;
-	private final OWLDataFactory factory;
+	//private OWLOntologyManager manager;
+	//private OWLDataFactory factory;
 	private final IRIManager iriManager;
 	private final AbstractConnection connection;
 	private final OWLReasonerFactory rfactory;
@@ -69,6 +73,8 @@ public class Owlbuilder{
 	
 	private final Map<String,OWLOntology>supportOntologies = new HashMap<String,OWLOntology>();
 	private OWLOntology mergedSources = null;
+	
+	private final OWLGraphWrapper testWrapper;
 		
 	
 	public static final String targetIRI = "http://arachb.org/arachb/arachb.owl";
@@ -98,16 +104,19 @@ public class Owlbuilder{
 		else{
 			connection = DBConnection.getMockConnection();
 		}
-		manager = OWLManager.createOWLOntologyManager();
-		factory = manager.getOWLDataFactory();
+		testWrapper = new OWLGraphWrapper(targetIRI);
 		rfactory = new ElkReasonerFactory();
 		iriManager = new IRIManager(connection);
+		final OWLOntologyFormat format = testWrapper.getManager().getOntologyFormat(testWrapper.getSourceOntology());
+		format.asPrefixOWLOntologyFormat().setPrefix("doi", "http://dx.doi.org/");
 	}
 
 	void process() throws Exception{	
+		target = testWrapper.getSourceOntology();
 		log.info("Loading ontologies");
 		loadImportedOntologies();
 		mergedSources = mergeImportedOntologies();
+		loadCuratorAddedTerms(mergedSources);
 		log.info("Initializing reasoner");
 		preReasoner = rfactory.createReasoner(mergedSources);
 		log.info("Finished reasoner initialization");
@@ -115,9 +124,7 @@ public class Owlbuilder{
 		try{
 			preReasoner.precomputeInferences(InferenceType.CLASS_HIERARCHY);
 			log.info("Finished precomputing class hierarchy");
-			target = manager.createOntology(IRI.create(targetIRI));
-			OWLOntologyFormat format = manager.getOntologyFormat(target);
-			format.asPrefixOWLOntologyFormat().setPrefix("doi", "http://dx.doi.org/");
+			//target = manager.createOntology(IRI.create(targetIRI));
 			log.info("copying relevant taxonony to target ontology");
 			initializeTaxonomy();
 			log.info("copying misc support terms to target ontology");
@@ -136,12 +143,9 @@ public class Owlbuilder{
 
 	        InferredOntologyGenerator iog = new InferredOntologyGenerator(postReasoner,
 	                        gens);
-	        iog.fillOntology(manager,target);
+	        iog.fillOntology(testWrapper.getManager(),target);
 	        
-			log.info("Saving ontology");			
-			File f = new File(temporaryOutput);
-			manager.saveOntology(target, IRI.create(f.toURI()));
-			log.info("Generating HTML pages");
+	        saveOntology();
 			generateHTML();
 			log.info("Shutting down reasoner");
 		}
@@ -172,6 +176,7 @@ public class Owlbuilder{
 	void loadImportedOntologies() throws Exception{
 		final Map <String,String> sourceMap = connection.loadImportSourceMap();
 		final Map <String,String> namesForLoading = connection.loadOntologyNamesForLoading();
+		final OWLOntologyManager manager = testWrapper.getManager();
 		for (String source : sourceMap.keySet()){
 			log.info(String.format("Loading %s from %s", namesForLoading.get(source), source));
 			IRI iri = IRI.create(source);
@@ -180,6 +185,7 @@ public class Owlbuilder{
 			String cachePath = "file:/" + config.getCacheDir() + "/" + pathParts[pathParts.length-1];
             log.info("Cachepath is " + cachePath);
 			manager.addIRIMapper(new SimpleIRIMapper(iri, IRI.create(cachePath)));
+			log.info("Added IRIMapper");
 			OWLOntology ont = manager.loadOntology(iri);
 			log.info("Loaded ontology: " + ont);
             supportOntologies.put(source, ont);
@@ -189,6 +195,7 @@ public class Owlbuilder{
 	
 	OWLOntology mergeImportedOntologies() throws Exception{
 		log.info("Starting ontology merge");
+		final OWLOntologyManager manager = testWrapper.getManager();
 		OWLOntologyMerger merger = new OWLOntologyMerger(manager);
 		IRI mergedOntologyIRI = IRI.create("http://www.semanticweb.com/mymergedont");
         OWLOntology merged = merger.createMergedOntology(manager, mergedOntologyIRI);
@@ -210,7 +217,7 @@ public class Owlbuilder{
 	}
 	
 	private void initializeTaxonomy(){
-		OWLClass arachnidaClass = factory.getOWLClass(IRIManager.arachnidaTaxon);
+		OWLClass arachnidaClass = testWrapper.getDataFactory().getOWLClass(IRIManager.arachnidaTaxon);
 		final NodeSet<OWLClass> arachnidaParents = preReasoner.getSuperClasses(arachnidaClass, false);
 		final NodeSet<OWLClass> arachnidaChildren = preReasoner.getSubClasses(arachnidaClass, false);
 		initializeTaxon(arachnidaClass);
@@ -223,6 +230,7 @@ public class Owlbuilder{
 	}
 	
 	private void initializeTaxon(OWLClass taxon){
+		final OWLOntologyManager manager = testWrapper.getManager();
 		Set<OWLClassAxiom> taxonAxioms =  mergedSources.getAxioms(taxon);
 		manager.addAxioms(target, taxonAxioms);
 		//log.info("Annotations");
@@ -254,6 +262,7 @@ public class Owlbuilder{
 	};
 	
 	private void initializeMisc(){
+		final OWLDataFactory factory = testWrapper.getDataFactory();
 		for (IRI mTerm : MISC_TERMS){
 			OWLClass mClass = factory.getOWLClass(mTerm);
 			initializeMiscTermAndParents(mClass);
@@ -274,6 +283,7 @@ public class Owlbuilder{
 	}
 	
 	public void initializeMiscTerm(OWLClass term){
+		final OWLOntologyManager manager = testWrapper.getManager();
 		Set<OWLClassAxiom> taxonAxioms =  mergedSources.getAxioms(term);
 		if (taxonAxioms.isEmpty()){
 			log.error("No Axioms for term " + term);
@@ -281,11 +291,9 @@ public class Owlbuilder{
 		else{
 			manager.addAxioms(target, taxonAxioms);
 		}
-		//log.info("Annotations");
 		Set<OWLAnnotationAssertionAxiom> termAnnotations = 
 				mergedSources.getAnnotationAssertionAxioms(term.getIRI());
 		for (OWLAnnotationAssertionAxiom a : termAnnotations){
-			//log.info("   Annotation Axiom: " + a.toString());
 			if (a.getAnnotation().getProperty().isLabel()){
 				manager.addAxiom(target, a);
 			}
@@ -303,6 +311,7 @@ public class Owlbuilder{
 	}
 	
 	public void initializeMiscObjProperty(OWLObjectPropertyExpression prope){
+		final OWLOntologyManager manager = testWrapper.getManager();
 		Set<OWLObjectPropertyAxiom> propertyAxioms =  mergedSources.getAxioms(prope);
 		if (propertyAxioms.isEmpty()){
 			log.error("No Axioms for object property " + prope);
@@ -325,8 +334,16 @@ public class Owlbuilder{
 		}
 	}
 	
+	private void saveOntology() throws OWLOntologyStorageException{
+		log.info("Saving ontology");			
+		File f = new File(temporaryOutput);
+		testWrapper.getManager().saveOntology(target, IRI.create(f.toURI()));		
+	}
+	
+
+	
 	private void generateHTML(){
-		
+		log.info("Generating HTML pages");
 	}
 	
 	/**
@@ -336,21 +353,14 @@ public class Owlbuilder{
 		return target;
 	}
 	
-	/**
-	 * This returns the knowledge base (the ontology that this tool is generating)
-	 * @return the Ontology (TBox + ABox) that will be written
-	 */
-	//public OWLOntology getTarget(){
-	//	return target;
-	//}
 	
 	public OWLOntologyManager getOntologyManager(){
-		return manager;
+		return testWrapper.getManager();
 	}
 	
 	
 	public OWLDataFactory getDataFactory(){
-		return factory;
+		return testWrapper.getDataFactory();
 	}
 	
 	public IRIManager getIRIManager(){
@@ -373,6 +383,11 @@ public class Owlbuilder{
 		return postReasoner;
 	}
 
+	public void loadCuratorAddedTerms(OWLOntology mergedSources){
+		
+	}
+	
+	
 	public void addNonNCBITaxon(IRI taxonIRI,String label){
 		nonNCBITaxa.put(label, taxonIRI);
 	}

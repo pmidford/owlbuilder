@@ -20,6 +20,11 @@ public class DBResults implements AbstractResults {
 	public String getString(int field) throws SQLException{
 		return results.getString(field);
 	}
+	
+	@Override
+	public boolean getBoolean(int field) throws SQLException{
+		return results.getBoolean(field);
+	}
 
 	@Override
 	public boolean next() throws SQLException {

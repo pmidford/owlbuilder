@@ -8,6 +8,7 @@ public class MockResults implements AbstractResults {
 
 	private final Map<Integer,Integer> intResults = new HashMap<Integer,Integer>();
 	private final Map<Integer,String> stringResults = new HashMap<Integer,String>();
+	private final Map<Integer,Boolean> booleanResults = new HashMap<Integer,Boolean>();
 	private int count = 0;
 	private int size = 0;
 	
@@ -30,6 +31,17 @@ public class MockResults implements AbstractResults {
 			throw new SQLException("Bad string field in MockResults: " + field);
 		}
 	}
+	
+	@Override
+	public boolean getBoolean(int field) throws SQLException {
+		if (booleanResults.containsKey(field)){
+			return booleanResults.get(field);
+		}
+		else {
+			throw new SQLException("Bad boolean field in MockResults: " + field);
+		}
+	}
+	
 
 	@Override
 	public boolean next() {

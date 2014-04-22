@@ -24,17 +24,25 @@ public class Taxon{
 	static final int DBNAME = 2;
 	static final int DBAUTHOR = 3;
 	static final int DBYEAR = 4;
-	static final int DBOTTOLID = 5;
-	static final int DBNCBIID = 6;
-	static final int DBGENERATEDID = 7;
+	static final int EXTERNAL_ID = 5;
+	static final int AUTHORITY = 6;
+	static final int PARENT_NAME = 7;
+	static final int DBGENERATEDID = 8;
+	static final int PARENT_TERM = 9;
+	static final int MERGED = 10;
+	static final int MERGE_STATUS = 11;
 	
 	int id;
 	String name;
 	String author;
 	String year;
-	String ottol_id;
-	String ncbi_id;
+	String external_id;
+	String authority;
+	String parent_name;
 	String generated_id;
+	int parent_term;
+	boolean merged;
+	String merge_status;
 	
 
 	//maybe make this a constructor
@@ -43,9 +51,14 @@ public class Taxon{
 		name = record.getString(DBNAME);
 		author = record.getString(DBAUTHOR);
 		year = record.getString(DBYEAR);
-		ottol_id = record.getString(DBOTTOLID);
-		ncbi_id = record.getString(DBNCBIID);
+		external_id = record.getString(EXTERNAL_ID);
+		authority = record.getString(AUTHORITY);
+		parent_name = record.getString(PARENT_TERM);
 		generated_id = record.getString(DBGENERATEDID);
+		parent_term = record.getInt(PARENT_TERM);
+		merged = record.getBoolean(MERGED);
+		merge_status = record.getString(MERGE_STATUS);
+		
 	}
 	
 	public int get_id(){
@@ -53,11 +66,11 @@ public class Taxon{
 	}
 	
 	public String get_available_id(){
-		if (get_ncbi_id() == null){
+		if (get_external_id() == null){
 			return get_generated_id();
 		}
 		else {
-			return get_ncbi_id();
+			return get_external_id();
 		}
 	}
 	
@@ -73,16 +86,13 @@ public class Taxon{
 		return year;
 	}
 	
-	public String get_ottol_id(){
-		return ottol_id;
-	}
-	
-	public String get_ncbi_id(){
-		return ncbi_id;
-	}
 
 	public String get_generated_id(){
 		return generated_id;
+	}
+	
+	public String get_external_id(){
+		return external_id;
 	}
 	
 	//Just updates the id in the bean - method for updating db is in DBConnection

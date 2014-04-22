@@ -262,7 +262,9 @@ public class Assertion implements AbstractNamedEntity{
         	//TODO fill this in
         }
         else {
-        	throw new RuntimeException("Assertion primary neither an individual or a class expression");
+        	throw new RuntimeException("Assertion primary " + 
+        							   owlPrimary + 
+        							   " is neither an individual or a class expression");
         }
         
  	    Publication pub = c.getPublication(getPublication());
