@@ -188,14 +188,14 @@ public class DBConnection implements AbstractConnection{
 		return result;
 	}
 	
-	public Assertion getAssertion(int id) throws Exception{
-		final PreparedStatement assertionStatement = c.prepareStatement(Assertion.getRowQuery());
-		assertionStatement.setInt(1, id);
-		final ResultSet r = assertionStatement.executeQuery();
-		final AbstractResults assertionSet = new DBResults(r);
-		if (assertionSet.next()){
-			Assertion result = new Assertion();
-			result.fill(assertionSet);
+	public Claim getClaim(int id) throws Exception{
+		final PreparedStatement claimStatement = c.prepareStatement(Claim.getRowQuery());
+		claimStatement.setInt(1, id);
+		final ResultSet r = claimStatement.executeQuery();
+		final AbstractResults claimSet = new DBResults(r);
+		if (claimSet.next()){
+			Claim result = new Claim();
+			result.fill(claimSet);
 			return result;
 		}
 		else {
@@ -203,21 +203,21 @@ public class DBConnection implements AbstractConnection{
 		}
 	}
 	
-	public Set<Assertion> getAssertions() throws Exception {
-		final Set<Assertion> result = new HashSet<Assertion>();
-		final Statement allAssertionStatement = c.createStatement();
-		final ResultSet r = allAssertionStatement.executeQuery(Assertion.getTableQuery());
-		final AbstractResults assertionSet = new DBResults(r);
-		while (assertionSet.next()){
-			Assertion a = new Assertion();
-			a.fill(assertionSet);
+	public Set<Claim> getClaims() throws Exception {
+		final Set<Claim> result = new HashSet<Claim>();
+		final Statement allClaimStatement = c.createStatement();
+		final ResultSet r = allClaimStatement.executeQuery(Claim.getTableQuery());
+		final AbstractResults claimSet = new DBResults(r);
+		while (claimSet.next()){
+			Claim a = new Claim();
+			a.fill(claimSet);
 			result.add(a);
 		}
 		return result;
 	}
 		
 	
-	public Participant getPrimaryParticipant(Assertion a) throws Exception{
+	public Participant getPrimaryParticipant(Claim a) throws Exception{
 		PreparedStatement participantStatement =
 				c.prepareStatement(Participant.getPrimaryQuery());
 		participantStatement.setInt(1, a.getId());
@@ -241,7 +241,7 @@ public class DBConnection implements AbstractConnection{
 		}
 	}
 	
-	public Set<Participant> getParticipants(Assertion a) throws SQLException {
+	public Set<Participant> getParticipants(Claim a) throws SQLException {
 		final Set<Participant> result = new HashSet<Participant>();
 		int assertion_id = a.getId();
 		PreparedStatement participantsStatement =

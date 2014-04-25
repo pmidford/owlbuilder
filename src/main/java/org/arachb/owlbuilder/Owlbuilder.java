@@ -15,7 +15,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.arachb.owlbuilder.lib.AbstractConnection;
-import org.arachb.owlbuilder.lib.Assertion;
+import org.arachb.owlbuilder.lib.Claim;
 import org.arachb.owlbuilder.lib.Config;
 import org.arachb.owlbuilder.lib.DBConnection;
 import org.arachb.owlbuilder.lib.IRIManager;
@@ -30,7 +30,6 @@ import org.semanticweb.owlapi.model.OWLAnnotationProperty;
 import org.semanticweb.owlapi.model.OWLAnnotationSubject;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
-import org.semanticweb.owlapi.model.OWLClassAssertionAxiom;
 import org.semanticweb.owlapi.model.OWLClassAxiom;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLIndividual;
@@ -48,6 +47,7 @@ import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 import org.semanticweb.owlapi.util.InferredAxiomGenerator;
 import org.semanticweb.owlapi.util.InferredClassAssertionAxiomGenerator;
+import org.semanticweb.owlapi.util.InferredClassAxiomGenerator;
 import org.semanticweb.owlapi.util.InferredEquivalentClassAxiomGenerator;
 import org.semanticweb.owlapi.util.InferredIndividualAxiomGenerator;
 import org.semanticweb.owlapi.util.InferredOntologyGenerator;
@@ -165,8 +165,8 @@ public class Owlbuilder{
 	}
 
 	void processDatabase() throws Exception{
-		log.info("Processing assertions");
-		processAssertions();
+		log.info("Processing Claims");
+		processClaims();
 	}
 	
 	/**
@@ -207,12 +207,12 @@ public class Owlbuilder{
 	
 	//when to get iri's for terms contained in participants?
 	
-	void processAssertions() throws Exception{
-		final Set<Assertion> assertions = connection.getAssertions();
-		log.info("In ProcessAssertions");
-		for (Assertion a : assertions){
+	void processClaims() throws Exception{
+		final Set<Claim> Claims = connection.getClaims();
+		log.info("In ProcessClaims");
+		for (Claim a : Claims){
 			iriManager.validateIRI(a);
-			OWLObject owlAssertion = a.generateOWL(this);
+			OWLObject owlClaim = a.generateOWL(this);
  		}		
 	}
 	
@@ -322,10 +322,10 @@ public class Owlbuilder{
 		//log.info("Annotations");
 		if (prope instanceof OWLObjectProperty){
 			OWLObjectProperty prop = (OWLObjectProperty) prope;
-		
-			Set<OWLAnnotationAssertionAxiom> termAnnotations = 
-					mergedSources.getAnnotationAssertionAxioms(prop.getIRI());
-			for (OWLAnnotationAssertionAxiom a : termAnnotations){
+
+			    Set<OWLAnnotationAssertionAxiom> termAnnotations = 
+			    		mergedSources.getAnnotationAssertionAxioms(prop.getIRI());
+			    for (OWLAnnotationAssertionAxiom a : termAnnotations){
 				//log.info("   Annotation Axiom: " + a.toString());
 				if (a.getAnnotation().getProperty().isLabel()){
 					manager.addAxiom(target, a);

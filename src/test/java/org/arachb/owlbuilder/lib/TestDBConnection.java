@@ -96,7 +96,7 @@ public class TestDBConnection {
 
 	@Test
 	public void testgetPrimaryParticipant() throws Exception{
-		Assertion testAssertion = testConnection.getAssertion(1);
+		Claim testAssertion = testConnection.getClaim(1);
 		Participant testParticipant = testConnection.getPrimaryParticipant(testAssertion);
 		assertNotNull(testParticipant);
 		assertEquals(1,testParticipant.getId());  //not really the best test...
@@ -109,7 +109,7 @@ public class TestDBConnection {
 	
 	@Test
 	public void testgetParticipants() throws Exception{
-		Assertion testAssertion = testConnection.getAssertion(1);
+		Claim testAssertion = testConnection.getClaim(1);
 		Set<Participant> testSet = testConnection.getParticipants(testAssertion);
 		assertNotNull(testSet);
 		assertEquals(1,testSet.size());
@@ -123,7 +123,7 @@ public class TestDBConnection {
 	
 	@Test
 	public void testupdateParticipant() throws Exception{
-		Assertion testAssertion = testConnection.getAssertion(1);
+		Claim testAssertion = testConnection.getClaim(1);
 		Participant testParticipant = testConnection.getPrimaryParticipant(testAssertion);
 		assertNotNull(testParticipant);
 	}
@@ -131,29 +131,29 @@ public class TestDBConnection {
 	
 	@Test
 	public void testgetAssertion() throws Exception{
-		Assertion testAssertion = testConnection.getAssertion(1);
-		assertNotNull(testAssertion);
-		assertEquals(1,testAssertion.getId());
+		Claim testClaim = testConnection.getClaim(1);
+		assertNotNull(testClaim);
+		assertEquals(1,testClaim.getId());
 	}
 	
 	@Test
 	public void testgetAssertions() throws Exception{
-		Set<Assertion> testSet = testConnection.getAssertions();
+		Set<Claim> testSet = testConnection.getClaims();
 		assertNotNull(testSet);
 		assertEquals(1,testSet.size());
 	}
 	
 	@Test
 	public void testupdateAssertion() throws Exception{
-		Assertion testAssertion = testConnection.getAssertion(1);
+		Claim testAssertion = testConnection.getClaim(1);
 		assertNotNull(testAssertion);
 		testAssertion.setGeneratedId(testID);
 		testConnection.updateNamedEntity(testAssertion);
-		Assertion updatedAssertion = testConnection.getAssertion(1);
+		Claim updatedAssertion = testConnection.getClaim(1);
 		assertEquals(testID,updatedAssertion.getIriString());
 		updatedAssertion.setGeneratedId("");
 		testConnection.updateNamedEntity(updatedAssertion);
-		Assertion updatedAssertion2 = testConnection.getAssertion(1);
+		Claim updatedAssertion2 = testConnection.getClaim(1);
 		assertEquals("",updatedAssertion2.getIriString());  //bogus test here
 	}
 	

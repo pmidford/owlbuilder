@@ -127,17 +127,17 @@ public class MockConnection implements AbstractConnection {
 		mockPrimaryParticipantResults.setString(Participant.DBSUBSTRATEGENERATEDID,null);
 	}
 	
-	private static MockResults mockAssertionResults = new MockResults();
+	private static MockResults mockClaimResults = new MockResults();
 	static{
-		mockAssertionResults.setInteger(Assertion.DBID, 1);
-		mockAssertionResults.setInteger(Assertion.DBPUBLICATION,6);
-		mockAssertionResults.setInteger(Assertion.DBBEHAVIORTERM,9);
-		mockAssertionResults.setString(Assertion.DBPUBLICATIONBEHAVIOR,"behavior");
-		mockAssertionResults.setInteger(Assertion.DBTAXON, 12);
-		mockAssertionResults.setInteger(Assertion.DBEVIDENCE,0);
-		mockAssertionResults.setString(Assertion.DBGENERATEDID,"");
-		mockAssertionResults.setString(Assertion.DBPUBDOI, TESTDOI);
-		mockAssertionResults.setString(Assertion.DBBEHAVIORSOURCEID, TESTBEHAVIOR);
+		mockClaimResults.setInteger(Claim.DBID, 1);
+		mockClaimResults.setInteger(Claim.DBPUBLICATION,6);
+		mockClaimResults.setInteger(Claim.DBBEHAVIORTERM,9);
+		mockClaimResults.setString(Claim.DBPUBLICATIONBEHAVIOR,"behavior");
+		mockClaimResults.setInteger(Claim.DBTAXON, 12);
+		mockClaimResults.setInteger(Claim.DBEVIDENCE,0);
+		mockClaimResults.setString(Claim.DBGENERATEDID,"");
+		mockClaimResults.setString(Claim.DBPUBDOI, TESTDOI);
+		mockClaimResults.setString(Claim.DBBEHAVIORSOURCEID, TESTBEHAVIOR);
 
 	}
 	
@@ -229,7 +229,7 @@ public class MockConnection implements AbstractConnection {
 
 	
 	@Override
-	public Participant getPrimaryParticipant(Assertion a) throws SQLException {
+	public Participant getPrimaryParticipant(Claim a) throws SQLException {
 		final MockResults primaryResults = mockPrimaryParticipantResults;
 		primaryResults.setString(Participant.DBTAXONSOURCEID, mockTermResults.getString(Term.DBSOURCEID));
 		primaryResults.setString(Participant.DBANATOMYSOURCEID, mockTermResults2.getString(Term.DBSOURCEID));
@@ -238,7 +238,7 @@ public class MockConnection implements AbstractConnection {
 	}
 
 	@Override
-	public Set<Participant> getParticipants(Assertion a) throws SQLException {
+	public Set<Participant> getParticipants(Claim a) throws SQLException {
 		Set<Participant> results = new HashSet<Participant>();
 		final MockResults secondaryResults = mockSecondaryParticipantResults;
 		secondaryResults.setString(Participant.DBTAXONSOURCEID, mockTermResults.getString(Term.DBSOURCEID));
@@ -253,18 +253,18 @@ public class MockConnection implements AbstractConnection {
 	}
 
 	@Override
-	public Assertion getAssertion(int i) throws Exception {
-		Assertion result = new Assertion();
-        result.fill(mockAssertionResults);
+	public Claim getClaim(int i) throws Exception {
+		Claim result = new Claim();
+        result.fill(mockClaimResults);
 		return result;
 	}
 
 
 	@Override
-	public Set<Assertion> getAssertions() throws Exception {
-		Set<Assertion> results = new HashSet<Assertion>();
-		Assertion a1 = new Assertion();
-		a1.fill(mockAssertionResults);
+	public Set<Claim> getClaims() throws Exception {
+		Set<Claim> results = new HashSet<Claim>();
+		Claim a1 = new Claim();
+		a1.fill(mockClaimResults);
 		results.add(a1);
 		return results;
 	}
@@ -287,7 +287,7 @@ public class MockConnection implements AbstractConnection {
 			}
 		}
 		else{
-			mockAssertionResults.setString(Assertion.DBGENERATEDID, e.getIriString());		
+			mockClaimResults.setString(Claim.DBGENERATEDID, e.getIriString());		
 		}
 	}
 

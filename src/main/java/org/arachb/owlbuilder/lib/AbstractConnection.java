@@ -22,10 +22,10 @@ public interface AbstractConnection {
 
 	/**
 	 * 
-	 * @return all the assertions in the supplying resource
+	 * @return all the claims in the supplying resource
 	 * @throws Exception
 	 */
-	Set<Assertion> getAssertions() throws Exception;
+	Set<Claim> getClaims() throws Exception;
 
 	/**
 	 * returns a single publication
@@ -48,7 +48,7 @@ public interface AbstractConnection {
 	 * @return object filled with the fields of the participant requested
 	 * @throws Exception
 	 */
-	Participant getPrimaryParticipant(Assertion a) throws Exception;
+	Participant getPrimaryParticipant(Claim a) throws Exception;
 
 	/**
 	 * 
@@ -56,7 +56,7 @@ public interface AbstractConnection {
 	 * @return
 	 * @throws SQLException
 	 */
-	Set<Participant> getParticipants(Assertion a) throws SQLException;
+	Set<Participant> getParticipants(Claim a) throws SQLException;
 
 	/**
 	 * performs query and returns a mapping from uri's of support ontologies used
@@ -76,7 +76,7 @@ public interface AbstractConnection {
 
 	Set<Term> getTerms() throws SQLException;
 
-	Assertion getAssertion(int i) throws Exception;
+	Claim getClaim(int i) throws Exception;
 
 	void updateNamedEntity(AbstractNamedEntity e) throws SQLException;
 

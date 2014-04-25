@@ -17,7 +17,7 @@ import org.semanticweb.owlapi.model.OWLObjectPropertyAssertionAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 
-public class Assertion implements AbstractNamedEntity{
+public class Claim implements AbstractNamedEntity{
 
 	static final private String ROWQUERY = "SELECT a.id, a.publication, " +
 	"a.publication_behavior, a.behavior_term, a.taxon," +
@@ -67,7 +67,7 @@ public class Assertion implements AbstractNamedEntity{
 	final static String NOASSERTIONGENID = 
 			"Assertion has no generated id; db id = %s";
 	
-	private final static Logger log = Logger.getLogger(Assertion.class);
+	private final static Logger log = Logger.getLogger(Claim.class);
 
 	private int id;
 	private int publication;
@@ -80,20 +80,20 @@ public class Assertion implements AbstractNamedEntity{
 	private String publicationIRI;
 	private String evidenceIRI;
 	
-	static final Assertion dummy = new Assertion(); 
+	static final Claim dummy = new Claim(); 
 	
 	
 	public static String getRowQuery(){
-		return Assertion.ROWQUERY;
+		return Claim.ROWQUERY;
 	}
 	
 	public static String getTableQuery(){
-		return Assertion.TABLEQUERY;
+		return Claim.TABLEQUERY;
 	}
 	
 	@Override
 	public String getUpdateStatement(){
-		return Assertion.ROWUPDATE;
+		return Claim.ROWUPDATE;
 	}
 	
 	
