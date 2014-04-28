@@ -21,7 +21,7 @@ public class TestDBConnection {
     private final static String testAnatomy = "http://purl.obolibrary.org/obo/SPD_0000001";
     
 	@Before
-	public void setUp() throws Exception {
+	public void setup() throws Exception {
 		if (DBConnection.testConnection()){
 			testConnection = DBConnection.getTestConnection();
 		}

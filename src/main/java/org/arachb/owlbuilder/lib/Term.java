@@ -3,10 +3,7 @@ package org.arachb.owlbuilder.lib;
 import java.sql.SQLException;
 
 import org.arachb.owlbuilder.Owlbuilder;
-import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLObject;
-import org.semanticweb.owlapi.model.OWLOntology;
-import org.semanticweb.owlapi.model.OWLOntologyManager;
 
 public class Term implements AbstractNamedEntity{
 

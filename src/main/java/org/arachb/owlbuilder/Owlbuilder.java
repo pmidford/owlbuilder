@@ -6,6 +6,7 @@ package org.arachb.owlbuilder;
  */
 
 import java.io.File;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -19,20 +20,16 @@ import org.arachb.owlbuilder.lib.Claim;
 import org.arachb.owlbuilder.lib.Config;
 import org.arachb.owlbuilder.lib.DBConnection;
 import org.arachb.owlbuilder.lib.IRIManager;
-import org.arachb.owlbuilder.lib.Publication;
+import org.arachb.owlbuilder.lib.Taxon;
 import org.semanticweb.elk.owlapi.ElkReasonerFactory;
-import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAnnotation;
 import org.semanticweb.owlapi.model.OWLAnnotationAssertionAxiom;
-import org.semanticweb.owlapi.model.OWLAnnotationAxiom;
-import org.semanticweb.owlapi.model.OWLAnnotationProperty;
 import org.semanticweb.owlapi.model.OWLAnnotationSubject;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassAxiom;
 import org.semanticweb.owlapi.model.OWLDataFactory;
-import org.semanticweb.owlapi.model.OWLIndividual;
 import org.semanticweb.owlapi.model.OWLObject;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLObjectPropertyAxiom;
@@ -47,16 +44,13 @@ import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 import org.semanticweb.owlapi.util.InferredAxiomGenerator;
 import org.semanticweb.owlapi.util.InferredClassAssertionAxiomGenerator;
-import org.semanticweb.owlapi.util.InferredClassAxiomGenerator;
 import org.semanticweb.owlapi.util.InferredEquivalentClassAxiomGenerator;
-import org.semanticweb.owlapi.util.InferredIndividualAxiomGenerator;
 import org.semanticweb.owlapi.util.InferredOntologyGenerator;
 import org.semanticweb.owlapi.util.InferredSubClassAxiomGenerator;
 import org.semanticweb.owlapi.util.OWLOntologyMerger;
 import org.semanticweb.owlapi.util.SimpleIRIMapper;
 
 import owltools.graph.OWLGraphWrapper;
-import owltools.graph.OWLGraphWrapperBasic;
 
 public class Owlbuilder{
 
@@ -69,7 +63,7 @@ public class Owlbuilder{
 	private OWLOntology target;
 	private OWLReasoner preReasoner;
 	private OWLReasoner postReasoner;
-	private final Map<String,IRI>nonNCBITaxa = new HashMap<String,IRI>();
+	private final Map<IRI,Taxon>nonNCBITaxa = new HashMap<IRI,Taxon>();
 	
 	private final Map<String,OWLOntology>supportOntologies = new HashMap<String,OWLOntology>();
 	private OWLOntology mergedSources = null;
@@ -383,13 +377,21 @@ public class Owlbuilder{
 		return postReasoner;
 	}
 
-	public void loadCuratorAddedTerms(OWLOntology mergedSources){
+	public void loadCuratorAddedTerms(OWLOntology mergedSources) throws SQLException{
+		final OWLOntologyManager manager = testWrapper.getManager();
+		final OWLDataFactory factory = testWrapper.getDataFactory();
+		final Set<Taxon> taxa = connection.getTaxa();
+		for (Taxon t : taxa){
+			final IRI iri = IRI.create(t.getIriString());
+			nonNCBITaxa.put(iri, t);
+
+		}
+
+	}
+	
+	public Map<IRI,Taxon> getNonNCBITaxa(){
+		return nonNCBITaxa;
+	}
+	
 		
-	}
-	
-	
-	public void addNonNCBITaxon(IRI taxonIRI,String label){
-		nonNCBITaxa.put(label, taxonIRI);
-	}
-	
 }

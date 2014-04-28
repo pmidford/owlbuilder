@@ -21,12 +21,12 @@ public abstract class Participant implements AbstractEntity{
 	"taxon.source_id, taxon.generated_id, " +
 	"substrate.source_id, substrate.generated_id, " +
 	"anatomy.source_id, anatomy.generated_id " +
-	"FROM participant2assertion as p2a " + 
-	"JOIN participant AS part ON (p2a.participant = part.id) " +
+	"FROM participant2claim as p2c " + 
+	"JOIN participant AS part ON (p2c.participant = part.id) " +
 	"LEFT JOIN term AS taxon ON (part.taxon = taxon.id) " +
 	"LEFT JOIN term AS substrate ON (part.substrate = substrate.id) " +
 	"LEFT JOIN term AS anatomy ON (part.anatomy = anatomy.id) " +
-	"WHERE p2a.assertion = ? AND p2a.participant_index = 1";
+	"WHERE p2c.claim = ? AND p2c.participant_index = 1";
 	
 	static final private String RESTQUERY = "SELECT part.id, " + 
 	"part.taxon, part.substrate, part.anatomy, " +
@@ -35,12 +35,12 @@ public abstract class Participant implements AbstractEntity{
 	"taxon.source_id, taxon.generated_id, " +
 	"substrate.source_id, substrate.generated_id, " +
 	"anatomy.source_id, anatomy.generated_id " +
-	"FROM participant2assertion as p2a " + 
-	"JOIN participant AS part ON (p2a.participant = part.id) " +
+	"FROM participant2claim as p2c " + 
+	"JOIN participant AS part ON (p2c.participant = part.id) " +
 	"LEFT JOIN term AS taxon ON (part.taxon = taxon.id) " +
 	"LEFT JOIN term AS substrate ON (part.substrate = substrate.id) " +
 	"LEFT JOIN term AS anatomy ON (part.anatomy = anatomy.id) " +
-	"WHERE p2a.assertion = ? AND p2a.participant_index > 1";
+	"WHERE p2c.claim = ? AND p2c.participant_index > 1";
 
 	
 	final static int DBID = 1;
@@ -130,10 +130,10 @@ public abstract class Participant implements AbstractEntity{
 		publicationSubstrate = record.getString(DBPUBLICATIONSUBSTRATE);
 		if (taxon != 0){
 			if (record.getString(DBTAXONSOURCEID) != null){
-				this.setTaxonIri(record.getString(DBTAXONSOURCEID));
+				taxonIRI =record.getString(DBTAXONSOURCEID);
 			}
 			else if (record.getString(DBTAXONGENERATEDID) != null){
-				this.setTaxonIri(record.getString(DBTAXONGENERATEDID));
+				taxonIRI = record.getString(DBTAXONGENERATEDID);
 			}
 			else{
 				final String msg = String.format(BADTAXONIRI, id, taxon);
@@ -142,10 +142,10 @@ public abstract class Participant implements AbstractEntity{
 		}
 		if (anatomy != 0){
 			if (record.getString(DBANATOMYSOURCEID) != null){
-				this.setAnatomyIri(record.getString(DBANATOMYSOURCEID));
+				anatomyIRI = record.getString(DBANATOMYSOURCEID);
 			}
 			else if (record.getString(DBANATOMYGENERATEDID) != null){
-				this.setAnatomyIri(record.getString(DBANATOMYGENERATEDID));
+				anatomyIRI = record.getString(DBANATOMYGENERATEDID);
 			}
 			else{
 				final String msg = String.format(BADANATOMYIRI, id, anatomy);
@@ -154,10 +154,10 @@ public abstract class Participant implements AbstractEntity{
 		}
 		if (substrate != 0){
 			if (record.getString(DBSUBSTRATESOURCEID) != null){
-				this.setSubstrateIri(record.getString(DBSUBSTRATESOURCEID));
+				substrateIRI = record.getString(DBSUBSTRATESOURCEID);
 			}
 			else if (record.getString(DBSUBSTRATEGENERATEDID) != null){
-				this.setSubstrateIri(record.getString(DBSUBSTRATEGENERATEDID));
+				substrateIRI = record.getString(DBSUBSTRATEGENERATEDID);
 			}
 			else{
 				final String msg = String.format(BADSUBSTRATEIRI, id, substrate);
@@ -206,27 +206,15 @@ public abstract class Participant implements AbstractEntity{
 	public String getTaxonIri(){
 		return taxonIRI;
 	}
-	
-	public void setTaxonIri(String s){
-		taxonIRI = s;
-	}
-	
+		
 	public String getSubstrateIri(){
 		return substrateIRI;
-	}
-	
-	public void setSubstrateIri(String s){
-		substrateIRI= s;
 	}
 	
 	public String getAnatomyIri(){
 		return anatomyIRI;
 	}
 
-	public void setAnatomyIri(String s){
-		anatomyIRI = s;
-	}
-	
 	public String getGeneratedId(){
 		return generatedId;
 	}
@@ -243,11 +231,7 @@ public abstract class Participant implements AbstractEntity{
 		if (true){  //add appropriate when figured out
 			log.info("Need to add taxon: " + taxon.getIRI());
 			//log.info("Defining Axioms");
-			Set<OWLClassAxiom> taxonAxioms =  merged.getAxioms(taxon);
-			for (OWLClassAxiom a : taxonAxioms){
-				//log.info("   Axiom: " + a.toString());
-			}
-			manager.addAxioms(extracted, taxonAxioms);
+			manager.addAxioms(extracted, merged.getAxioms(taxon));
 			//log.info("Annotations");
 			Set<OWLAnnotationAssertionAxiom> taxonAnnotations = merged.getAnnotationAssertionAxioms(taxon.getIRI());
 			for (OWLAnnotationAssertionAxiom a : taxonAnnotations){

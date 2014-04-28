@@ -15,7 +15,7 @@ public class TestIRIManager {
 	private Term t;
 
 	@Before
-	public void setUp() throws Exception {
+	public void setup() throws Exception {
 		c = new MockConnection();
 		t = c.getTerm(1);
 

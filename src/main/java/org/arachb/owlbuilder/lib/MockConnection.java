@@ -138,9 +138,18 @@ public class MockConnection implements AbstractConnection {
 		mockClaimResults.setString(Claim.DBGENERATEDID,"");
 		mockClaimResults.setString(Claim.DBPUBDOI, TESTDOI);
 		mockClaimResults.setString(Claim.DBBEHAVIORSOURCEID, TESTBEHAVIOR);
-
 	}
 	
+	private static MockResults mockTaxonResults = new MockResults();
+	static{
+		mockTaxonResults.setInteger(Taxon.DBID, 1);
+	}
+	
+	private static MockResults mockTaxonResults2 = new MockResults();
+	static{
+		mockTaxonResults2.setInteger(Taxon.DBID, 12);
+	}
+
 	private static Map<String,String> mockImportSourceMap = new HashMap<String,String>();
 	static{
 		mockImportSourceMap.put("http://purl.obolibrary.org/obo/eco.owl", "evidence");
@@ -268,6 +277,32 @@ public class MockConnection implements AbstractConnection {
 		results.add(a1);
 		return results;
 	}
+	
+	@Override
+	public Taxon getTaxon(int id) throws SQLException {
+		Taxon result = new Taxon();
+		if (id == 1){
+			result.fill(mockTaxonResults);
+		}
+		else {
+			result.fill(mockTaxonResults2);			
+		}
+		return result;
+	}
+
+	@Override
+	public Set<Taxon> getTaxa() throws SQLException {
+		Set<Taxon> results = new HashSet<Taxon>();
+		Taxon t1 = new Taxon();
+		t1.fill(mockTaxonResults);
+		results.add(t1);
+		Taxon t2 = new Taxon();
+		t2.fill(mockTaxonResults2);
+		results.add(t2);
+		return results;
+	}
+
+
 
 	// Sort of ugly (do better somehow?)
 	@Override

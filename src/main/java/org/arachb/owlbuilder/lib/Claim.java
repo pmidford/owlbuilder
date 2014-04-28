@@ -19,27 +19,27 @@ import org.semanticweb.owlapi.model.OWLOntologyManager;
 
 public class Claim implements AbstractNamedEntity{
 
-	static final private String ROWQUERY = "SELECT a.id, a.publication, " +
-	"a.publication_behavior, a.behavior_term, a.taxon," +
-	"a.evidence, a.generated_id, pub.doi, " +
+	static final String ROWQUERY = "SELECT c.id, c.publication, " +
+	"c.publication_behavior, c.behavior_term, c.taxon," +
+	"c.evidence, c.generated_id, pub.doi, " +
 	"pub.generated_id, behavior.source_id, behavior.generated_id " +
-    "FROM assertion AS a " +
-	"LEFT JOIN publication AS pub ON (a.publication = pub.id) " +
-	"LEFT JOIN term AS behavior ON (a.behavior_term = behavior.id) " +
-	"LEFT JOIN term AS evidence ON (a.evidence = evidence.id) " +
-    "WHERE a.id = ?";
+    "FROM claim AS c " +
+	"LEFT JOIN publication AS pub ON (c.publication = pub.id) " +
+	"LEFT JOIN term AS behavior ON (c.behavior_term = behavior.id) " +
+	"LEFT JOIN term AS evidence ON (c.evidence = evidence.id) " +
+    "WHERE c.id = ?";
 	
 
-	static final private String TABLEQUERY = "SELECT a.id, a.publication, " +
-	"a.publication_behavior, a.behavior_term, a.taxon, " +
-	"a.evidence, a.generated_id, pub.doi, " +
+	static final private String TABLEQUERY = "SELECT c.id, c.publication, " +
+	"c.publication_behavior, c.behavior_term, c.taxon, " +
+	"c.evidence, c.generated_id, pub.doi, " +
 	"pub.generated_id, behavior.source_id, behavior.generated_id " +
-	"FROM assertion AS a " +
-	"LEFT JOIN publication AS pub ON (a.publication = pub.id) " +
-	"LEFT JOIN term AS behavior ON (a.behavior_term = behavior.id) " +
-	"LEFT JOIN term AS evidence ON (a.evidence = evidence.id) ";
+	"FROM claim AS c " +
+	"LEFT JOIN publication AS pub ON (c.publication = pub.id) " +
+	"LEFT JOIN term AS behavior ON (c.behavior_term = behavior.id) " +
+	"LEFT JOIN term AS evidence ON (c.evidence = evidence.id) ";
 	
-	static final private String ROWUPDATE = "UPDATE assertion " +
+	static final private String ROWUPDATE = "UPDATE claim " +
 			"SET generated_id = ? WHERE id = ?";
 	
 
@@ -58,11 +58,11 @@ public class Claim implements AbstractNamedEntity{
 	final static int DBEVIDENCEGENERATEDID = 13;
 	
 	final static String BADPUBLICATIONIRI =
-			"Publication without IRI referenced as assertion publication: assertion id = %s; publication id = %s";
+			"Publication without IRI referenced as publication cited in claim: claim id = %s; publication id = %s";
 	final static String BADBEHAVIORIRI =
-			"Term without IRI referenced as assertion behavior: assertion id = %s; behavior id = %s";
+			"Term without IRI referenced as behavior cited in claim: claim id = %s; behavior id = %s";
 	final static String BADEVIDENCEIRI =
-			"Term without IRI referenced as assertion evidence; assertion id = %s; evidence id = %s";
+			"Term without IRI referenced as evidence type supporting claim; claim id = %s; evidence id = %s";
 
 	final static String NOASSERTIONGENID = 
 			"Assertion has no generated id; db id = %s";
@@ -83,16 +83,16 @@ public class Claim implements AbstractNamedEntity{
 	static final Claim dummy = new Claim(); 
 	
 	
-	public static String getRowQuery(){
+	public final static String getRowQuery(){
 		return Claim.ROWQUERY;
 	}
 	
-	public static String getTableQuery(){
+	public final static String getTableQuery(){
 		return Claim.TABLEQUERY;
 	}
 	
 	@Override
-	public String getUpdateStatement(){
+	public final String getUpdateStatement(){
 		return Claim.ROWUPDATE;
 	}
 	

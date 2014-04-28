@@ -57,6 +57,22 @@ public interface AbstractConnection {
 	 * @throws SQLException
 	 */
 	Set<Participant> getParticipants(Claim a) throws SQLException;
+	
+	/**
+	 * returns a single (curator added) taxon 
+	 * @param id integer id of the (curator added) taxon to return
+	 * @return object filled with the fields from the taxon requested
+	 * @throws SQLException
+	 */
+	Taxon getTaxon(int id) throws SQLException;
+
+	/**
+	 * 
+	 * @return all the taxa in the supplying resource
+	 * @throws SQLException
+	 */
+	Set<Taxon> getTaxa() throws SQLException;
+
 
 	/**
 	 * performs query and returns a mapping from uri's of support ontologies used

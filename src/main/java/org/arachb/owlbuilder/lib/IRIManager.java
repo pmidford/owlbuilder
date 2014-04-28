@@ -18,7 +18,7 @@ public class IRIManager {
 	public static final IRI textualEntity =
 			IRI.create("http://purl.obolibrary.org/obo/IAO_0000300");
 
-	public static Set<IRI> iaoImports = new HashSet<IRI>();
+	public static final Set<IRI> iaoImports = new HashSet<IRI>();
 	static {
 		iaoImports.add(pubAboutInvestigation);
 		iaoImports.add(denotesProperty);
@@ -30,7 +30,7 @@ public class IRIManager {
 	public static final IRI hasParticipantProperty =
 			IRI.create("http://purl.obolibrary.org/obo/BFO_0000057");
 
-	public static Set<IRI> bfoImports = new HashSet<IRI>();
+	public static final Set<IRI> bfoImports = new HashSet<IRI>();
 	static {
 		bfoImports.add(partOfProperty);
 		bfoImports.add(hasParticipantProperty);

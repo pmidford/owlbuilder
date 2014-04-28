@@ -1,10 +1,10 @@
 package org.arachb.owlbuilder.lib;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -54,7 +54,13 @@ public class DBConnection implements AbstractConnection{
 			final String password = properties.getProperty("password");
 			c = DriverManager.getConnection(String.format("jdbc:mysql://%s/%s",host,db),user,password);
 		}
-		catch (Exception e){
+		catch (SQLException e){
+			return false;
+		}
+		catch (IOException e){
+			return false;
+		}
+		catch (ClassNotFoundException e){
 			return false;
 		}
 		finally{
@@ -189,31 +195,41 @@ public class DBConnection implements AbstractConnection{
 	}
 	
 	public Claim getClaim(int id) throws Exception{
-		final PreparedStatement claimStatement = c.prepareStatement(Claim.getRowQuery());
-		claimStatement.setInt(1, id);
-		final ResultSet r = claimStatement.executeQuery();
-		final AbstractResults claimSet = new DBResults(r);
-		if (claimSet.next()){
-			Claim result = new Claim();
-			result.fill(claimSet);
-			return result;
+		final PreparedStatement claimStatement = c.prepareStatement(Claim.ROWQUERY);
+		try{
+			claimStatement.setInt(1, id);
+			final ResultSet r = claimStatement.executeQuery();
+			final AbstractResults claimSet = new DBResults(r);
+			if (claimSet.next()){
+				Claim result = new Claim();
+				result.fill(claimSet);
+				return result;
+			}
+			else {
+				return null;
+			}
 		}
-		else {
-			return null;
+		finally{
+			claimStatement.close();
 		}
 	}
 	
 	public Set<Claim> getClaims() throws Exception {
-		final Set<Claim> result = new HashSet<Claim>();
 		final Statement allClaimStatement = c.createStatement();
-		final ResultSet r = allClaimStatement.executeQuery(Claim.getTableQuery());
-		final AbstractResults claimSet = new DBResults(r);
-		while (claimSet.next()){
-			Claim a = new Claim();
-			a.fill(claimSet);
-			result.add(a);
+		try{
+			final Set<Claim> result = new HashSet<Claim>();
+			final ResultSet r = allClaimStatement.executeQuery(Claim.getTableQuery());
+			final AbstractResults claimSet = new DBResults(r);
+			while (claimSet.next()){
+				Claim a = new Claim();
+				a.fill(claimSet);
+				result.add(a);
+			}
+			return result;
 		}
-		return result;
+		finally {
+			allClaimStatement.close();
+		}
 	}
 		
 	
@@ -257,7 +273,34 @@ public class DBConnection implements AbstractConnection{
 	}
 
 	
+	public Taxon getTaxon(int id) throws SQLException{
+		PreparedStatement taxonStatement = c.prepareStatement(Taxon.getRowQuery());
+		taxonStatement.setInt(1, id);
+		ResultSet rawResults = taxonStatement.executeQuery();
+		AbstractResults taxonResults = new DBResults(rawResults);
+		if (taxonResults.next()){
+			Taxon result = new Taxon();
+			result.fill(taxonResults);
+			return result;
+		}
+		else {
+			return null;
+		}
+	}
 	
+	public Set<Taxon> getTaxa() throws SQLException{
+		final Set<Taxon> result = new HashSet<Taxon>();
+		Statement allTaxaStatement = c.createStatement();
+		ResultSet rawResults = allTaxaStatement.executeQuery(Taxon.getTableQuery());
+        AbstractResults taxaResults = new DBResults(rawResults);
+		while (taxaResults.next()){
+			Taxon tax = new Taxon();
+			tax.fill(taxaResults);
+			result.add(tax);
+		}
+		return result;
+	}
+
 	
 	private final String ONTOLOGYSOURCEQUERY = "SELECT source_url,domain FROM ontology_source";
 
@@ -269,15 +312,20 @@ public class DBConnection implements AbstractConnection{
 	public Map<String,String>loadImportSourceMap() throws Exception{
 		final Map<String,String> result = new HashMap<String,String>();
 		Statement sourceOntStatement = c.createStatement();
-		ResultSet sourceOntSet = sourceOntStatement.executeQuery(ONTOLOGYSOURCEQUERY);
-		while (sourceOntSet.next()){
-			final int domain_id = sourceOntSet.getInt("domain");
-			final String domain = domainName(domain_id);
-			final String source = sourceOntSet.getString("source_url");
-			result.put(source,domain);
+		try{
+			ResultSet sourceOntSet = sourceOntStatement.executeQuery(ONTOLOGYSOURCEQUERY);
+			while (sourceOntSet.next()){
+				final int domain_id = sourceOntSet.getInt("domain");
+				final String domain = domainName(domain_id);
+				final String source = sourceOntSet.getString("source_url");
+				result.put(source,domain);
+			}
+			sourceOntStatement.close();
+			return result;
 		}
-		sourceOntStatement.close();
-		return result;
+		finally{
+			sourceOntStatement.close();
+		}
 	}
 
 	private final String ONTOLOGYNAMEQUERY = "SELECT source_url,name FROM ontology_source";
@@ -290,14 +338,19 @@ public class DBConnection implements AbstractConnection{
 	public Map<String,String>loadOntologyNamesForLoading() throws SQLException{
 		final Map<String,String> result = new HashMap<String,String>();
 		Statement sourceOntStatement = c.createStatement();
-		ResultSet sourceOntSet = sourceOntStatement.executeQuery(ONTOLOGYNAMEQUERY);
-		while (sourceOntSet.next()){
-			final String source = sourceOntSet.getString("source_url");
-			final String name = sourceOntSet.getString("name");
-			result.put(source,name);
+		try{
+			ResultSet sourceOntSet = sourceOntStatement.executeQuery(ONTOLOGYNAMEQUERY);
+			while (sourceOntSet.next()){
+				final String source = sourceOntSet.getString("source_url");
+				final String name = sourceOntSet.getString("name");
+				result.put(source,name);
+			}
+			sourceOntStatement.close();
+			return result;
 		}
-		sourceOntStatement.close();
-		return result;
+		finally{
+			sourceOntStatement.close();
+		}
 	}
 
 	
@@ -313,8 +366,8 @@ public class DBConnection implements AbstractConnection{
 	private static final String PUBLICATIONIDCOUNTERQUERY = 
 			"SELECT generated_id FROM publication";
 	
-	private static final String ASSERTIONIDCOUNTERQUERY = 
-			"SELECT generated_id FROM assertion";
+	private static final String CLAIMIDCOUNTERQUERY = 
+			"SELECT generated_id FROM claim";
 	
 	private static final String INDIVIDUALIDCOUNTERQUERY = 
 			"SELECT generated_id FROM individual";
@@ -322,35 +375,37 @@ public class DBConnection implements AbstractConnection{
 	public int scanPrivateIDs() throws Exception{
 		int maxid=0;
 		Statement countStatement = c.createStatement();
-		ResultSet publicationSet = countStatement.executeQuery(PUBLICATIONIDCOUNTERQUERY);
-		while(publicationSet.next()){
-			final String source = publicationSet.getString("generated_id");
-			int count = extractCount(source);
-			if (count > maxid){
-				maxid = count;
+		try {
+			ResultSet publicationSet = countStatement.executeQuery(PUBLICATIONIDCOUNTERQUERY);
+			while(publicationSet.next()){
+				final String source = publicationSet.getString("generated_id");
+				int count = extractCount(source);
+				if (count > maxid){
+					maxid = count;
+				}
 			}
-		}
-		publicationSet.close();
-		ResultSet assertionSet = countStatement.executeQuery(ASSERTIONIDCOUNTERQUERY);
-		while(assertionSet.next()){
-			final String source = assertionSet.getString("generated_id");
-			int count = extractCount(source);
-			if (count > maxid){
-				maxid = count;
+			ResultSet assertionSet = countStatement.executeQuery(CLAIMIDCOUNTERQUERY);
+			while(assertionSet.next()){
+				final String source = assertionSet.getString("generated_id");
+				int count = extractCount(source);
+				if (count > maxid){
+					maxid = count;
+				}
 			}
-		}
-		assertionSet.close();
-		ResultSet individualSet = countStatement.executeQuery(INDIVIDUALIDCOUNTERQUERY);
-		while(individualSet.next()){
-			final String source = individualSet.getString("generated_id");
-			int count = extractCount(source);
-			if (count > maxid){
-				maxid = count;
-			}
+			assertionSet.close();
+			ResultSet individualSet = countStatement.executeQuery(INDIVIDUALIDCOUNTERQUERY);
+			while(individualSet.next()){
+				final String source = individualSet.getString("generated_id");
+				int count = extractCount(source);
+				if (count > maxid){
+					maxid = count;
+				}
 			
+			}
 		}
-		individualSet.close();
-		countStatement.close();
+		finally {
+			countStatement.close();
+		}
 		return maxid;
 	}
 	

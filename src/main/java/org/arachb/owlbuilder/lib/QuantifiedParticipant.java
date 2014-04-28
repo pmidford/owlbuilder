@@ -1,15 +1,14 @@
 package org.arachb.owlbuilder.lib;
 
-import java.sql.SQLException;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.arachb.owlbuilder.Owlbuilder;
 import org.semanticweb.owlapi.model.IRI;
-import org.semanticweb.owlapi.model.OWLAnnotationAssertionAxiom;
-import org.semanticweb.owlapi.model.OWLAnnotationProperty;
+import org.semanticweb.owlapi.model.OWLAnnotation;
+import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
-import org.semanticweb.owlapi.model.OWLClassAxiom;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLObject;
@@ -89,7 +88,32 @@ public class QuantifiedParticipant extends Participant {
 			}
 			else{
 				log.info("Did not find taxon class in signature of merged ontology for: " + getTaxonIri());
-				OWLClass taxonClass = factory.getOWLClass(iri);
+				final IRI taxonIri = IRI.create(getTaxonIri());
+				final Map<IRI,Taxon> nonNCBITaxa = builder.getNonNCBITaxa();
+				final OWLOntologyManager manager = builder.getOntologyManager();
+				Taxon t = nonNCBITaxa.get(taxonIri);
+				if (t == null){
+					log.info("Taxon IRI not found in declared non-NCBI taxa");
+					throw new IllegalStateException("Taxon IRI not found in declared non-NCBI taxa");
+				}
+				final OWLClass taxonClass = factory.getOWLClass(iri);
+				if (t.getParentSourceId() != null){
+					IRI parentIri = IRI.create(t.getParentSourceId());
+			    	OWLClass parentClass = factory.getOWLClass(parentIri);
+			    	log.info("Parent IRI is " + parentIri.toString());
+					OWLAxiom sc_ax = factory.getOWLSubClassOfAxiom(taxonClass, parentClass);
+					manager.addAxiom(target, sc_ax);
+				}
+				else{
+					log.info("failed to find IRI of parent of " + getTaxonIri());
+				}
+				if (t.getName() != null){
+					OWLAnnotation labelAnno = factory.getOWLAnnotation(factory.getRDFSLabel(),
+							factory.getOWLLiteral(t.getName()));
+					OWLAxiom ax = factory.getOWLAnnotationAssertionAxiom(iri, labelAnno);
+				    // Add the axiom to the ontology
+				    manager.addAxiom(target,ax);
+				}
 				return taxonClass;
 			}
 		}
@@ -122,7 +146,6 @@ public class QuantifiedParticipant extends Participant {
 			OWLClass taxonClass = factory.getOWLClass(iri);
 			return taxonClass;   // may not be right
 		}
-
 	}
 
 	
