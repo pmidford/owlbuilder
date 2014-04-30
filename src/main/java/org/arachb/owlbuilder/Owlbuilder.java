@@ -223,17 +223,40 @@ public class Owlbuilder{
 		}
 	}
 	
+	private final static List<String> filterLabels = new ArrayList<String>();
+	static{
+		filterLabels.add("sp. BOLD:");
+		filterLabels.add("JXZ-2013");
+		filterLabels.add("PS-2009");
+		filterLabels.add("WOCS-2009");
+		filterLabels.add("LB-2013");
+		filterLabels.add("MCZDNA");
+		filterLabels.add("DNA10");
+	}
+	
 	private void initializeTaxon(OWLClass taxon){
 		final OWLOntologyManager manager = testWrapper.getManager();
-		Set<OWLClassAxiom> taxonAxioms =  mergedSources.getAxioms(taxon);
-		manager.addAxioms(target, taxonAxioms);
-		//log.info("Annotations");
-		Set<OWLAnnotationAssertionAxiom> taxonAnnotations = 
+		final Set<OWLAnnotationAssertionAxiom> taxonAnnotations = 
 				mergedSources.getAnnotationAssertionAxioms(taxon.getIRI());
+		boolean skipTaxon = false;
 		for (OWLAnnotationAssertionAxiom a : taxonAnnotations){
-			//log.info("   Annotation Axiom: " + a.toString());
 			if (a.getAnnotation().getProperty().isLabel()){
-				manager.addAxiom(target, a);
+				String labelStr = a.getAnnotation().getValue().toString();
+				for (String filter : filterLabels){
+					if (labelStr.contains(filter)){
+						skipTaxon = true;
+					}
+				}
+			}
+		}
+		if (!skipTaxon){
+			Set<OWLClassAxiom> taxonAxioms =  mergedSources.getAxioms(taxon);
+			manager.addAxioms(target, taxonAxioms);
+			for (OWLAnnotationAssertionAxiom a : taxonAnnotations){
+				if (a.getAnnotation().getProperty().isLabel()){
+					manager.addAxiom(target, a);
+					log.info("Taxon label is: " + a.getAnnotation().getValue().toString());
+				}
 			}
 		}
 	}
