@@ -261,10 +261,10 @@ public class Claim implements AbstractNamedEntity{
         else if (owlPrimary instanceof OWLIndividual){
         	//TODO fill this in
         }
-        else {
-        	throw new RuntimeException("Assertion primary " + 
-        							   owlPrimary + 
-        							   " is neither an individual or a class expression");
+        else {  // probably a curation error; log this don't throw exception
+        	final String msgStr = 
+        			"Assertion primary %s of id %s is neither an individual nor a class expression";
+			throw new RuntimeException(String.format(msgStr,owlPrimary,this.id));
         }
         
  	    Publication pub = c.getPublication(getPublication());
