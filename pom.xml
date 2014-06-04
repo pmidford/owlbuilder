@@ -30,6 +30,14 @@
     </developer>
   </developers>
 
+  <repositories>
+    <repository>
+      <id>my-repo1</id>
+      <name>your custom repo</name>
+      <url>http://code.berkeleybop.org/maven/</url>
+    </repository>
+  </repositories>
+
   <dependencies>
     <dependency>
       <groupId>net.sourceforge.owlapi</groupId>
