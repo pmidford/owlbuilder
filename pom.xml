@@ -32,8 +32,8 @@
 
   <repositories>
     <repository>
-      <id>my-repo1</id>
-      <name>your custom repo</name>
+      <id>bbop</id>
+      <name>BBOP</name>
       <url>http://code.berkeleybop.org/maven/</url>
     </repository>
   </repositories>
@@ -46,7 +46,7 @@
     </dependency>
     <dependency>
         <groupId>org.bbop</groupId>
-        <artifactId>owlTools-Core</artifactId>
+        <artifactId>OWLTools-Core</artifactId>
         <version>0.2.1-SNAPSHOT</version>
     </dependency>
     <dependency> 
