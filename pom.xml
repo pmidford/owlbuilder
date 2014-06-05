@@ -34,7 +34,7 @@
     <repository>
       <id>bbop</id>
       <name>BBOP</name>
-      <url>http://code.berkeleybop.org/maven/</url>
+      <url>http://code.berkeleybop.org/maven/snapshot-repository/</url>
     </repository>
   </repositories>
 
