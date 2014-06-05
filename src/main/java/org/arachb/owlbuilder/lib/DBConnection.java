@@ -63,6 +63,9 @@ public class DBConnection implements AbstractConnection{
 		catch (ClassNotFoundException e){
 			return false;
 		}
+		catch (NullPointerException e){
+			return false;
+		}
 		finally{
 			try {
 				if (c != null){
