@@ -15,6 +15,9 @@ All original code is copyright 2013-2014 Peter E. Midford
 ## Travis build status
 [![Build Status](https://travis-ci.org/pmidford/owlbuilder.png?branch=master)](https://travis-ci.org/pmidford/owlbuilder)
 
+### What does this mean?
+If the build status is passing, the HEAD revision of the repository has been sucessfully built on a continuous build server so it should build on your system using maven.  Note that the tests are written to pass in the absence of a configured arachadmin database (there is a 'mock' database connection that the tests use in this situation).  
+
 ## Building
 
 Use maven (3.0 recommended, 2.x may work) to build.  It was developed under Java 6, but at least builds and tests under Java 7 (using Travis-CI).
