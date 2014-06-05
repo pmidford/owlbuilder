@@ -47,7 +47,7 @@
     <dependency>
       <groupId>org.bbop</groupId>
       <artifactId>OWLTools-Core</artifactId>
-      <version>0.2.1</version>
+      <version>0.2.1-20140324.185932-25</version>
     </dependency>
     <dependency> 
       <groupId>org.semanticweb.elk</groupId> 
