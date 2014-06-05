@@ -32,8 +32,8 @@
 
   <repositories>
     <repository>
-      <id>bbop</id>
-      <name>BBOP</name>
+      <id>org.bbop</id>
+      <name>Berkeley Bioinformatics Open-Source Projects</name>
       <url>http://code.berkeleybop.org/maven/snapshot-repository/</url>
     </repository>
   </repositories>
@@ -47,7 +47,7 @@
     <dependency>
       <groupId>org.bbop</groupId>
       <artifactId>OWLTools-Core</artifactId>
-      <version>0.2.1</version>
+      <version>0.2.1-20140324.185932-25</version>
     </dependency>
     <dependency> 
       <groupId>org.semanticweb.elk</groupId> 
