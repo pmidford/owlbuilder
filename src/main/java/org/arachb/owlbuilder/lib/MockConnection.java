@@ -306,20 +306,15 @@ public class MockConnection implements AbstractConnection {
 	// Sort of ugly (do better somehow?)
 	@Override
 	public void updateNamedEntity(AbstractNamedEntity e) throws SQLException{
-		if (e instanceof Publication){
-			updatePublication((Publication)e);
-		}
-		if (e instanceof Term){
-		}
-		else{
-			mockClaimResults.setString(Claim.DBGENERATEDID, e.getIriString());		
-		}
+		e.updateDB(this);
 	}
-	
 	
 	@Override
 	public void updateClaim(Claim cl){
-		
+		switch (cl.getId()){
+		case 1:
+			mockClaimResults.setString(Claim.DBGENERATEDID, cl.getGeneratedId());
+		}
 	}
 	
 	@Override
