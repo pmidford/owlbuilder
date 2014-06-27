@@ -154,6 +154,10 @@ public class DBConnection implements AbstractConnection{
 	
 	private static final String CONNECTIONSPEC = "jdbc:mysql://%s/%s";
 	
+	/**
+	 * 
+	 * @return whether the connection succeeded
+	 */
 	public static boolean testConnection(){
 		Connection c = null;
 		String connectionSpec = DEFAULTPROPERTIESFILE;
@@ -220,11 +224,21 @@ public class DBConnection implements AbstractConnection{
 		domainStatement.close();
 	}
 	
+	/**
+	 * 
+	 * @return
+	 * @throws Exception
+	 */
 	public static DBConnection getDBConnection() throws Exception{
 		return new DBConnection(DEFAULTPROPERTIESFILE);
 	}
 
 	
+	/**
+	 * 
+	 * @return
+	 * @throws Exception
+	 */
 	public static DBConnection getTestConnection() throws Exception{
 		return new DBConnection(TESTPROPERTIESFILE);
 	}
@@ -245,45 +259,62 @@ public class DBConnection implements AbstractConnection{
 	
 	public Publication getPublication(int id) throws SQLException{
 		PreparedStatement publicationStatement = c.prepareStatement(PUBLICATIONROWQUERY);
-		publicationStatement.setInt(1, id);
-		ResultSet rawResults = publicationStatement.executeQuery();
-		AbstractResults publicationResults = new DBResults(rawResults);
-		if (publicationResults.next()){
-			Publication result = new Publication();
-			result.fill(publicationResults);
-			return result;
+		try{
+			publicationStatement.setInt(1, id);
+			ResultSet rawResults = publicationStatement.executeQuery();
+			AbstractResults publicationResults = new DBResults(rawResults);
+			if (publicationResults.next()){
+				Publication result = new Publication();
+				result.fill(publicationResults);
+				return result;
+			}
+			else {
+				return null;
+			}
 		}
-		else {
-			return null;
+		finally{
+			publicationStatement.close();
 		}
 	}
 	
 	public Set<Publication> getPublications() throws SQLException{
 		final Set<Publication> result = new HashSet<Publication>();
 		Statement allpubStatement = c.createStatement();
-		ResultSet rawResults = allpubStatement.executeQuery(PUBLICATIONTABLEQUERY);
-        AbstractResults publicationResults = new DBResults(rawResults);
-		while (publicationResults.next()){
-			Publication pub = new Publication();
-			pub.fill(publicationResults);
-			result.add(pub);
+		try{
+			ResultSet rawResults = allpubStatement.executeQuery(PUBLICATIONTABLEQUERY);
+			AbstractResults publicationResults = new DBResults(rawResults);
+			while (publicationResults.next()){
+				Publication pub = new Publication();
+				pub.fill(publicationResults);
+				result.add(pub);
+			}
+			return result;
 		}
-		return result;
+		finally{
+			allpubStatement.close();
+		}
 	}
-	
+
+	final static private String UPDATEPUBLICATIONFAIL = "publication (%s) update failed; row count = %d";
 	public void updatePublication(Publication p) throws SQLException{
 		PreparedStatement updateStatement = 
 				c.prepareStatement(PUBLICATIONUPDATESTATEMENT);
-		updateStatement.setString(1, p.getGeneratedId());  //getIRI_String() is wrong - 
-		updateStatement.setInt(2,p.getId());
-		int count = updateStatement.executeUpdate();
-		if (count != 1){
-			logger.error("entity update failed; row count = " + count);
+		try{
+			updateStatement.setString(1, p.getGeneratedId());  //getIRI_String() is wrong - 
+			updateStatement.setInt(2,p.getId());
+			int count = updateStatement.executeUpdate();
+			if (count != 1){
+				logger.error(String.format(UPDATEPUBLICATIONFAIL,p,count));
+			}
+		}
+		finally{
+			updateStatement.close();
 		}
 	}
 	
 	public Term getTerm(int id) throws SQLException{
 		PreparedStatement termStatement = c.prepareStatement(TERMROWQUERY);
+		try{
 		termStatement.setInt(1, id);
 		ResultSet termSet = termStatement.executeQuery();
 		AbstractResults termResults = new DBResults(termSet);
@@ -295,32 +326,47 @@ public class DBConnection implements AbstractConnection{
 		else {
 			return null;
 		}
+		}
+		finally{
+			termStatement.close();
+		}
 	}
 	
 	public Set<Term> getTerms() throws SQLException{
 		final Set<Term> result = new HashSet<Term>();
 		final Statement allTermStatement = c.createStatement();
-		final ResultSet termSet = allTermStatement.executeQuery(TERMTABLEQUERY);
-		final AbstractResults termResults = new DBResults(termSet);
-		while (termSet.next()){
-			Term t = new Term();
-			t.fill(termResults);
-			result.add(t);
+		try{
+			final ResultSet termSet = allTermStatement.executeQuery(TERMTABLEQUERY);
+			final AbstractResults termResults = new DBResults(termSet);
+			while (termSet.next()){
+				Term t = new Term();
+				t.fill(termResults);
+				result.add(t);
+			}
+			return result;
 		}
-		return result;
+		finally{
+			allTermStatement.close();
+		}
 	}
-	
+
 	
 	public void updateTerm(Term t) throws SQLException{
 		PreparedStatement updateStatement = 
 				c.prepareStatement(TERMUPDATESTATEMENT);
-		updateStatement.setString(1, t.getGeneratedId());  //getIRI_String() is wrong - 
-		updateStatement.setInt(2, t.getId());
-		int count = updateStatement.executeUpdate();
-		if (count != 1){
-			logger.error("entity update failed; row count = " + count);
+		try{
+			updateStatement.setString(1, t.getGeneratedId());  //getIRI_String() is wrong - 
+			updateStatement.setInt(2, t.getId());
+			int count = updateStatement.executeUpdate();
+			if (count != 1){
+				logger.error("entity update failed; row count = " + count);
+			}
+		}
+		finally{
+			updateStatement.close();
 		}
 	}
+
 
 	public Claim getClaim(int id) throws Exception{
 		final PreparedStatement claimStatement = c.prepareStatement(CLAIMROWQUERY);
@@ -363,11 +409,16 @@ public class DBConnection implements AbstractConnection{
 	public void updateClaim(Claim cl) throws SQLException{
 		PreparedStatement updateStatement = 
 				c.prepareStatement(CLAIMUPDATESTATEMENT);
+		try{
 		updateStatement.setString(1, cl.getGeneratedId());  //getIRI_String() is wrong - 
 		updateStatement.setInt(2,cl.getId());
 		int count = updateStatement.executeUpdate();
 		if (count != 1){
 			logger.error("entity update failed; row count = " + count);
+		}
+		}
+		finally{
+			updateStatement.close();
 		}
 	}
 
@@ -382,7 +433,6 @@ public class DBConnection implements AbstractConnection{
 			if (participantSet.next()){
 				Participant result = Participant.makeParticipant(participantSet);
 				result.fill(participantSet);
-			
 				if (participantSet.next()){
 					final String msg = String.format(MULTIPLEPRIMARYPARTICIPANTERROR, a.getId());
 					log.error(msg);
@@ -403,17 +453,22 @@ public class DBConnection implements AbstractConnection{
 	
 	public Set<Participant> getParticipants(Claim a) throws SQLException {
 		final Set<Participant> result = new HashSet<Participant>();
-		int assertion_id = a.getId();
+		final int assertion_id = a.getId();
 		PreparedStatement participantsStatement =
 				c.prepareStatement(PARTICIPANTSQUERY);
-		participantsStatement.setInt(1, assertion_id);
-		final ResultSet r = participantsStatement.executeQuery();
-		final AbstractResults participantSet = new DBResults(r);
-		while (participantSet.next()){
-			Participant p = Participant.makeParticipant(participantSet);
-			result.add(p);
+		try{
+			participantsStatement.setInt(1, assertion_id);
+			final ResultSet r = participantsStatement.executeQuery();
+			final AbstractResults participantSet = new DBResults(r);
+			while (participantSet.next()){
+				Participant p = Participant.makeParticipant(participantSet);
+				result.add(p);
+			}
+			return result;
 		}
-		return result;
+		finally{
+			participantsStatement.close();
+		}
 	}
 
 	@Override
@@ -424,51 +479,73 @@ public class DBConnection implements AbstractConnection{
 	public void updateIndividualParticipant(IndividualParticipant p) throws SQLException{
 		PreparedStatement updateStatement = 
 				c.prepareStatement(INDIVIDUALPARTICIPANTUPDATESTATEMENT);
-		updateStatement.setString(1, p.getGeneratedId());  //getIRI_String() is wrong - 
-		updateStatement.setInt(2, p.getId());
-		int count = updateStatement.executeUpdate();
-		if (count != 1){
-			logger.error("entity update failed; row count = " + count);
+		try{
+			updateStatement.setString(1, p.getGeneratedId());  //getIRI_String() is wrong - 
+			updateStatement.setInt(2, p.getId());
+			int count = updateStatement.executeUpdate();
+			if (count != 1){
+				logger.error("entity update failed; row count = " + count);
+			}
+		}
+		finally{
+			updateStatement.close();
 		}
 	}
 
 	
 	public Taxon getTaxon(int id) throws SQLException{
 		PreparedStatement taxonStatement = c.prepareStatement(TAXONROWQUERY);
-		taxonStatement.setInt(1, id);
-		ResultSet rawResults = taxonStatement.executeQuery();
-		AbstractResults taxonResults = new DBResults(rawResults);
-		if (taxonResults.next()){
-			Taxon result = new Taxon();
-			result.fill(taxonResults);
-			return result;
+		try{
+			taxonStatement.setInt(1, id);
+			ResultSet rawResults = taxonStatement.executeQuery();
+			AbstractResults taxonResults = new DBResults(rawResults);
+			if (taxonResults.next()){
+				Taxon result = new Taxon();
+				result.fill(taxonResults);
+				return result;
+			}
+			else {
+				return null;
+			}
 		}
-		else {
-			return null;
+		finally{
+			taxonStatement.close();
 		}
 	}
 	
+
 	public Set<Taxon> getTaxa() throws SQLException{
 		final Set<Taxon> result = new HashSet<Taxon>();
 		Statement allTaxaStatement = c.createStatement();
-		ResultSet rawResults = allTaxaStatement.executeQuery(TAXONTABLEQUERY);
-        AbstractResults taxaResults = new DBResults(rawResults);
-		while (taxaResults.next()){
-			Taxon tax = new Taxon();
-			tax.fill(taxaResults);
-			result.add(tax);
+		try{
+			ResultSet rawResults = allTaxaStatement.executeQuery(TAXONTABLEQUERY);
+			AbstractResults taxaResults = new DBResults(rawResults);
+			while (taxaResults.next()){
+				Taxon tax = new Taxon();
+				tax.fill(taxaResults);
+				result.add(tax);
+			}
+			return result;
 		}
-		return result;
+		finally{
+			allTaxaStatement.close();
+		}
 	}
 
+	
 	public void updateTaxon(Taxon t) throws SQLException{
 		PreparedStatement updateStatement = 
 				c.prepareStatement(TAXONUPDATESTATEMENT);
-		updateStatement.setString(1, t.getGeneratedId());  //getIRI_String() is wrong - 
-		updateStatement.setInt(2, t.getId());
-		int count = updateStatement.executeUpdate();
-		if (count != 1){
-			logger.error("entity update failed; row count = " + count);
+		try{
+			updateStatement.setString(1, t.getGeneratedId());  //getIRI_String() is wrong - 
+			updateStatement.setInt(2, t.getId());
+			int count = updateStatement.executeUpdate();
+			if (count != 1){
+				logger.error("entity update failed; row count = " + count);
+			}
+		}
+		finally{
+			updateStatement.close();
 		}
 	}
 
