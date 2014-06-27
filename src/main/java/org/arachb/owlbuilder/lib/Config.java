@@ -6,7 +6,6 @@ public class Config {
 	private String importDir;
 	private String mireotDir;
 	private String cacheDir;
-	private String taxonomyTarget;
 	
 	public Config(String configFile){
 		//will eventually process a configuration file
