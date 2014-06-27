@@ -23,9 +23,7 @@ import org.arachb.owlbuilder.lib.IRIManager;
 import org.arachb.owlbuilder.lib.Taxon;
 import org.semanticweb.elk.owlapi.ElkReasonerFactory;
 import org.semanticweb.owlapi.model.IRI;
-import org.semanticweb.owlapi.model.OWLAnnotation;
 import org.semanticweb.owlapi.model.OWLAnnotationAssertionAxiom;
-import org.semanticweb.owlapi.model.OWLAnnotationSubject;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassAxiom;
@@ -400,8 +398,6 @@ public class Owlbuilder{
 	}
 
 	public void loadCuratorAddedTerms(OWLOntology mergedSources) throws SQLException{
-		final OWLOntologyManager manager = testWrapper.getManager();
-		final OWLDataFactory factory = testWrapper.getDataFactory();
 		final Set<Taxon> taxa = connection.getTaxa();
 		for (Taxon t : taxa){
 			final IRI iri = IRI.create(t.getIriString());

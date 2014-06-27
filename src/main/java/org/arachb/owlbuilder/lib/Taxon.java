@@ -6,38 +6,10 @@ import org.arachb.owlbuilder.Owlbuilder;
 import org.semanticweb.owlapi.model.OWLObject;
 
 public class Taxon implements AbstractNamedEntity{
-
-	static final private String ROWQUERY = "SELECT t.id,t.name,t.author, " +
-			"t.year,t.external_id,t.authority,t.parent,t.generated_id, " +
-			"t.parent_term, t.merged, t.merge_status, parent_record.source_id " +
-			"FROM taxon AS t where taxon.id = ? " +
-			"LEFT JOIN term AS parent_record ON (t.parent_term = parent_record.id) ";
-
-
-	static final private String TABLEQUERY = "SELECT t.id,t.name,t.author, " +
-			"t.year,t.external_id,t.authority,t.parent,t.generated_id, " +
-			"t.parent_term,t.merged,t.merge_status, parent_record.source_id " +
-			"FROM taxon AS t " +
-			"LEFT JOIN term AS parent_record ON (t.parent_term = parent_record.id) ";
-			
-
-	static final private String ROWUPDATE = "";
 	
 	final static String BADPARENTIRI =
 			"Taxon without IRI referenced as parent of taxon: taxon id = %s; parent id = %s";
 
-	
-	public static String getRowQuery(){
-		return Taxon.ROWQUERY;
-	}
-	
-	public static String getTableQuery(){
-		return Taxon.TABLEQUERY;
-	}
-	
-	public String getUpdateStatement(){
-		return Taxon.ROWUPDATE;
-	}
 
 	static final int DBID = 1;
 	static final int DBNAME = 2;
@@ -161,6 +133,11 @@ public class Taxon implements AbstractNamedEntity{
 		return parent_sourceid;
 	}
 
+	@Override
+	public void updateDB(AbstractConnection c) throws SQLException{
+		c.updateTaxon(this);
+	}
+	
 	@Override
 	public OWLObject generateOWL(Owlbuilder b) throws Exception {
 		// TODO Auto-generated method stub

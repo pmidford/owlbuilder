@@ -41,6 +41,18 @@ public interface AbstractConnection {
 	 * @throws SQLException
 	 */
 	Set<Publication> getPublications() throws SQLException;
+	
+	/**
+	 * 
+	 */
+	void updateClaim(Claim c) throws SQLException;
+
+	/**
+	 * 
+	 * @param p
+	 * @throws SQLException
+	 */
+	void updatePublication(Publication p) throws SQLException;
 
 	/**
 	 * 
@@ -59,6 +71,13 @@ public interface AbstractConnection {
 	Set<Participant> getParticipants(Claim a) throws SQLException;
 	
 	/**
+	 * 
+	 * @param p
+	 * @throws SQLException
+	 */
+	void updateIndividualParticipant(IndividualParticipant p) throws SQLException;
+	
+	/**
 	 * returns a single (curator added) taxon 
 	 * @param id integer id of the (curator added) taxon to return
 	 * @return object filled with the fields from the taxon requested
@@ -73,6 +92,12 @@ public interface AbstractConnection {
 	 */
 	Set<Taxon> getTaxa() throws SQLException;
 
+	/**
+	 * 
+	 * @param t
+	 * @throws SQLException
+	 */
+	void updateTaxon(Taxon t) throws SQLException;
 
 	/**
 	 * performs query and returns a mapping from uri's of support ontologies used
@@ -90,11 +115,35 @@ public interface AbstractConnection {
 	 */
 	Term getTerm(int termId) throws SQLException;
 
+	/**
+	 * 
+	 * @return
+	 * @throws SQLException
+	 */
 	Set<Term> getTerms() throws SQLException;
 
-	Claim getClaim(int i) throws Exception;
-
+	/**
+	 * 
+	 * @param t
+	 * @throws SQLException
+	 */
+	void updateTerm(Term t) throws SQLException;
+	
+	/**
+	 * 
+	 * @param e
+	 * @throws SQLException
+	 */
 	void updateNamedEntity(AbstractNamedEntity e) throws SQLException;
+
+	/**
+	 * 
+	 * @param claimId
+	 * @return
+	 * @throws Exception
+	 */
+	Claim getClaim(int claimId) throws Exception;
+
 
 	/**
 	 * 

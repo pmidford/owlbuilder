@@ -42,22 +42,7 @@ public class Publication implements AbstractNamedEntity{
 	static final int DBCURATIONUPDATE = 20;
 	
 
-	static final private String ROWQUERY = "SELECT id, publication_type,dispensation," +
-	"downloaded,reviewed,title,alternate_title,author_list,editor_list," +
-	"source_publication, volume,issue,serial_identifier,page_range,publication_date," +
-	"publication_year,doi,generated_id,curation_status,curation_update " +
-	"FROM publication where publication.id = ?";
 	
-	static final private String TABLEQUERY = "SELECT id, publication_type,dispensation," +
-	"downloaded,reviewed,title,alternate_title,author_list,editor_list," +
-	"source_publication,volume,issue,serial_identifier,page_range,publication_date," +
-	"publication_year,doi,generated_id,curation_status, curation_update " +
-	"FROM publication";
-
-	static final private String ROWUPDATE = "UPDATE publication " +
-			"SET generated_id = ? WHERE id = ?";
-	
-
 	private int id;
 	private String publication_type;
 	private String dispensation;
@@ -84,18 +69,6 @@ public class Publication implements AbstractNamedEntity{
 	private static Logger log = Logger.getLogger(Owlbuilder.class);
 
 	
-	public static String getRowQuery(){
-		return Publication.ROWQUERY;
-	}
-	
-	public static String getTableQuery(){
-		return Publication.TABLEQUERY;
-	}
-	
-	public String getUpdateStatement(){
-		return Publication.ROWUPDATE;
-	}
-
 	
 	@Override
 	public void fill(AbstractResults record) throws SQLException{
@@ -255,7 +228,12 @@ public class Publication implements AbstractNamedEntity{
 		}
 	}
 
-
+	@Override
+	public void updateDB(AbstractConnection c) throws SQLException{
+		c.updatePublication(this);
+	}
+	
+	
 	/**
 	 * This cleans up doi's (which tend to have lots of URI unfriendly characters) and returns a properly prefixed doi
 	 * @param doi

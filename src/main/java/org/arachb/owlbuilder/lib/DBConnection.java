@@ -21,9 +21,119 @@ import org.apache.log4j.Logger;
 
 public class DBConnection implements AbstractConnection{
 
+	//properties file names
 	static final String DEFAULTPROPERTIESFILE = "Connection.properties";
 	
 	static final String TESTPROPERTIESFILE = "TestConnection.properties";
+	
+	
+	//Query strings
+	
+	static final String PUBLICATIONROWQUERY = 
+			"SELECT id, publication_type,dispensation," +
+					"downloaded,reviewed,title,alternate_title,author_list,editor_list," +
+					"source_publication, volume,issue,serial_identifier,page_range,publication_date," +
+					"publication_year,doi,generated_id,curation_status,curation_update " +
+					"FROM publication where publication.id = ?";
+
+	static final String PUBLICATIONTABLEQUERY = 
+			"SELECT id, publication_type,dispensation," +
+					"downloaded,reviewed,title,alternate_title,author_list,editor_list," +
+					"source_publication,volume,issue,serial_identifier,page_range,publication_date," +
+					"publication_year,doi,generated_id,curation_status, curation_update " +
+					"FROM publication";
+	
+	static final String PUBLICATIONUPDATESTATEMENT = 
+			"UPDATE publication SET generated_id = ? WHERE id = ?";
+				
+
+	static final String TERMROWQUERY = 
+			"SELECT id,source_id,domain," +
+					"authority,label,generated_id,comment " +
+					"FROM term where term.id = ?";
+		
+	static final String TERMTABLEQUERY = 
+			"SELECT id,source_id,domain," +
+					"authority,label,generated_id,comment " +
+					"FROM term";
+			
+	static final String TERMUPDATESTATEMENT = 
+			"UPDATE term SET generated_id = ? WHERE id = ?";
+
+	static final String TERMIRIQUERY = 
+			"SELECT id,source_id,generated_id FROM term where term.id = ?";
+		
+	static final String PRIMARYPARTICIPANTQUERY =
+			"SELECT part.id, part.taxon, part.substrate, part.anatomy, " +
+					"part.quantification, part.generated_id, part.publication_taxon, " +
+					"part.label, part.publication_anatomy, part.publication_substrate, " +
+					"taxon.source_id, taxon.generated_id, " +
+					"substrate.source_id, substrate.generated_id, " +
+					"anatomy.source_id, anatomy.generated_id " +
+					"FROM participant2claim as p2c " + 
+					"JOIN participant AS part ON (p2c.participant = part.id) " +
+					"LEFT JOIN term AS taxon ON (part.taxon = taxon.id) " +
+					"LEFT JOIN term AS substrate ON (part.substrate = substrate.id) " +
+					"LEFT JOIN term AS anatomy ON (part.anatomy = anatomy.id) " +
+					"WHERE p2c.claim = ? AND p2c.participant_index = 1";
+	
+	static final String PARTICIPANTSQUERY = 
+			"SELECT part.id, part.taxon, part.substrate, part.anatomy, " +
+					"part.quantification, part.generated_id, part.publication_taxon, " +
+					"part.label, part.publication_anatomy, part.publication_substrate, " +
+					"taxon.source_id, taxon.generated_id, " +
+					"substrate.source_id, substrate.generated_id, " +
+					"anatomy.source_id, anatomy.generated_id " +
+					"FROM participant2claim as p2c " + 
+					"JOIN participant AS part ON (p2c.participant = part.id) " +
+					"LEFT JOIN term AS taxon ON (part.taxon = taxon.id) " +
+					"LEFT JOIN term AS substrate ON (part.substrate = substrate.id) " +
+					"LEFT JOIN term AS anatomy ON (part.anatomy = anatomy.id) " +
+					"WHERE p2c.claim = ? AND p2c.participant_index > 1";
+
+	static final String CLAIMROWQUERY =
+			"SELECT c.id, c.publication, c.publication_behavior, c.behavior_term, " +
+					"c.evidence, c.generated_id, pub.doi, " +
+					"pub.generated_id, behavior.source_id, behavior.generated_id " +
+				    "FROM claim AS c " +
+					"LEFT JOIN publication AS pub ON (c.publication = pub.id) " +
+					"LEFT JOIN term AS behavior ON (c.behavior_term = behavior.id) " +
+					"LEFT JOIN term AS evidence ON (c.evidence = evidence.id) " +
+				    "WHERE c.id = ?";
+
+	static final String CLAIMTABLEQUERY =
+			"SELECT c.id, c.publication, c.publication_behavior, c.behavior_term, " +
+					"c.evidence, c.generated_id, pub.doi, " +
+					"pub.generated_id, behavior.source_id, behavior.generated_id " +
+					"FROM claim AS c " +
+					"LEFT JOIN publication AS pub ON (c.publication = pub.id) " +
+					"LEFT JOIN term AS behavior ON (c.behavior_term = behavior.id) " +
+					"LEFT JOIN term AS evidence ON (c.evidence = evidence.id) ";
+
+	
+	static final String CLAIMUPDATESTATEMENT = 
+			"UPDATE claim SET generated_id = ? WHERE id = ?";
+
+	
+	static final String TAXONROWQUERY = 
+			"SELECT t.id,t.name,t.author, " +
+					"t.year,t.external_id,t.authority,t.parent,t.generated_id, " +
+					"t.parent_term, t.merged, t.merge_status, parent_record.source_id " +
+					"FROM taxon AS t where taxon.id = ? " +
+					"LEFT JOIN term AS parent_record ON (t.parent_term = parent_record.id) ";
+
+	static final String TAXONTABLEQUERY = 
+			"SELECT t.id,t.name,t.author, " +
+					"t.year,t.external_id,t.authority,t.parent,t.generated_id, " +
+					"t.parent_term,t.merged,t.merge_status, parent_record.source_id " +
+					"FROM taxon AS t " +
+					"LEFT JOIN term AS parent_record ON (t.parent_term = parent_record.id) ";
+
+	static final String TAXONUPDATESTATEMENT = "";
+	
+	static final String INDIVIDUALPARTICIPANTUPDATESTATEMENT = 
+			"UPDATE participant SET generated_id = ? WHERE id = ?";
+
 	
 	
 	//Error strings
@@ -40,6 +150,9 @@ public class DBConnection implements AbstractConnection{
 
 	private static Logger log = Logger.getLogger(DBConnection.class);
 
+	private static final String DRIVERSPEC = "com.mysql.jdbc.Driver";
+	
+	private static final String CONNECTIONSPEC = "jdbc:mysql://%s/%s";
 	
 	public static boolean testConnection(){
 		Connection c = null;
@@ -47,12 +160,12 @@ public class DBConnection implements AbstractConnection{
 		try {
 			final Properties properties = new Properties();
 			properties.load(DBConnection.class.getClassLoader().getResourceAsStream(connectionSpec));
-			Class.forName("com.mysql.jdbc.Driver");
+			Class.forName(DRIVERSPEC);
 			final String host = properties.getProperty("host");
 			final String db = properties.getProperty("dbname");
 			final String user = properties.getProperty("user");
 			final String password = properties.getProperty("password");
-			c = DriverManager.getConnection(String.format("jdbc:mysql://%s/%s",host,db),user,password);
+			c = DriverManager.getConnection(String.format(CONNECTIONSPEC,host,db),user,password);
 		}
 		catch (SQLException e){
 			return false;
@@ -131,7 +244,7 @@ public class DBConnection implements AbstractConnection{
 	}
 	
 	public Publication getPublication(int id) throws SQLException{
-		PreparedStatement publicationStatement = c.prepareStatement(Publication.getRowQuery());
+		PreparedStatement publicationStatement = c.prepareStatement(PUBLICATIONROWQUERY);
 		publicationStatement.setInt(1, id);
 		ResultSet rawResults = publicationStatement.executeQuery();
 		AbstractResults publicationResults = new DBResults(rawResults);
@@ -148,7 +261,7 @@ public class DBConnection implements AbstractConnection{
 	public Set<Publication> getPublications() throws SQLException{
 		final Set<Publication> result = new HashSet<Publication>();
 		Statement allpubStatement = c.createStatement();
-		ResultSet rawResults = allpubStatement.executeQuery(Publication.getTableQuery());
+		ResultSet rawResults = allpubStatement.executeQuery(PUBLICATIONTABLEQUERY);
         AbstractResults publicationResults = new DBResults(rawResults);
 		while (publicationResults.next()){
 			Publication pub = new Publication();
@@ -158,11 +271,11 @@ public class DBConnection implements AbstractConnection{
 		return result;
 	}
 	
-	public void updateNamedEntity(AbstractNamedEntity e) throws SQLException{
+	public void updatePublication(Publication p) throws SQLException{
 		PreparedStatement updateStatement = 
-				c.prepareStatement(e.getUpdateStatement());
-		updateStatement.setString(1, e.getGeneratedId());  //getIRI_String() is wrong - 
-		updateStatement.setInt(2,e.getId());
+				c.prepareStatement(PUBLICATIONUPDATESTATEMENT);
+		updateStatement.setString(1, p.getGeneratedId());  //getIRI_String() is wrong - 
+		updateStatement.setInt(2,p.getId());
 		int count = updateStatement.executeUpdate();
 		if (count != 1){
 			logger.error("entity update failed; row count = " + count);
@@ -170,7 +283,7 @@ public class DBConnection implements AbstractConnection{
 	}
 	
 	public Term getTerm(int id) throws SQLException{
-		PreparedStatement termStatement = c.prepareStatement(Term.getRowQuery());
+		PreparedStatement termStatement = c.prepareStatement(TERMROWQUERY);
 		termStatement.setInt(1, id);
 		ResultSet termSet = termStatement.executeQuery();
 		AbstractResults termResults = new DBResults(termSet);
@@ -187,7 +300,7 @@ public class DBConnection implements AbstractConnection{
 	public Set<Term> getTerms() throws SQLException{
 		final Set<Term> result = new HashSet<Term>();
 		final Statement allTermStatement = c.createStatement();
-		final ResultSet termSet = allTermStatement.executeQuery(Term.getTableQuery());
+		final ResultSet termSet = allTermStatement.executeQuery(TERMTABLEQUERY);
 		final AbstractResults termResults = new DBResults(termSet);
 		while (termSet.next()){
 			Term t = new Term();
@@ -197,8 +310,20 @@ public class DBConnection implements AbstractConnection{
 		return result;
 	}
 	
+	
+	public void updateTerm(Term t) throws SQLException{
+		PreparedStatement updateStatement = 
+				c.prepareStatement(TERMUPDATESTATEMENT);
+		updateStatement.setString(1, t.getGeneratedId());  //getIRI_String() is wrong - 
+		updateStatement.setInt(2, t.getId());
+		int count = updateStatement.executeUpdate();
+		if (count != 1){
+			logger.error("entity update failed; row count = " + count);
+		}
+	}
+
 	public Claim getClaim(int id) throws Exception{
-		final PreparedStatement claimStatement = c.prepareStatement(Claim.ROWQUERY);
+		final PreparedStatement claimStatement = c.prepareStatement(CLAIMROWQUERY);
 		try{
 			claimStatement.setInt(1, id);
 			final ResultSet r = claimStatement.executeQuery();
@@ -221,7 +346,7 @@ public class DBConnection implements AbstractConnection{
 		final Statement allClaimStatement = c.createStatement();
 		try{
 			final Set<Claim> result = new HashSet<Claim>();
-			final ResultSet r = allClaimStatement.executeQuery(Claim.getTableQuery());
+			final ResultSet r = allClaimStatement.executeQuery(CLAIMTABLEQUERY);
 			final AbstractResults claimSet = new DBResults(r);
 			while (claimSet.next()){
 				Claim a = new Claim();
@@ -235,28 +360,44 @@ public class DBConnection implements AbstractConnection{
 		}
 	}
 		
+	public void updateClaim(Claim cl) throws SQLException{
+		PreparedStatement updateStatement = 
+				c.prepareStatement(CLAIMUPDATESTATEMENT);
+		updateStatement.setString(1, cl.getGeneratedId());  //getIRI_String() is wrong - 
+		updateStatement.setInt(2,cl.getId());
+		int count = updateStatement.executeUpdate();
+		if (count != 1){
+			logger.error("entity update failed; row count = " + count);
+		}
+	}
+
 	
 	public Participant getPrimaryParticipant(Claim a) throws Exception{
-		PreparedStatement participantStatement =
-				c.prepareStatement(Participant.getPrimaryQuery());
-		participantStatement.setInt(1, a.getId());
-		final ResultSet r = participantStatement.executeQuery();
-		final AbstractResults participantSet = new DBResults(r);
-		if (participantSet.next()){
-			Participant result = Participant.makeParticipant(participantSet);
-			result.fill(participantSet);
-			
+		final PreparedStatement participantStatement = 
+				c.prepareStatement(PRIMARYPARTICIPANTQUERY);
+		try{
+			participantStatement.setInt(1, a.getId());
+			final ResultSet r = participantStatement.executeQuery();
+			final AbstractResults participantSet = new DBResults(r);
 			if (participantSet.next()){
-				final String msg = String.format(MULTIPLEPRIMARYPARTICIPANTERROR, a.getId());
-				log.error(msg);
-				throw new RuntimeException(msg);
+				Participant result = Participant.makeParticipant(participantSet);
+				result.fill(participantSet);
+			
+				if (participantSet.next()){
+					final String msg = String.format(MULTIPLEPRIMARYPARTICIPANTERROR, a.getId());
+					log.error(msg);
+					throw new RuntimeException(msg);
+				}
+				else{
+					return result;
+				}
 			}
-			else{
-				return result;
+			else {
+				return null;
 			}
 		}
-		else {
-			return null;
+		finally {
+			participantStatement.close();
 		}
 	}
 	
@@ -264,7 +405,7 @@ public class DBConnection implements AbstractConnection{
 		final Set<Participant> result = new HashSet<Participant>();
 		int assertion_id = a.getId();
 		PreparedStatement participantsStatement =
-				c.prepareStatement(Participant.getRestQuery());
+				c.prepareStatement(PARTICIPANTSQUERY);
 		participantsStatement.setInt(1, assertion_id);
 		final ResultSet r = participantsStatement.executeQuery();
 		final AbstractResults participantSet = new DBResults(r);
@@ -275,9 +416,25 @@ public class DBConnection implements AbstractConnection{
 		return result;
 	}
 
+	@Override
+	public void updateNamedEntity(AbstractNamedEntity e) throws SQLException{
+		e.updateDB(this);
+	}
+	
+	public void updateIndividualParticipant(IndividualParticipant p) throws SQLException{
+		PreparedStatement updateStatement = 
+				c.prepareStatement(INDIVIDUALPARTICIPANTUPDATESTATEMENT);
+		updateStatement.setString(1, p.getGeneratedId());  //getIRI_String() is wrong - 
+		updateStatement.setInt(2, p.getId());
+		int count = updateStatement.executeUpdate();
+		if (count != 1){
+			logger.error("entity update failed; row count = " + count);
+		}
+	}
+
 	
 	public Taxon getTaxon(int id) throws SQLException{
-		PreparedStatement taxonStatement = c.prepareStatement(Taxon.getRowQuery());
+		PreparedStatement taxonStatement = c.prepareStatement(TAXONROWQUERY);
 		taxonStatement.setInt(1, id);
 		ResultSet rawResults = taxonStatement.executeQuery();
 		AbstractResults taxonResults = new DBResults(rawResults);
@@ -294,7 +451,7 @@ public class DBConnection implements AbstractConnection{
 	public Set<Taxon> getTaxa() throws SQLException{
 		final Set<Taxon> result = new HashSet<Taxon>();
 		Statement allTaxaStatement = c.createStatement();
-		ResultSet rawResults = allTaxaStatement.executeQuery(Taxon.getTableQuery());
+		ResultSet rawResults = allTaxaStatement.executeQuery(TAXONTABLEQUERY);
         AbstractResults taxaResults = new DBResults(rawResults);
 		while (taxaResults.next()){
 			Taxon tax = new Taxon();
@@ -302,6 +459,17 @@ public class DBConnection implements AbstractConnection{
 			result.add(tax);
 		}
 		return result;
+	}
+
+	public void updateTaxon(Taxon t) throws SQLException{
+		PreparedStatement updateStatement = 
+				c.prepareStatement(TAXONUPDATESTATEMENT);
+		updateStatement.setString(1, t.getGeneratedId());  //getIRI_String() is wrong - 
+		updateStatement.setInt(2, t.getId());
+		int count = updateStatement.executeUpdate();
+		if (count != 1){
+			logger.error("entity update failed; row count = " + count);
+		}
 	}
 
 	

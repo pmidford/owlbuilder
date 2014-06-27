@@ -1,5 +1,6 @@
 package org.arachb.owlbuilder.lib;
 
+import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -18,44 +19,19 @@ import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 
 public class Claim implements AbstractNamedEntity{
-
-	static final String ROWQUERY = "SELECT c.id, c.publication, " +
-	"c.publication_behavior, c.behavior_term, c.taxon," +
-	"c.evidence, c.generated_id, pub.doi, " +
-	"pub.generated_id, behavior.source_id, behavior.generated_id " +
-    "FROM claim AS c " +
-	"LEFT JOIN publication AS pub ON (c.publication = pub.id) " +
-	"LEFT JOIN term AS behavior ON (c.behavior_term = behavior.id) " +
-	"LEFT JOIN term AS evidence ON (c.evidence = evidence.id) " +
-    "WHERE c.id = ?";
 	
-
-	static final private String TABLEQUERY = "SELECT c.id, c.publication, " +
-	"c.publication_behavior, c.behavior_term, c.taxon, " +
-	"c.evidence, c.generated_id, pub.doi, " +
-	"pub.generated_id, behavior.source_id, behavior.generated_id " +
-	"FROM claim AS c " +
-	"LEFT JOIN publication AS pub ON (c.publication = pub.id) " +
-	"LEFT JOIN term AS behavior ON (c.behavior_term = behavior.id) " +
-	"LEFT JOIN term AS evidence ON (c.evidence = evidence.id) ";
-	
-	static final private String ROWUPDATE = "UPDATE claim " +
-			"SET generated_id = ? WHERE id = ?";
-	
-
 	final static int DBID = 1;
 	final static int DBPUBLICATION = 2;
 	final static int DBPUBLICATIONBEHAVIOR = 3;
 	final static int DBBEHAVIORTERM = 4;
-	final static int DBTAXON = 5;
-	final static int DBEVIDENCE = 6;
-	final static int DBGENERATEDID = 7;
-	final static int DBPUBDOI = 8;
-	final static int DBPUBGENERATEDID = 9;
-	final static int DBBEHAVIORSOURCEID = 10;
-	final static int DBBEHAVIORGENERATEDID = 11;
-	final static int DBEVIDENCESOURCEID = 12;
-	final static int DBEVIDENCEGENERATEDID = 13;
+	final static int DBEVIDENCE = 5;
+	final static int DBGENERATEDID = 6;
+	final static int DBPUBDOI = 7;
+	final static int DBPUBGENERATEDID = 8;
+	final static int DBBEHAVIORSOURCEID = 9;
+	final static int DBBEHAVIORGENERATEDID = 10;
+	final static int DBEVIDENCESOURCEID = 11;
+	final static int DBEVIDENCEGENERATEDID = 12;
 	
 	final static String BADPUBLICATIONIRI =
 			"Publication without IRI referenced as publication cited in claim: claim id = %s; publication id = %s";
@@ -73,7 +49,6 @@ public class Claim implements AbstractNamedEntity{
 	private int publication;
 	private int behavior;
 	private String publicationBehavior;
-	private int taxon;
 	private int evidence;
 	private String generated_id = null;  //for validity checking
 	private String behaviorIRI;
@@ -83,20 +58,6 @@ public class Claim implements AbstractNamedEntity{
 	static final Claim dummy = new Claim(); 
 	
 	
-	public final static String getRowQuery(){
-		return Claim.ROWQUERY;
-	}
-	
-	public final static String getTableQuery(){
-		return Claim.TABLEQUERY;
-	}
-	
-	@Override
-	public final String getUpdateStatement(){
-		return Claim.ROWUPDATE;
-	}
-	
-	
 	//maybe make this a constructor
 	@Override
 	public void fill(AbstractResults record) throws Exception{
@@ -104,7 +65,6 @@ public class Claim implements AbstractNamedEntity{
 		publication = record.getInt(DBPUBLICATION);
 		publicationBehavior = record.getString(DBPUBLICATIONBEHAVIOR);
 		behavior= record.getInt(DBBEHAVIORTERM);
-		taxon = record.getInt(DBTAXON);
 		evidence = record.getInt(DBEVIDENCE);
 		generated_id = record.getString(DBGENERATEDID);
 		if (publication != 0){
@@ -158,6 +118,11 @@ public class Claim implements AbstractNamedEntity{
 		final String msg = String.format(BADEVIDENCEIRI, id, evidence);
 		throw new IllegalStateException(msg);
 	}
+	
+	@Override
+	public void updateDB(AbstractConnection c) throws SQLException{
+		c.updateClaim(this);
+	}
 
 	@Override
 	public int getId(){
@@ -175,11 +140,7 @@ public class Claim implements AbstractNamedEntity{
 	public int getBehavior(){
 		return behavior;
 	}
-		
-	public int getTaxon(){
-		return taxon;
-	}
-	
+			
 	
 	public int getEvidence(){
 		return evidence;

@@ -7,16 +7,6 @@ import org.semanticweb.owlapi.model.OWLObject;
 
 public class Term implements AbstractNamedEntity{
 
-	static final private String ROWQUERY = "SELECT id,source_id,domain," +
-		    "authority,label,generated_id,comment " +
-		    "FROM term where term.id = ?";
-		
-	static final private String TABLEQUERY = "SELECT id,source_id,domain," +
-		    "authority,label,generated_id,comment " +
-		    "FROM term";
-			
-	static final private String ROWUPDATE = "UPDATE term " +
-			"SET generated_id = ? WHERE id = ?";
 
 	static final int DBID = 1;
 	static final int DBSOURCEID = 2;
@@ -34,25 +24,7 @@ public class Term implements AbstractNamedEntity{
 	private String generated_id;
 	private String comment;
 	
-	
-	public static String getRowQuery(){
-		return Term.ROWQUERY;
-	}
-	
-	public static String getTableQuery(){
-		return Term.TABLEQUERY;
-	}
-	
-	public String getUpdateStatement(){
-		return Term.ROWUPDATE;
-	}
-	
-	static final private String IRIQUERY = 
-			"SELECT id,source_id,generated_id FROM term where term.id = ?";
-
-	public String getIRIQuery(){
-		return Term.IRIQUERY;
-	}
+		
 
 	//maybe make this a constructor
 	public void fill(AbstractResults record) throws SQLException{
@@ -125,6 +97,10 @@ public class Term implements AbstractNamedEntity{
 	
 	public String getGeneratedId(){
 		return generated_id;
+	}
+	
+	public void updateDB(AbstractConnection c) throws SQLException{
+		c.updateTerm(this);
 	}
 
 	@Override

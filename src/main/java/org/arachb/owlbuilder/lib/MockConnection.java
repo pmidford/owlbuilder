@@ -133,7 +133,6 @@ public class MockConnection implements AbstractConnection {
 		mockClaimResults.setInteger(Claim.DBPUBLICATION,6);
 		mockClaimResults.setInteger(Claim.DBBEHAVIORTERM,9);
 		mockClaimResults.setString(Claim.DBPUBLICATIONBEHAVIOR,"behavior");
-		mockClaimResults.setInteger(Claim.DBTAXON, 12);
 		mockClaimResults.setInteger(Claim.DBEVIDENCE,0);
 		mockClaimResults.setString(Claim.DBGENERATEDID,"");
 		mockClaimResults.setString(Claim.DBPUBDOI, TESTDOI);
@@ -308,22 +307,52 @@ public class MockConnection implements AbstractConnection {
 	@Override
 	public void updateNamedEntity(AbstractNamedEntity e) throws SQLException{
 		if (e instanceof Publication){
-			if (e.getId() == 2){
-				mockPublicationResults2.setString(Publication.DBGENERATEDID, e.getIriString());
-			}
+			updatePublication((Publication)e);
 		}
 		if (e instanceof Term){
-			switch (e.getId()){
-			case 1:
-				mockTermResults.setString(Term.DBGENERATEDID, e.getGeneratedId());
-				break;
-			default:
-				mockTermResults2.setString(Term.DBGENERATEDID, e.getGeneratedId());
-			}
 		}
 		else{
 			mockClaimResults.setString(Claim.DBGENERATEDID, e.getIriString());		
 		}
+	}
+	
+	
+	@Override
+	public void updateClaim(Claim cl){
+		
+	}
+	
+	@Override
+	public void updateIndividualParticipant(IndividualParticipant p){
+		
+	}
+	
+	@Override
+	public void updatePublication(Publication p){
+		switch (p.getId()){
+		case 2:
+			mockPublicationResults2.setString(Publication.DBGENERATEDID, p.getIriString());
+			break;
+		default:
+			break;
+		}
+	}		
+	
+	@Override
+	public void updateTerm(Term t){
+		switch (t.getId()){
+		case 1:
+			mockTermResults.setString(Term.DBGENERATEDID, t.getGeneratedId());
+			break;
+		default:
+			mockTermResults2.setString(Term.DBGENERATEDID, t.getGeneratedId());
+		}
+		
+	}
+	
+	@Override
+	public void updateTaxon(Taxon t){
+		
 	}
 
 	@Override

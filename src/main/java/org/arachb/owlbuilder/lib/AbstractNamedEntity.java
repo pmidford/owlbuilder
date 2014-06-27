@@ -1,15 +1,11 @@
 package org.arachb.owlbuilder.lib;
 
+import java.sql.SQLException;
+
 public interface AbstractNamedEntity extends AbstractEntity{
-	
+		
 	public void setGeneratedId(String id);
-	
-	/**
-	 * 
-	 * @return a statement for updating the generated-id field in an SQL table
-	 */
-	public String getUpdateStatement();
-	
+		
 	/**
 	 * need to save the original generated id so old generated id's can
 	 * be captured using SAMEAS
@@ -29,6 +25,13 @@ public interface AbstractNamedEntity extends AbstractEntity{
 	 * @return string for making IRI's or null (means needs to be generated)
 	 **/
 	public Object checkIriString();
+	
+	/**
+	 * 
+	 * @param c
+	 * @throws SQLException 
+	 */
+	public void updateDB(AbstractConnection c) throws SQLException;
 
 	
 }

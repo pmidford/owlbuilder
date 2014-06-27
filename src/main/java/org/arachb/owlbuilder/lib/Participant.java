@@ -13,36 +13,7 @@ import org.semanticweb.owlapi.model.OWLOntologyManager;
 
 public abstract class Participant implements AbstractEntity{
 
-	
-	static final private String PRIMARYQUERY = "SELECT part.id, " + 
-	"part.taxon, part.substrate, part.anatomy, " +
-	"part.quantification, part.generated_id, part.publication_taxon, " +
-	"part.label, part.publication_anatomy, part.publication_substrate, " +
-	"taxon.source_id, taxon.generated_id, " +
-	"substrate.source_id, substrate.generated_id, " +
-	"anatomy.source_id, anatomy.generated_id " +
-	"FROM participant2claim as p2c " + 
-	"JOIN participant AS part ON (p2c.participant = part.id) " +
-	"LEFT JOIN term AS taxon ON (part.taxon = taxon.id) " +
-	"LEFT JOIN term AS substrate ON (part.substrate = substrate.id) " +
-	"LEFT JOIN term AS anatomy ON (part.anatomy = anatomy.id) " +
-	"WHERE p2c.claim = ? AND p2c.participant_index = 1";
-	
-	static final private String RESTQUERY = "SELECT part.id, " + 
-	"part.taxon, part.substrate, part.anatomy, " +
-	"part.quantification, part.generated_id, part.publication_taxon, " +
-	"part.label, part.publication_anatomy, part.publication_substrate, " +
-	"taxon.source_id, taxon.generated_id, " +
-	"substrate.source_id, substrate.generated_id, " +
-	"anatomy.source_id, anatomy.generated_id " +
-	"FROM participant2claim as p2c " + 
-	"JOIN participant AS part ON (p2c.participant = part.id) " +
-	"LEFT JOIN term AS taxon ON (part.taxon = taxon.id) " +
-	"LEFT JOIN term AS substrate ON (part.substrate = substrate.id) " +
-	"LEFT JOIN term AS anatomy ON (part.anatomy = anatomy.id) " +
-	"WHERE p2c.claim = ? AND p2c.participant_index > 1";
-
-	
+		
 	final static int DBID = 1;
 	final static int DBTAXON = 2;
 	final static int DBSUBSTRATE = 3;
@@ -81,14 +52,6 @@ public abstract class Participant implements AbstractEntity{
 	private String taxonIRI = null;
 	private String substrateIRI = null;
 	private String anatomyIRI = null;
-	
-	public static String getPrimaryQuery(){
-		return Participant.PRIMARYQUERY;
-	}
-	
-	public static String getRestQuery(){
-		return Participant.RESTQUERY;
-	}
 	
 	private static String INDIVIDUALQUANTIFIER = "INDIVIDUAL";
 	private static String SOMEQUANTIFIER = "SOME";

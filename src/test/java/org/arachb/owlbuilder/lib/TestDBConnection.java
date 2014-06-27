@@ -56,11 +56,11 @@ public class TestDBConnection {
 		assertEquals(testID,testPub2.getGeneratedId());		
 		String saved_id = testPub2.getGeneratedId();
 		testPub2.setGeneratedId(doi1);
-		testConnection.updateNamedEntity(testPub2);
+		testConnection.updatePublication(testPub2);
 		Publication updatedPub = testConnection.getPublication(2);
 		assertEquals(doi1,updatedPub.getIriString());
 		updatedPub.setGeneratedId(saved_id);
-		testConnection.updateNamedEntity(updatedPub);
+		testConnection.updatePublication(updatedPub);
 	}
 	
 	@Test 
@@ -69,7 +69,7 @@ public class TestDBConnection {
 		assertNotNull(testTerm);
         assertEquals(1,testTerm.getId());
 		testTerm.setGeneratedId(testID);
-		testConnection.updateNamedEntity(testTerm);
+		testConnection.updateTerm(testTerm);
 	}
 	
 	@Test
@@ -145,14 +145,14 @@ public class TestDBConnection {
 	
 	@Test
 	public void testupdateAssertion() throws Exception{
-		Claim testAssertion = testConnection.getClaim(1);
-		assertNotNull(testAssertion);
-		testAssertion.setGeneratedId(testID);
-		testConnection.updateNamedEntity(testAssertion);
-		Claim updatedAssertion = testConnection.getClaim(1);
-		assertEquals(testID,updatedAssertion.getIriString());
-		updatedAssertion.setGeneratedId("");
-		testConnection.updateNamedEntity(updatedAssertion);
+		Claim testClaim = testConnection.getClaim(1);
+		assertNotNull(testClaim);
+		testClaim.setGeneratedId(testID);
+		testConnection.updateClaim(testClaim);
+		Claim updatedClaim = testConnection.getClaim(1);
+		assertEquals(testID,updatedClaim.getIriString());
+		updatedClaim.setGeneratedId("");
+		testConnection.updateClaim(updatedClaim);
 		Claim updatedAssertion2 = testConnection.getClaim(1);
 		assertEquals("",updatedAssertion2.getIriString());  //bogus test here
 	}
