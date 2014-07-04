@@ -12,12 +12,6 @@ public interface AbstractEntity {
 	 */
 	public int getId();
 
-	/**
-	 * Method for filling the fields of a new instance of an AE subtype; 
-	 * @param record key value pairs to fill instance from - typically wraps an SQL ResultSet
-	 * @throws Exception
-	 */
-	void fill(AbstractResults record) throws Exception;
 	
 	/**
 	 * Creates OWLAPI object and assertions that logically define it; assertions are

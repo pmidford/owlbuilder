@@ -5,12 +5,17 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.arachb.arachadmin.AbstractConnection;
+import org.arachb.arachadmin.ParticipantBean;
+import org.arachb.arachadmin.TaxonBean;
 import org.arachb.owlbuilder.Owlbuilder;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAnnotation;
+import org.semanticweb.owlapi.model.OWLAnnotationAssertionAxiom;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassAssertionAxiom;
+import org.semanticweb.owlapi.model.OWLClassAxiom;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLIndividual;
 import org.semanticweb.owlapi.model.OWLObject;
@@ -21,10 +26,14 @@ import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.reasoner.NodeSet;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 
-public class IndividualParticipant extends Participant implements AbstractNamedEntity{
+public class IndividualParticipant implements AbstractNamedEntity{
 	
+	private final ParticipantBean bean;
 	private final static Logger log = Logger.getLogger(IndividualParticipant.class);
 		
+	public IndividualParticipant(ParticipantBean b){
+		bean = b;
+	}
 	
 	@Override
 	/**
@@ -41,14 +50,14 @@ public class IndividualParticipant extends Participant implements AbstractNamedE
 		final OWLIndividual ind = factory.getOWLNamedIndividual(IRI.create(getIriString()));
 		log.info("individual is " + ind);
 		//anatomy specified
-		if (getAnatomy() != 0)
+		if (bean.getAnatomy() != 0)
 			generateOWLforAnatomy(builder, ind);
 		// No anatomy specified, just a taxon
 		OWLOntology target = builder.getTarget();
 		OWLOntologyManager manager = builder.getOntologyManager();
-		if (getTaxon() != 0){
-			if (getTaxonIri() != null){
-				OWLClass taxon = processParticipantTaxon(builder,IRI.create(getTaxonIri()));
+		if (bean.getTaxon() != 0){
+			if (bean.getTaxonIri() != null){
+				OWLClass taxon = processParticipantTaxon(builder,IRI.create(bean.getTaxonIri()));
 		        OWLClassAssertionAxiom taxonAssertion = factory.getOWLClassAssertionAxiom(taxon,ind);
 	        	manager.addAxiom(target, taxonAssertion);
 	        	return ind;
@@ -58,9 +67,9 @@ public class IndividualParticipant extends Participant implements AbstractNamedE
 				throw new IllegalStateException(msg);
 			}
 		}
-		if (getSubstrate() != 0){
-			if (getAnatomyIri() != null){
-				processParticipantSubstrate(builder,IRI.create(getSubstrateIri()));
+		if (bean.getSubstrate() != 0){
+			if (bean.getAnatomyIri() != null){
+				processParticipantSubstrate(builder,IRI.create(bean.getSubstrateIri()));
 			}
 			else{
 				final String msg = String.format("No substrate IRI available; id = %s",getId());
@@ -86,19 +95,19 @@ public class IndividualParticipant extends Participant implements AbstractNamedE
 		OWLOntologyManager manager = builder.getOntologyManager();
 		final OWLObjectProperty partofProperty = factory.getOWLObjectProperty(IRIManager.partOfProperty);
 		{
-			if (getAnatomyIri() != null){
-				final OWLClass anatomyClass =processParticipantAnatomy(builder,IRI.create(getAnatomyIri()));
+			if (bean.getAnatomyIri() != null){
+				final OWLClass anatomyClass =processParticipantAnatomy(builder,IRI.create(bean.getAnatomyIri()));
 				log.info("anatomy is " + anatomyClass);
 				// and the taxon (anatomy w/o taxon should be flagged as a curation error
-				if (getTaxon() != 0){
-					if (getTaxonIri() != null){
+				if (bean.getTaxon() != 0){
+					if (bean.getTaxonIri() != null){
 						// This will require some more attention - curation should be able to
 						// label the organisms because different parts of the same organism or
 						// the same part will be mentioned multiple times - this is why arachb
 						// uses individuals in the first place
-						log.info("taxon is " + getTaxonIri());
+						log.info("taxon is " + bean.getTaxonIri());
 						OWLIndividual organism = factory.getOWLAnonymousIndividual();
-						OWLClass taxon = processParticipantTaxon(builder,IRI.create(getTaxonIri()));
+						OWLClass taxon = processParticipantTaxon(builder,IRI.create(bean.getTaxonIri()));
 						OWLClassAssertionAxiom taxonAssertion = factory.getOWLClassAssertionAxiom(taxon,organism);
 						log.warn("assert " + organism + " is " + taxon);
 						manager.addAxiom(target, taxonAssertion);
@@ -167,7 +176,7 @@ public class IndividualParticipant extends Participant implements AbstractNamedE
 		log.info("Flattened parent count = " + parentList.size());
 		parentList.add(taxonClass);
 		for (OWLClass taxon : parentList){
-			super.processTaxon(builder,taxon);
+			processTaxon(builder,taxon);
 		}
 		return taxonClass;
 	}
@@ -181,8 +190,8 @@ public class IndividualParticipant extends Participant implements AbstractNamedE
 	private OWLClass processNonNCBITaxon(Owlbuilder builder, IRI iri) {
 		final OWLDataFactory factory = builder.getDataFactory();
 		final OWLOntology target = builder.getTarget();
-		log.info("Did not find taxon class in signature of merged ontology for: " + getTaxonIri());
-		final IRI taxonIri = IRI.create(getTaxonIri());
+		log.info("Did not find taxon class in signature of merged ontology for: " + bean.getTaxonIri());
+		final IRI taxonIri = IRI.create(bean.getTaxonIri());
 		final Map<IRI,Taxon> nonNCBITaxa = builder.getNonNCBITaxa();
 		final OWLOntologyManager manager = builder.getOntologyManager();
 		final Taxon t = nonNCBITaxa.get(taxonIri);
@@ -199,7 +208,7 @@ public class IndividualParticipant extends Participant implements AbstractNamedE
 			manager.addAxiom(target, sc_ax);
 		}
 		else{
-			log.info("failed to find IRI of parent of " + getTaxonIri());
+			log.info("failed to find IRI of parent of " + bean.getTaxonIri());
 		}
 		if (t.getName() != null){
 			OWLAnnotation labelAnno = factory.getOWLAnnotation(factory.getRDFSLabel(),
@@ -210,6 +219,53 @@ public class IndividualParticipant extends Participant implements AbstractNamedE
 		}
 		return taxonClass;
 
+	}
+
+	void processTaxon(Owlbuilder builder,OWLClass taxon){
+		final OWLOntologyManager manager = builder.getOntologyManager();
+		final OWLOntology merged = builder.getMergedSources();
+		final OWLOntology extracted = builder.getTarget();
+		if (true){  //add appropriate when figured out
+			log.info("Need to add taxon: " + taxon.getIRI());
+			//log.info("Defining Axioms");
+			manager.addAxioms(extracted, merged.getAxioms(taxon));
+			//log.info("Annotations");
+			Set<OWLAnnotationAssertionAxiom> taxonAnnotations = merged.getAnnotationAssertionAxioms(taxon.getIRI());
+			for (OWLAnnotationAssertionAxiom a : taxonAnnotations){
+				//log.info("   Annotation Axiom: " + a.toString());
+				if (a.getAnnotation().getProperty().isLabel()){
+					log.info("Label is " + a.getAnnotation().getValue().toString());
+					manager.addAxiom(extracted, a);
+				}
+			}
+		}
+	}
+
+	public void processAnatomy(Owlbuilder builder, OWLClass anatomyClass) {
+		final OWLOntologyManager manager = builder.getOntologyManager();
+		final OWLOntology merged = builder.getMergedSources();
+		final OWLOntology extracted = builder.getTarget();
+		if (true){
+			log.info("Need to add anatomy: " + anatomyClass.getIRI());
+			Set<OWLClassAxiom> anatAxioms = merged.getAxioms(anatomyClass);
+			manager.addAxioms(extracted, anatAxioms);
+			Set<OWLAnnotationAssertionAxiom> anatAnnotations = 
+					merged.getAnnotationAssertionAxioms(anatomyClass.getIRI());
+			for (OWLAnnotationAssertionAxiom a : anatAnnotations){
+				//log.info("   Annotation Axiom: " + a.toString());
+				if (a.getAnnotation().getProperty().isLabel()){
+					log.info("Label is " + a.getAnnotation().getValue().toString());
+					manager.addAxiom(extracted, a);
+				}
+			}
+		}
+    	builder.initializeMiscTermAndParents(anatomyClass);
+		
+	}
+
+	public void processSubstrate(Owlbuilder builder, OWLClass substrateClass) {
+		builder.initializeMiscTermAndParents(substrateClass);
+		
 	}
 
 
@@ -229,11 +285,11 @@ public class IndividualParticipant extends Participant implements AbstractNamedE
 			if (anatomy_exists){
 				log.info("Found class in signature of merged ontology for: " + iri);
 				OWLClass anatomyClass = factory.getOWLClass(iri);
-				super.processAnatomy(builder,anatomyClass);
+				processAnatomy(builder,anatomyClass);
 				return anatomyClass;
 			}
 			else{
-				log.info("Did not find class in signature of merged ontology for: " + getTaxonIri());
+				log.info("Did not find class in signature of merged ontology for: " + bean.getTaxonIri());
 				return null;
 			}
 		}
@@ -258,7 +314,7 @@ public class IndividualParticipant extends Participant implements AbstractNamedE
 			if (substrate_exists){
 				log.info("Found class in signature of merged ontology for: " + iri);
 				OWLClass substrateClass = factory.getOWLClass(iri);
-				super.processSubstrate(builder,substrateClass);
+				processSubstrate(builder,substrateClass);
 			}
 		}
 	}
@@ -280,6 +336,26 @@ public class IndividualParticipant extends Participant implements AbstractNamedE
 	@Override
 	public void updateDB(AbstractConnection c) throws SQLException{
 		c.updateIndividualParticipant(this);
+	}
+
+	@Override
+	public int getId() {
+		// TODO Auto-generated method stub
+		return bean.getId();
+	}
+
+
+
+	@Override
+	public String getGeneratedId() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setGeneratedId(String id) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

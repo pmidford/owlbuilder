@@ -5,6 +5,10 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.arachb.arachadmin.AbstractConnection;
+import org.arachb.arachadmin.ClaimBean;
+import org.arachb.arachadmin.ParticipantBean;
+import org.arachb.arachadmin.PublicationBean;
 import org.arachb.owlbuilder.Owlbuilder;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLClass;
@@ -18,169 +22,58 @@ import org.semanticweb.owlapi.model.OWLObjectPropertyAssertionAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 
-public class Claim implements AbstractNamedEntity{
+public class Claim implements AbstractNamedEntity {
 	
-	final static int DBID = 1;
-	final static int DBPUBLICATION = 2;
-	final static int DBPUBLICATIONBEHAVIOR = 3;
-	final static int DBBEHAVIORTERM = 4;
-	final static int DBEVIDENCE = 5;
-	final static int DBGENERATEDID = 6;
-	final static int DBPUBDOI = 7;
-	final static int DBPUBGENERATEDID = 8;
-	final static int DBBEHAVIORSOURCEID = 9;
-	final static int DBBEHAVIORGENERATEDID = 10;
-	final static int DBEVIDENCESOURCEID = 11;
-	final static int DBEVIDENCEGENERATEDID = 12;
-	
-	final static String BADPUBLICATIONIRI =
-			"Publication without IRI referenced as publication cited in claim: claim id = %s; publication id = %s";
-	final static String BADBEHAVIORIRI =
-			"Term without IRI referenced as behavior cited in claim: claim id = %s; behavior id = %s";
-	final static String BADEVIDENCEIRI =
-			"Term without IRI referenced as evidence type supporting claim; claim id = %s; evidence id = %s";
+	private final ClaimBean bean;
 
-	final static String NOASSERTIONGENID = 
-			"Assertion has no generated id; db id = %s";
-	
-	private final static Logger log = Logger.getLogger(Claim.class);
+	private static Logger log = Logger.getLogger(Claim.class);
 
-	private int id;
-	private int publication;
-	private int behavior;
-	private String publicationBehavior;
-	private int evidence;
-	private String generated_id = null;  //for validity checking
-	private String behaviorIRI;
-	private String publicationIRI;
-	private String evidenceIRI;
-	
-	static final Claim dummy = new Claim(); 
-	
-	
-	//maybe make this a constructor
+	public Claim(ClaimBean b){
+		bean = b;
+	}
+
+
 	@Override
-	public void fill(AbstractResults record) throws Exception{
-		id = record.getInt(DBID);
-		publication = record.getInt(DBPUBLICATION);
-		publicationBehavior = record.getString(DBPUBLICATIONBEHAVIOR);
-		behavior= record.getInt(DBBEHAVIORTERM);
-		evidence = record.getInt(DBEVIDENCE);
-		generated_id = record.getString(DBGENERATEDID);
-		if (publication != 0){
-			updatePublicationIRI(record);
-		}
-		if (behavior != 0){
-			updateBehaviorIRI(record);
-		}
-		if (evidence != 0){
-			updateEvidenceIRI(record);
-		}
-	}
-	
-	private void updatePublicationIRI(AbstractResults record) throws Exception{
-		if (record.getString(DBPUBDOI) != null){
-			this.setPublicationIri(Publication.cleanupDoi(record.getString(DBPUBDOI)));
-		}
-		else if (record.getString(DBPUBGENERATEDID) != null){
-			this.setPublicationIri(record.getString(DBPUBGENERATEDID));
-		}
-		else{
-			throwBadState(BADPUBLICATIONIRI);
-		}
-	}
-
-	private void updateBehaviorIRI(AbstractResults record) throws Exception{
-		if (record.getString(DBBEHAVIORSOURCEID) != null){
-			this.setBehaviorIri(record.getString(DBBEHAVIORSOURCEID));
-		}
-		else if (record.getString(DBBEHAVIORGENERATEDID) != null){
-			this.setBehaviorIri(record.getString(DBBEHAVIORGENERATEDID));
-		}
-		else{
-			throwBadState(BADBEHAVIORIRI);
-		}
-	}
-
-	private void updateEvidenceIRI(AbstractResults record) throws Exception{
-		if (record.getString(DBEVIDENCESOURCEID) != null){
-			this.setEvidenceIri(record.getString(DBEVIDENCESOURCEID));
-		}
-		else if (record.getString(DBEVIDENCEGENERATEDID) != null){
-			this.setEvidenceIri(record.getString(DBEVIDENCEGENERATEDID));
-		}
-		else{
-			throwBadState(BADEVIDENCEIRI);
-		}
-	}
-	
-	private void throwBadState(String template){
-		final String msg = String.format(BADEVIDENCEIRI, id, evidence);
-		throw new IllegalStateException(msg);
-	}
-	
-	@Override
-	public void updateDB(AbstractConnection c) throws SQLException{
-		c.updateClaim(this);
+	public int getId() {
+		return bean.getId();
 	}
 
 	@Override
-	public int getId(){
-		return id;
+	public void setGeneratedId(String id) {
+		// TODO Auto-generated method stub
+
 	}
+
 	
-	public int getPublication(){
-		return publication;
-	}
-	
-	public String getPublicationBehavior(){
-		return publicationBehavior;
-	}
-	
-	public int getBehavior(){
-		return behavior;
-	}
-			
-	
-	public int getEvidence(){
-		return evidence;
-	}
-	
+	final static String NOASSERTIONGENID = "Assertion has no generated id; db id = %s";
+
 	@Override
 	public String getIriString(){
-		if (generated_id == null){
-			final String msg = String.format(NOASSERTIONGENID, id);
+		final String genId = bean.getGeneratedId();
+		if (genId == null){
+			final String msg = String.format(NOASSERTIONGENID, bean.getId());
 			throw new IllegalStateException(msg);
 		}
-		return generated_id;
+		return genId;
 	}
 
+	//this seems a little dubious
 	@Override
 	public String checkIriString(){
-		return generated_id;
+		return bean.getGeneratedId();
 	}
 
-	public void setPublicationIri(String s){
-		publicationIRI = s;
-	}
-
-	public void setBehaviorIri(String s){
-		behaviorIRI = s;
-	}
-
-	public void setEvidenceIri(String s){
-		evidenceIRI = s;
-	}
-
-	
 	@Override
-	public void setGeneratedId(String id){
-		generated_id = id;
+	public String getGeneratedId() {
+		// TODO Auto-generated method stub
+		return null;
 	}
-	
+
+
 	@Override
-	public String getGeneratedId(){
-		return generated_id;
+	public void updateDB(AbstractConnection c) throws SQLException {
+		// TODO Auto-generated method stub
+
 	}
 
 	@Override
@@ -193,13 +86,14 @@ public class Claim implements AbstractNamedEntity{
 		final OWLObjectProperty denotesProp = factory.getOWLObjectProperty(IRIManager.denotesProperty);
 		final OWLObjectProperty partofProperty = factory.getOWLObjectProperty(IRIManager.partOfProperty);
     	final OWLIndividual assert_ind = factory.getOWLNamedIndividual(IRI.create(getIriString()));
-    	OWLClass behaviorClass = factory.getOWLClass(IRI.create(behaviorIRI));
-		final Participant primary = c.getPrimaryParticipant(this);
+    	OWLClass behaviorClass = factory.getOWLClass(IRI.create(bean.getBehaviorIri()));
+		final QuantifiedParticipant primary = new QuantifiedParticipant(c.getPrimaryParticipant(bean));
     	builder.initializeMiscTermAndParents(behaviorClass);
 		OWLObject owlPrimary = primary.generateOWL(builder);
-		final Set<Participant> otherParticipants = c.getParticipants(this);
+		final Set<QuantifiedParticipant> otherParticipants = 
+				QuantifiedParticipant.wrapSet(c.getParticipants(bean));
 		final Set<OWLObject> otherOWLParticipants = new HashSet<OWLObject>();
-		for (Participant p : otherParticipants){
+		for (QuantifiedParticipant p : otherParticipants){
 			otherOWLParticipants.add(p.generateOWL(builder));
 		}
 		OWLObjectProperty hasParticipant = factory.getOWLObjectProperty(IRIManager.hasParticipantProperty);
@@ -225,11 +119,11 @@ public class Claim implements AbstractNamedEntity{
         else {  // probably a curation error; log this don't throw exception
         	final String msgStr = 
         			"Assertion primary %s of id %s is neither an individual nor a class expression";
-			throw new RuntimeException(String.format(msgStr,owlPrimary,this.id));
+			throw new RuntimeException(String.format(msgStr,owlPrimary,bean.getId()));
         }
         
- 	    Publication pub = c.getPublication(getPublication());
- 	    
+ 	    Publication pub = new Publication(c.getPublication(bean.getPublication()));
+ 	   
  	    OWLObject pub_obj = pub.generateOWL(builder);
  	    if (pub_obj instanceof OWLIndividual){
  	    	OWLIndividual pub_ind = (OWLIndividual)pub_obj;
@@ -239,6 +133,7 @@ public class Claim implements AbstractNamedEntity{
     	}
         return assert_ind;
 	}
-	
+
+
 
 }
