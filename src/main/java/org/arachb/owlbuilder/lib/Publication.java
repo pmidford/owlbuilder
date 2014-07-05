@@ -23,11 +23,16 @@ public class Publication implements AbstractNamedEntity {
 	
 	private final PublicationBean bean;
 
+	private String generatedLabel;
+	
 	private static Logger log = Logger.getLogger(Publication.class);
 	
+	
+
 
 	public Publication(PublicationBean b){
 		bean = b;
+        generatedLabel = generateLabel();
 	}
 
 
@@ -37,6 +42,22 @@ public class Publication implements AbstractNamedEntity {
 	}
 
 
+	public boolean hasGeneratedLabel(){
+		return (generatedLabel != null);
+	}
+	
+	public String getGeneratedLabel(){
+		return generatedLabel;
+	}
+	
+    //generate a label; this should gradually get smarter
+	private String generateLabel(){
+		StringBuilder b = new StringBuilder(100);
+        b.append(bean.getAuthorList());
+        b.append(' ');
+        b.append(bean.getPublicationYear());
+		return b.toString();
+	}
 
 
 	/**
@@ -74,9 +95,9 @@ public class Publication implements AbstractNamedEntity {
 		OWLClassAssertionAxiom classAssertion = 
 				factory.getOWLClassAssertionAxiom(pubAboutInvestigationClass, pub_ind); 
 		manager.addAxiom(builder.getTarget(), classAssertion);
-		if (bean.hasGeneratedLabel()){
+		if (hasGeneratedLabel()){
 			OWLAnnotation labelAnno = factory.getOWLAnnotation(factory.getRDFSLabel(),
-					factory.getOWLLiteral(bean.getGeneratedLabel()));
+					factory.getOWLLiteral(getGeneratedLabel()));
 			OWLAxiom ax = factory.getOWLAnnotationAssertionAxiom(publication_id, labelAnno);
 			// Add the axiom to the ontology
 			manager.addAxiom(builder.getTarget(),ax);
@@ -132,15 +153,13 @@ public class Publication implements AbstractNamedEntity {
 
 	@Override
 	public void setGeneratedId(String id) {
-		// TODO Auto-generated method stub
-		
+		bean.setGeneratedId(id);
 	}
 
 
 	@Override
 	public String getGeneratedId() {
-		// TODO Auto-generated method stub
-		return null;
+		return bean.getGeneratedId();
 	}
 
 

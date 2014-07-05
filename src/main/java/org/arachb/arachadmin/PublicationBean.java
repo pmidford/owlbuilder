@@ -1,23 +1,8 @@
 package org.arachb.arachadmin;
 
-import java.net.URL;
-import java.net.URLEncoder;
 import java.sql.SQLException;
 
-import org.apache.log4j.Logger;
-import org.arachb.owlbuilder.Owlbuilder;
-import org.arachb.owlbuilder.lib.AbstractNamedEntity;
 import org.arachb.owlbuilder.lib.AbstractResults;
-import org.arachb.owlbuilder.lib.IRIManager;
-import org.semanticweb.owlapi.model.IRI;
-import org.semanticweb.owlapi.model.OWLAnnotation;
-import org.semanticweb.owlapi.model.OWLAxiom;
-import org.semanticweb.owlapi.model.OWLClass;
-import org.semanticweb.owlapi.model.OWLClassAssertionAxiom;
-import org.semanticweb.owlapi.model.OWLDataFactory;
-import org.semanticweb.owlapi.model.OWLIndividual;
-import org.semanticweb.owlapi.model.OWLObject;
-import org.semanticweb.owlapi.model.OWLOntologyManager;
 
 
 public class PublicationBean implements BeanBase{
@@ -67,8 +52,6 @@ public class PublicationBean implements BeanBase{
 	private String curation_status;
 	private String curation_update;
 	
-	private String generatedLabel;
-	
 
 	
 	
@@ -94,7 +77,6 @@ public class PublicationBean implements BeanBase{
 		generated_id = record.getString(DBGENERATEDID);
         curation_status = record.getString(DBCURATIONSTATUS);
         curation_update = record.getString(DBCURATIONUPDATE);        
-        generatedLabel = generateLabel();
 	}
 	
 	@Override
@@ -189,22 +171,6 @@ public class PublicationBean implements BeanBase{
 		c.updatePublication(this);
 	}
 	
-	public boolean hasGeneratedLabel(){
-		return (generatedLabel != null);
-	}
-	
-	public String getGeneratedLabel(){
-		return generatedLabel;
-	}
-	
-    //generate a label; this should gradually get smarter
-	private String generateLabel(){
-		StringBuilder b = new StringBuilder(100);
-        b.append(getAuthorList());
-        b.append(' ');
-        b.append(getPublicationYear());
-		return b.toString();
-	}
 
 	
 }

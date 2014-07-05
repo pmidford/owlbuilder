@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.arachb.owlbuilder.lib.Publication;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -25,9 +24,11 @@ public class TestDBConnection {
 	@Before
 	public void setup() throws Exception {
 		if (DBConnection.testConnection()){
+			log.info("Testing with live connection");
 			testConnection = DBConnection.getTestConnection();
 		}
 		else{
+			log.info("Testing with mock connection");
 			testConnection = DBConnection.getMockConnection();
 		}
 	}

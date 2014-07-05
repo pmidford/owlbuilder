@@ -105,7 +105,7 @@ public class ClaimBean implements BeanBase{
 		throw new IllegalStateException(msg);
 	}
 	
-	@Override
+
 	public void updateDB(AbstractConnection c) throws SQLException{
 		c.updateClaim(this);
 	}

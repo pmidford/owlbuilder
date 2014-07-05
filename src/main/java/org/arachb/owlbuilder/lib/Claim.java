@@ -7,8 +7,6 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.arachb.arachadmin.AbstractConnection;
 import org.arachb.arachadmin.ClaimBean;
-import org.arachb.arachadmin.ParticipantBean;
-import org.arachb.arachadmin.PublicationBean;
 import org.arachb.owlbuilder.Owlbuilder;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLClass;
@@ -30,6 +28,17 @@ public class Claim implements AbstractNamedEntity {
 
 	public Claim(ClaimBean b){
 		bean = b;
+	}
+
+	/**
+	 * Utility for making Claim Sets from sets of beans
+	 */
+	public static Set<Claim> wrapSet(Set<ClaimBean> bset){
+		final Set<Claim>result = new HashSet<Claim>();
+		for(ClaimBean b : bset){
+			result.add(new Claim(b));
+		}
+		return result;
 	}
 
 
@@ -87,13 +96,13 @@ public class Claim implements AbstractNamedEntity {
 		final OWLObjectProperty partofProperty = factory.getOWLObjectProperty(IRIManager.partOfProperty);
     	final OWLIndividual assert_ind = factory.getOWLNamedIndividual(IRI.create(getIriString()));
     	OWLClass behaviorClass = factory.getOWLClass(IRI.create(bean.getBehaviorIri()));
-		final QuantifiedParticipant primary = new QuantifiedParticipant(c.getPrimaryParticipant(bean));
+		final Participant primary = new Participant(c.getPrimaryParticipant(bean));
     	builder.initializeMiscTermAndParents(behaviorClass);
 		OWLObject owlPrimary = primary.generateOWL(builder);
-		final Set<QuantifiedParticipant> otherParticipants = 
-				QuantifiedParticipant.wrapSet(c.getParticipants(bean));
+		final Set<Participant> otherParticipants = 
+				Participant.wrapSet(c.getParticipants(bean));
 		final Set<OWLObject> otherOWLParticipants = new HashSet<OWLObject>();
-		for (QuantifiedParticipant p : otherParticipants){
+		for (Participant p : otherParticipants){
 			otherOWLParticipants.add(p.generateOWL(builder));
 		}
 		OWLObjectProperty hasParticipant = factory.getOWLObjectProperty(IRIManager.hasParticipantProperty);

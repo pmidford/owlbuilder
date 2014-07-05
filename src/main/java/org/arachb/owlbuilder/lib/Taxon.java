@@ -4,7 +4,6 @@ import java.sql.SQLException;
 
 import org.apache.log4j.Logger;
 import org.arachb.arachadmin.AbstractConnection;
-import org.arachb.arachadmin.ParticipantBean;
 import org.arachb.arachadmin.TaxonBean;
 import org.arachb.owlbuilder.Owlbuilder;
 import org.semanticweb.owlapi.model.OWLObject;
@@ -44,14 +43,17 @@ public class Taxon implements AbstractNamedEntity{
 
 	@Override
 	public String getIriString() {
-		// TODO Auto-generated method stub
-		return null;
+		return bean.getIriString();
 	}
 
 	@Override
-	public Object checkIriString() {
-		// TODO Auto-generated method stub
-		return null;
+	public String checkIriString() {
+		if (bean.get_available_id() == null){
+			throw new IllegalStateException("Term has neither assigned nor generated id");
+		}
+		else {
+			return bean.get_available_id();
+		}
 	}
 
 	public String getParentSourceId(){

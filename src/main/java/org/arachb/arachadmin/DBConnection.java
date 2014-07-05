@@ -19,7 +19,6 @@ import org.apache.log4j.Logger;
 import org.arachb.owlbuilder.lib.AbstractNamedEntity;
 import org.arachb.owlbuilder.lib.AbstractResults;
 import org.arachb.owlbuilder.lib.IRIManager;
-import org.arachb.owlbuilder.lib.IndividualParticipant;
 
 
 
@@ -481,12 +480,12 @@ public class DBConnection implements AbstractConnection{
 		e.updateDB(this);
 	}
 	
-	public void updateIndividualParticipant(IndividualParticipant p) throws SQLException{
+	public void updateParticipant(ParticipantBean b) throws SQLException{
 		PreparedStatement updateStatement = 
 				c.prepareStatement(INDIVIDUALPARTICIPANTUPDATESTATEMENT);
 		try{
-			updateStatement.setString(1, p.getGeneratedId());  //getIRI_String() is wrong - 
-			updateStatement.setInt(2, p.getId());
+			updateStatement.setString(1, b.getGeneratedId());  //getIRI_String() is wrong - 
+			updateStatement.setInt(2, b.getId());
 			int count = updateStatement.executeUpdate();
 			if (count != 1){
 				logger.error("entity update failed; row count = " + count);

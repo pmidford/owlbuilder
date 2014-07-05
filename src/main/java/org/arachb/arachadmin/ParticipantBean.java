@@ -54,8 +54,8 @@ public class ParticipantBean {
 	private String substrateIRI = null;
 	private String anatomyIRI = null;
 	
-	public static String INDIVIDUALQUANTIFIER = "INDIVIDUAL";
-	public static String SOMEQUANTIFIER = "SOME";
+	public final static String INDIVIDUALQUANTIFIER = "INDIVIDUAL";
+	public final static String SOMEQUANTIFIER = "SOME";
 	
 	private static Logger log = Logger.getLogger(ParticipantBean.class);
 

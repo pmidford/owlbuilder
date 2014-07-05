@@ -5,7 +5,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.arachb.owlbuilder.lib.AbstractNamedEntity;
-import org.arachb.owlbuilder.lib.IndividualParticipant;
 
 public interface AbstractConnection {
 

@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.arachb.owlbuilder.lib.AbstractNamedEntity;
-import org.arachb.owlbuilder.lib.IndividualParticipant;
 
 public class MockConnection implements AbstractConnection {
 	
@@ -316,6 +315,9 @@ public class MockConnection implements AbstractConnection {
 		switch (cl.getId()){
 		case 1:
 			mockClaimResults.setString(ClaimBean.DBGENERATEDID, cl.getGeneratedId());
+			break;
+		default:
+			break;
 		}
 	}
 	
