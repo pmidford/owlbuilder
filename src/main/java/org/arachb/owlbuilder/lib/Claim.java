@@ -74,8 +74,7 @@ public class Claim implements AbstractNamedEntity {
 
 	@Override
 	public String getGeneratedId() {
-		// TODO Auto-generated method stub
-		return null;
+		return bean.getGeneratedId();
 	}
 
 
@@ -127,7 +126,7 @@ public class Claim implements AbstractNamedEntity {
         }
         else {  // probably a curation error; log this don't throw exception
         	final String msgStr = 
-        			"Assertion primary %s of id %s is neither an individual nor a class expression";
+        			"Claim primary participant %s for claim id %s is neither an individual nor a class expression";
 			throw new RuntimeException(String.format(msgStr,owlPrimary,bean.getId()));
         }
         
