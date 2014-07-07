@@ -55,19 +55,6 @@ public class Participant implements AbstractNamedEntity{
 			"Term without IRI referenced as participant substrate; participant id = %s; substrate id = %s";
 
 
-	private int id;
-	private int taxon;
-	private int substrate;
-	private int anatomy;
-	private String quantification;
-	private String generatedId;
-	private String publicationTaxon;
-	private String label;
-	private String publicationAnatomy;
-	private String publicationSubstrate;
-	private String taxonIRI = null;
-	private String substrateIRI = null;
-	private String anatomyIRI = null;
 
 	private static String INDIVIDUALQUANTIFIER = "INDIVIDUAL";
 	private static String SOMEQUANTIFIER = "SOME";
@@ -92,14 +79,14 @@ public class Participant implements AbstractNamedEntity{
 	
 	@Override	
 	public OWLObject generateOWL(Owlbuilder builder) throws SQLException{
-		if (INDIVIDUALQUANTIFIER.equalsIgnoreCase(quantification)){
+		if (INDIVIDUALQUANTIFIER.equalsIgnoreCase(bean.getQuantification())){
 			return generateOWLForIndividual(builder);
 		}
-		else if (SOMEQUANTIFIER.equalsIgnoreCase(quantification)){
+		else if (SOMEQUANTIFIER.equalsIgnoreCase(bean.getQuantification())){
 			return generateOWLForClass(builder);
 		}
 		else{
-			final String msg = "Participant had bad quantification: " + quantification;
+			final String msg = "Participant had bad quantification: " + bean.getQuantification();
 			log.error(msg);
 			throw new IllegalArgumentException(msg);
 		}
@@ -611,59 +598,59 @@ public class Participant implements AbstractNamedEntity{
 
 
 	public int getId(){
-		return id;
+		return bean.getId();
 	}
 
 	public int getTaxon(){
-		return taxon;
+		return bean.getTaxon();
 	}
 
 	public int getSubstrate(){
-		return substrate;
+		return bean.getSubstrate();
 	}
 
 	public int getAnatomy(){
-		return anatomy;
+		return bean.getAnatomy();
 	}
 
 	public String getQuantification(){
-		return quantification;
+		return bean.getQuantification();
 	}
 
 	public String getPublicationTaxon(){
-		return publicationTaxon;
+		return bean.getPublicationTaxon();
 	}
 
 	public String getLabel(){
-		return label;
+		return bean.getLabel();
 	}
 
 	public String getPublicationAnatomy(){
-		return publicationAnatomy;
+		return bean.getPublicationAnatomy();
 	}
 
 	public String getPublicationSubstrate(){
-		return publicationSubstrate;
+		return bean.getPublicationSubstrate();
 	}
 
 	public String getTaxonIri(){
-		return taxonIRI;
+		return bean.getTaxonIri();
 	}
 
 	public String getSubstrateIri(){
-		return substrateIRI;
+		return bean.getSubstrateIri();
 	}
 
 	public String getAnatomyIri(){
-		return anatomyIRI;
+		return bean.getAnatomyIri();
 	}
 
 	public String getGeneratedId(){
-		return generatedId;
+		return bean.getGeneratedId();
 	}
 
 	public void setGeneratedId(String s){
-		generatedId = s;
+		bean.setGeneratedId(s);
 	}
 
 	public String getIriString(){
