@@ -364,11 +364,17 @@ public class MockConnection implements AbstractConnection {
 		return mockOntologyNamesMap;
 	}
 	
+	@Override
+	public IndividualBean getIndividual(int inId) throws SQLException {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 	@Override
 	public int scanPrivateIDs(){
 		return MAXMOCKIDVALUE;
 	}
+
 
 
 

@@ -134,6 +134,15 @@ public class DBConnection implements AbstractConnection{
 
 	static final String TAXONUPDATESTATEMENT = "";
 	
+	static final String INDIVIDUALROWQUERY =
+			"SELECT i.id, i.source_id, i.generated_id, i.label, i.term " +
+			"FROM individual AS i WHERE i.id = ?";
+	
+	static final String INDIVIDUALTABLEQUERY =
+			"SELECT i.id, i.source_id, i.generated_id, i.label, i.term " +
+			"FROM individual AS i";
+	
+	//This is probably going away, individuals are their own things
 	static final String INDIVIDUALPARTICIPANTUPDATESTATEMENT = 
 			"UPDATE participant SET generated_id = ? WHERE id = ?";
 
@@ -175,15 +184,19 @@ public class DBConnection implements AbstractConnection{
 			c = DriverManager.getConnection(String.format(CONNECTIONSPEC,host,db),user,password);
 		}
 		catch (SQLException e){
+			log.error("DBConnection setup failed, encountered:",e);
 			return false;
 		}
 		catch (IOException e){
+			log.error("DBConnection setup failed, encountered:",e);
 			return false;
 		}
 		catch (ClassNotFoundException e){
+			log.error("DBConnection setup failed, encountered:",e);
 			return false;
 		}
 		catch (NullPointerException e){
+			log.error("DBConnection setup failed, encountered:",e);
 			return false;
 		}
 		finally{
@@ -318,17 +331,17 @@ public class DBConnection implements AbstractConnection{
 	public TermBean getTerm(int id) throws SQLException{
 		PreparedStatement termStatement = c.prepareStatement(TERMROWQUERY);
 		try{
-		termStatement.setInt(1, id);
-		ResultSet termSet = termStatement.executeQuery();
-		AbstractResults termResults = new DBResults(termSet);
-		if (termSet.next()){
-			TermBean result = new TermBean();
-			result.fill(termResults);
-			return result;
-		}
-		else {
-			return null;
-		}
+			termStatement.setInt(1, id);
+			ResultSet termSet = termStatement.executeQuery();
+			AbstractResults termResults = new DBResults(termSet);
+			if (termSet.next()){
+				TermBean result = new TermBean();
+				result.fill(termResults);
+				return result;
+			}
+			else {
+				return null;
+			}
 		}
 		finally{
 			termStatement.close();
@@ -431,7 +444,7 @@ public class DBConnection implements AbstractConnection{
 				c.prepareStatement(PRIMARYPARTICIPANTQUERY);
 		try{
 			participantStatement.setInt(1, a.getId());
-			final ResultSet r = participantStatement.executeQuery();
+			final ResultSet r = participantStatement.executeQuery();  //problem here**
 			final AbstractResults participantSet = new DBResults(r);
 			if (participantSet.next()){
 				ParticipantBean result = new ParticipantBean();
@@ -550,6 +563,27 @@ public class DBConnection implements AbstractConnection{
 		}
 		finally{
 			updateStatement.close();
+		}
+	}
+
+	
+	public IndividualBean getIndividual(int id) throws SQLException{
+		PreparedStatement individualStatement = c.prepareStatement(INDIVIDUALROWQUERY);
+		try{
+			individualStatement.setInt(1, id);
+			ResultSet individualSet = individualStatement.executeQuery();
+			AbstractResults individualResults = new DBResults(individualSet);
+			if (individualSet.next()){
+				IndividualBean result = new IndividualBean();
+				result.fill(individualResults);
+				return result;
+			}
+			else {
+				return null;
+			}
+		}
+		finally{
+			individualStatement.close();
 		}
 	}
 
@@ -682,6 +716,7 @@ public class DBConnection implements AbstractConnection{
 	public void close() throws Exception {
 		c.close();
 	}
+
 
 
 	

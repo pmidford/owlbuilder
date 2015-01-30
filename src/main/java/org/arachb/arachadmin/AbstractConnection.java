@@ -132,19 +132,28 @@ public interface AbstractConnection {
 	void updateTerm(TermBean t) throws SQLException;
 	
 	/**
-	 * 
+	 * should update the database record corresponding to the entity
 	 * @param e
 	 * @throws SQLException
 	 */
 	void updateNamedEntity(AbstractNamedEntity e) throws SQLException;
 
 	/**
-	 * 
+	 * returns representation of a single claim
 	 * @param claimId
-	 * @return
+	 * @return object filled with fields from the claim requested
 	 * @throws Exception
 	 */
 	ClaimBean getClaim(int claimId) throws Exception;
+	
+	/**
+	 * returns a single individual
+	 * @param inId integer id of the individual to return
+	 * @return object filled with the fields from the individual requested
+	 * @throws SQLException
+	 */
+	IndividualBean getIndividual(int inId) throws SQLException;
+
 
 
 	/**
