@@ -94,6 +94,16 @@ public class DBConnection implements AbstractConnection{
 					"LEFT JOIN term AS anatomy ON (part.anatomy = anatomy.id) " +
 					"WHERE p2c.claim = ? AND p2c.participant_index > 1";
 
+	static final String PELEMENTQUERY =
+			"SELECT ele.id, ele.type, ele.participant FROM participant_element as ele " +
+				    "LEFT JOIN pelement2term as p2t ON (p2t.element = ele.id) " +
+					"LEFT JOIN pelement2individual as p2i ON (p2i.element = ele.id) " +
+				    "WHERE ele.id = ?";
+	
+	static final String PLINKQUERY =
+			"SELECT l.child, l.property FROM participant_link AS l "+
+	                "WHERE l.head = ?";
+	
 	static final String CLAIMROWQUERY =
 			"SELECT c.id, c.publication, c.publication_behavior, c.behavior_term, " +
 					"c.evidence, c.generated_id, pub.doi, " +
@@ -438,7 +448,10 @@ public class DBConnection implements AbstractConnection{
 		}
 	}
 
-	
+	/**
+	 * @deprecated
+	 */
+	@Deprecated
 	public ParticipantBean getPrimaryParticipant(ClaimBean a) throws Exception{
 		final PreparedStatement participantStatement = 
 				c.prepareStatement(PRIMARYPARTICIPANTQUERY);
@@ -717,7 +730,41 @@ public class DBConnection implements AbstractConnection{
 		c.close();
 	}
 
+	@Override
+	public Set<ParticipantBean> getParticipantsWithProperty(ClaimBean a,
+			Object p) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
-
+	@Override
+	public Set<PElementBean> getPElements(ParticipantBean p) throws SQLException {
+		int head_id = p.getHeadElement();
+		
+		// TODO Auto-generated method stub
+		return null;
+	}
 	
+	@Override
+	public PElementBean getPElement(int id) throws Exception{
+		PreparedStatement pElementStatement = c.prepareStatement(PELEMENTQUERY);
+		try{
+			pElementStatement.setInt(1, id);
+			ResultSet rawResults = pElementStatement.executeQuery();
+			AbstractResults pElementResults = new DBResults(rawResults);
+			if (pElementResults.next()){
+				PElementBean result = new PElementBean();
+				result.fill(pElementResults);
+				return result;
+			}
+			else {
+				return null;
+			}
+		}
+		finally{
+			pElementStatement.close();
+		}
+	}
+
 }
+

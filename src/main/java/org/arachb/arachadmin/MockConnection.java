@@ -375,6 +375,26 @@ public class MockConnection implements AbstractConnection {
 		return MAXMOCKIDVALUE;
 	}
 
+	@Override
+	public Set<ParticipantBean> getParticipantsWithProperty(ClaimBean a,
+			Object p) {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("Need to implement getParticipantWithProperty");
+	}
+
+	@Override
+	public Set<PElementBean> getPElements(ParticipantBean p)
+			throws SQLException {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("Need to implement getPElements");
+	}
+
+	@Override
+	public PElementBean getPElement(int id) throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 
 
 

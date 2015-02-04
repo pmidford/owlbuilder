@@ -101,7 +101,7 @@ public class ClaimBean implements BeanBase{
 	}
 	
 	private void throwBadState(String template){
-		final String msg = String.format(BADEVIDENCEIRI, id, evidence);
+		final String msg = String.format(template, id, evidence);
 		throw new IllegalStateException(msg);
 	}
 	

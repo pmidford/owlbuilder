@@ -90,26 +90,45 @@ public class Claim implements AbstractNamedEntity {
 		OWLOntology target = builder.getTarget();
 		OWLOntologyManager manager = builder.getOntologyManager();
 		final OWLDataFactory factory = builder.getDataFactory();
+		final OWLObjectProperty partofProperty = factory.getOWLObjectProperty(IRIManager.partOfProperty);
+    	final OWLIndividual claim_ind = factory.getOWLNamedIndividual(IRI.create(getIriString()));
+    	OWLClass behaviorClass = factory.getOWLClass(IRI.create(bean.getBehaviorIri()));
+    	builder.initializeMiscTermAndParents(behaviorClass);
+		final Set<Participant> participants = 
+				Participant.wrapSet(c.getParticipants(bean));
+		final Set<OWLObject> owlParticipants = new HashSet<OWLObject>();
+		for (Participant p : participants){
+			owlParticipants.add(p.generateOWL(builder));
+			connectParticipant(builder,p, claim_ind, behaviorClass);
+		}
+		
+ 	    Publication pub = new Publication(c.getPublication(bean.getPublication()));
+ 	   
+ 	    OWLObject pub_obj = pub.generateOWL(builder);
+ 	    if (pub_obj instanceof OWLIndividual){
+ 	    	OWLIndividual pub_ind = (OWLIndividual)pub_obj;
+    		OWLObjectPropertyAssertionAxiom partofAssertion = 
+    				factory.getOWLObjectPropertyAssertionAxiom(partofProperty, claim_ind, pub_ind);
+    		manager.addAxiom(target, partofAssertion);
+    	}
+        return claim_ind;
+	}
+
+	private void connectParticipant(Owlbuilder builder, 
+								    Participant p, 
+								    OWLIndividual claim_ind, 
+								    OWLClass behaviorClass){
+		OWLOntology target = builder.getTarget();
+		OWLOntologyManager manager = builder.getOntologyManager();
+		final OWLDataFactory factory = builder.getDataFactory();
 		final OWLClass textualEntityClass = factory.getOWLClass(IRIManager.textualEntity);
 		final OWLObjectProperty denotesProp = factory.getOWLObjectProperty(IRIManager.denotesProperty);
-		final OWLObjectProperty partofProperty = factory.getOWLObjectProperty(IRIManager.partOfProperty);
-    	final OWLIndividual assert_ind = factory.getOWLNamedIndividual(IRI.create(getIriString()));
-    	OWLClass behaviorClass = factory.getOWLClass(IRI.create(bean.getBehaviorIri()));
-		final Participant primary = new Participant(c.getPrimaryParticipant(bean));
-    	builder.initializeMiscTermAndParents(behaviorClass);
-		OWLObject owlPrimary = primary.generateOWL(builder);
-		final Set<Participant> otherParticipants = 
-				Participant.wrapSet(c.getParticipants(bean));
-		final Set<OWLObject> otherOWLParticipants = new HashSet<OWLObject>();
-		for (Participant p : otherParticipants){
-			otherOWLParticipants.add(p.generateOWL(builder));
-		}
 		OWLObjectProperty hasParticipant = factory.getOWLObjectProperty(IRIManager.hasParticipantProperty);
-        if (owlPrimary instanceof OWLClassExpression){
+		if (p instanceof OWLClassExpression){
         	Set<OWLClassExpression> supersets = new HashSet<OWLClassExpression>(); 
         	supersets.add(textualEntityClass);
         	OWLClassExpression hasParticipantPrimary = 
-        			factory.getOWLObjectSomeValuesFrom(hasParticipant,(OWLClassExpression) owlPrimary);
+        			factory.getOWLObjectSomeValuesFrom(hasParticipant,(OWLClassExpression) p);
         	OWLClassExpression behaviorWithParticipant =
         			factory.getOWLObjectIntersectionOf(behaviorClass,hasParticipantPrimary);
         	OWLClassExpression denotesExpr = 
@@ -118,30 +137,19 @@ public class Claim implements AbstractNamedEntity {
         	OWLClassExpression intersectExpr =
         			factory.getOWLObjectIntersectionOf(supersets);
             OWLClassAssertionAxiom textClassAssertion = 
-        			factory.getOWLClassAssertionAxiom(intersectExpr, assert_ind); 
+        			factory.getOWLClassAssertionAxiom(intersectExpr, claim_ind); 
         	manager.addAxiom(target, textClassAssertion);
         }
-        else if (owlPrimary instanceof OWLIndividual){
+        else if (p instanceof OWLIndividual){
         	//TODO fill this in
         }
         else {  // probably a curation error; log this don't throw exception
         	final String msgStr = 
         			"Claim primary participant %s for claim id %s is neither an individual nor a class expression";
-			throw new RuntimeException(String.format(msgStr,owlPrimary,bean.getId()));
+			throw new RuntimeException(String.format(msgStr,p,bean.getId()));
         }
-        
- 	    Publication pub = new Publication(c.getPublication(bean.getPublication()));
- 	   
- 	    OWLObject pub_obj = pub.generateOWL(builder);
- 	    if (pub_obj instanceof OWLIndividual){
- 	    	OWLIndividual pub_ind = (OWLIndividual)pub_obj;
-    		OWLObjectPropertyAssertionAxiom partofAssertion = 
-    				factory.getOWLObjectPropertyAssertionAxiom(partofProperty, assert_ind, pub_ind);
-    		manager.addAxiom(target, partofAssertion);
-    	}
-        return assert_ind;
+		
 	}
-
 
 
 }

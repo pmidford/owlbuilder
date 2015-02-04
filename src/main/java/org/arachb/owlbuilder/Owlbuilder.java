@@ -147,7 +147,12 @@ public class Owlbuilder{
 		}
 		finally{
 			preReasoner.dispose();
-			postReasoner.dispose();
+			if (postReasoner != null){
+				postReasoner.dispose();					
+			}
+			else{
+				log.info("No post reasoner found at shutdown");
+			}
 		}
 	}
 	

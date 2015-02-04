@@ -53,6 +53,7 @@ public class ParticipantBean {
 	private String taxonIRI = null;
 	private String substrateIRI = null;
 	private String anatomyIRI = null;
+	private int headElement;
 	
 	public final static String INDIVIDUALQUANTIFIER = "INDIVIDUAL";
 	public final static String SOMEQUANTIFIER = "SOME";
@@ -168,6 +169,9 @@ public class ParticipantBean {
 		generatedId = s;
 	}
 	
+	public int getHeadElement(){
+		return headElement;
+	}
 	
 	void processTaxon(Owlbuilder builder,OWLClass taxon){
 		final OWLOntologyManager manager = builder.getOntologyManager();

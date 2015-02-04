@@ -61,7 +61,9 @@ public interface AbstractConnection {
 	 * @param a 
 	 * @return object filled with the fields of the participant requested
 	 * @throws Exception
+	 * @deprecated
 	 */
+	@Deprecated
 	ParticipantBean getPrimaryParticipant(ClaimBean a) throws Exception;
 
 	/**
@@ -74,11 +76,34 @@ public interface AbstractConnection {
 	
 	/**
 	 * 
+	 * @param a holds the claim
+	 * @param p specifies the property (e.g., activelyparticipatesin)
+	 * @throws SQLException
+	 */
+	Set<ParticipantBean> getParticipantsWithProperty(ClaimBean a, Object p);
+	
+	/**
+	 * 
 	 * @param p
 	 * @throws SQLException
 	 */
 	void updateParticipant(ParticipantBean p) throws SQLException;
 	
+	/**
+	 * @param p specifies the participant that packages these elements
+	 * @throws SQLException
+	 */
+	Set<PElementBean> getPElements(ParticipantBean p) throws SQLException;
+	
+	
+	/**
+	 * 
+	 * @param id
+	 * @return
+	 * @throws Exception
+	 */
+	PElementBean getPElement(int id) throws Exception;
+
 	/**
 	 * returns a single (curator added) taxon 
 	 * @param id integer id of the (curator added) taxon to return

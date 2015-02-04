@@ -33,35 +33,35 @@ public class TestDBConnection {
 		}
 	}
 
-	final static String doi1 = "http://dx.doi.org/10.1636/0161-8202(2000)028[0097:HDLHAB]2.0.CO;2";
+	final static String doi3 = "http://dx.doi.org/10.1636/0161-8202(2000)028[0097:HDLHAB]2.0.CO;2";
 	@Test
 	public void testgetPublication() throws SQLException {
-		PublicationBean testPub = testConnection.getPublication(1);
+		PublicationBean testPub = testConnection.getPublication(3);
 		assertNotNull(testPub);
-		assertEquals(1,testPub.getId());
+		assertEquals(3,testPub.getId());
 		assertEquals("Journal",testPub.getPublicationType());
-		assertEquals(doi1,testPub.getDoi());
+		assertEquals(doi3,testPub.getDoi());
 	}
 
 	@Test
 	public void testgetPublications() throws SQLException{
 		Set<PublicationBean> testSet = testConnection.getPublications();
 		assertNotNull(testSet);
-		assertEquals(2,testSet.size());
+		assertEquals(3,testSet.size());
 	}
 
 	@Test
 	public void testupdatePublication() throws SQLException{
 		PublicationBean testPub = testConnection.getPublication(1);
 		assertNotNull(testPub);
-		assertEquals(null,testPub.getGeneratedId());
-		PublicationBean testPub2 = testConnection.getPublication(2);
-		assertEquals(testID,testPub2.getGeneratedId());		
-		String saved_id = testPub2.getGeneratedId();
-		testPub2.setGeneratedId(doi1);
-		testConnection.updatePublication(testPub2);
-		PublicationBean updatedPub = testConnection.getPublication(2);
-		assertEquals(doi1,updatedPub.getGeneratedId());
+		//assertEquals(null,testPub.getGeneratedId());
+		PublicationBean testPub3 = testConnection.getPublication(3);
+		assertEquals(testID,testPub3.getGeneratedId());		
+		String saved_id = testPub3.getGeneratedId();
+		testPub3.setGeneratedId(doi3);
+		testConnection.updatePublication(testPub3);
+		PublicationBean updatedPub = testConnection.getPublication(3);
+		assertEquals(doi3,updatedPub.getGeneratedId());
 		updatedPub.setGeneratedId(saved_id);
 		testConnection.updatePublication(updatedPub);
 	}
@@ -97,18 +97,19 @@ public class TestDBConnection {
 		assertEquals(old_id, updatedTerm2.getGeneratedId());
 	}
 
+	
 	@Test
-	public void testgetPrimaryParticipant() throws Exception{
-		ClaimBean testAssertion = testConnection.getClaim(1);
-		ParticipantBean testParticipant = testConnection.getPrimaryParticipant(testAssertion);
-		assertNotNull(testParticipant);
-		assertEquals(1,testParticipant.getId());  //not really the best test...
-		assertEquals(1,testParticipant.getTaxon());
-		assertEquals(2,testParticipant.getAnatomy());
-		assertEquals(testTaxon,testParticipant.getTaxonIri());
-		assertEquals(testAnatomy,testParticipant.getAnatomyIri());
-		assertEquals(testPubTaxon,testParticipant.getPublicationTaxon());
+	public void testgetPElements() throws SQLException{
+		
 	}
+	
+	@Test
+	public void testgetPElement() throws Exception{
+		PElementBean testElement = testConnection.getPElement(1);
+		assertNotNull(testElement);
+		
+	}
+
 	
 	@Test
 	public void testgetParticipants() throws Exception{
@@ -127,27 +128,20 @@ public class TestDBConnection {
 	@Test
 	public void testupdateParticipant() throws Exception{
 		ClaimBean testAssertion = testConnection.getClaim(1);
-		ParticipantBean testParticipant = testConnection.getPrimaryParticipant(testAssertion);
-		assertNotNull(testParticipant);
+		//TODO make this test something?
 	}
 
 	
 	@Test
-	public void testgetAssertion() throws Exception{
+	public void testgetClaim() throws Exception{
 		ClaimBean testClaim = testConnection.getClaim(1);
 		assertNotNull(testClaim);
 		assertEquals(1,testClaim.getId());
 	}
 	
-	@Test
-	public void testgetAssertions() throws Exception{
-		Set<ClaimBean> testSet = testConnection.getClaims();
-		assertNotNull(testSet);
-		assertEquals(1,testSet.size());
-	}
 	
 	@Test
-	public void testupdateAssertion() throws Exception{
+	public void testupdateClaim() throws Exception{
 		ClaimBean testClaim = testConnection.getClaim(1);
 		assertNotNull(testClaim);
 		testClaim.setGeneratedId(testID);
