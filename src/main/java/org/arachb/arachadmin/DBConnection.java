@@ -81,18 +81,12 @@ public class DBConnection implements AbstractConnection{
 					"WHERE p2c.claim = ? AND p2c.participant_index = 1";
 	
 	static final String PARTICIPANTSQUERY = 
-			"SELECT part.id, part.taxon, part.substrate, part.anatomy, " +
-					"part.quantification, part.generated_id, part.publication_taxon, " +
-					"part.label, part.publication_anatomy, part.publication_substrate, " +
-					"taxon.source_id, taxon.generated_id, " +
-					"substrate.source_id, substrate.generated_id, " +
-					"anatomy.source_id, anatomy.generated_id " +
+			"SELECT part.id, part.quantification, part.label, part.generated_id, " +
+					"p2c.property, part.publication_taxon, part.publication_anatomy, " +
+					"part.publication_substrate, part.participation_property, part.head_element " +
 					"FROM participant2claim as p2c " + 
 					"JOIN participant AS part ON (p2c.participant = part.id) " +
-					"LEFT JOIN term AS taxon ON (part.taxon = taxon.id) " +
-					"LEFT JOIN term AS substrate ON (part.substrate = substrate.id) " +
-					"LEFT JOIN term AS anatomy ON (part.anatomy = anatomy.id) " +
-					"WHERE p2c.claim = ? AND p2c.participant_index > 1";
+					"WHERE p2c.claim = ?";
 
 	static final String PELEMENTQUERY =
 			"SELECT ele.id, ele.type, ele.participant FROM participant_element as ele " +

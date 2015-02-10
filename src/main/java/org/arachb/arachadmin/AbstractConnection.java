@@ -58,16 +58,6 @@ public interface AbstractConnection {
 
 	/**
 	 * 
-	 * @param a 
-	 * @return object filled with the fields of the participant requested
-	 * @throws Exception
-	 * @deprecated
-	 */
-	@Deprecated
-	ParticipantBean getPrimaryParticipant(ClaimBean a) throws Exception;
-
-	/**
-	 * 
 	 * @param a
 	 * @return
 	 * @throws SQLException

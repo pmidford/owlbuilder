@@ -16,7 +16,8 @@ public class TestDBConnection {
     private static Logger log = Logger.getLogger(TestDBConnection.class);
 
     private AbstractConnection testConnection;
-    private final static String testID = "http://arachb.org/arachb/TEST_0000001";
+    private final static String testID = "http://arachb.org/arachb/ARACHB_0000001";
+    private final static String testGenID = "http://arachb.org/arachb/ARACHB_0000099";
     private final static String testTaxon = "http://purl.obolibrary.org/obo/NCBITaxon_336608";
     private final static String testPubTaxon = "Tetragnatha straminea";
     private final static String testAnatomy = "http://purl.obolibrary.org/obo/SPD_0000001";
@@ -54,9 +55,9 @@ public class TestDBConnection {
 	public void testupdatePublication() throws SQLException{
 		PublicationBean testPub = testConnection.getPublication(1);
 		assertNotNull(testPub);
-		//assertEquals(null,testPub.getGeneratedId());
+		assertEquals(testGenID,testPub.getGeneratedId());
 		PublicationBean testPub3 = testConnection.getPublication(3);
-		assertEquals(testID,testPub3.getGeneratedId());		
+		assertEquals(null,testPub3.getGeneratedId());		
 		String saved_id = testPub3.getGeneratedId();
 		testPub3.setGeneratedId(doi3);
 		testConnection.updatePublication(testPub3);
@@ -79,7 +80,7 @@ public class TestDBConnection {
 	public void testgetTerms() throws SQLException{
 		Set<TermBean> testSet = testConnection.getTerms();
 		assertNotNull(testSet);
-		assertEquals(2,testSet.size());
+		assertEquals(3,testSet.size());
 	}
 
 	@Test
@@ -97,41 +98,6 @@ public class TestDBConnection {
 		assertEquals(old_id, updatedTerm2.getGeneratedId());
 	}
 
-	
-	@Test
-	public void testgetPElements() throws SQLException{
-		
-	}
-	
-	@Test
-	public void testgetPElement() throws Exception{
-		PElementBean testElement = testConnection.getPElement(1);
-		assertNotNull(testElement);
-		
-	}
-
-	
-	@Test
-	public void testgetParticipants() throws Exception{
-		ClaimBean testAssertion = testConnection.getClaim(1);
-		Set<ParticipantBean> testSet = testConnection.getParticipants(testAssertion);
-		assertNotNull(testSet);
-		assertEquals(1,testSet.size());
-		for (ParticipantBean p : testSet){
-			assertEquals(2,p.getId());
-			assertEquals(1,p.getTaxon());
-			assertEquals(testTaxon,p.getTaxonIri());
-			assertEquals(testPubTaxon,p.getPublicationTaxon());
-		}
-	}
-	
-	@Test
-	public void testupdateParticipant() throws Exception{
-		ClaimBean testAssertion = testConnection.getClaim(1);
-		//TODO make this test something?
-	}
-
-	
 	@Test
 	public void testgetClaim() throws Exception{
 		ClaimBean testClaim = testConnection.getClaim(1);
@@ -152,6 +118,42 @@ public class TestDBConnection {
 		testConnection.updateClaim(updatedClaim);
 		ClaimBean updatedAssertion2 = testConnection.getClaim(1);
 		assertEquals("",updatedAssertion2.getGeneratedId());  //bogus test here
+	}
+
+
+	
+	@Test
+	public void testgetParticipants() throws Exception{
+		ClaimBean testClaim = testConnection.getClaim(1);
+		Set<ParticipantBean> testSet = testConnection.getParticipants(testClaim);
+		assertNotNull(testSet);
+		assertEquals(1,testSet.size());
+		for (ParticipantBean p : testSet){
+			assertEquals(1,p.getId());
+			assertEquals(testPubTaxon,p.getPublicationTaxon());
+			assertEquals(1,p.getHeadElement());
+		}
+	}
+	
+	@Test
+	public void testupdateParticipant() throws Exception{
+		ClaimBean testClaim = testConnection.getClaim(1);
+		Set<ParticipantBean> testSet = testConnection.getParticipants(testClaim);
+		//TODO make this test something?
+	}
+
+	
+	
+	@Test
+	public void testgetPElements() throws SQLException{
+		
+	}
+	
+	@Test
+	public void testgetPElement() throws Exception{
+		PElementBean testElement = testConnection.getPElement(1);
+		assertNotNull(testElement);
+		
 	}
 	
 	@Test

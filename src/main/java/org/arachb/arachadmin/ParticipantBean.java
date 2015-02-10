@@ -14,23 +14,19 @@ import org.semanticweb.owlapi.model.OWLOntologyManager;
 
 public class ParticipantBean {
 
+	
+
 		
 	final static int DBID = 1;
-	final static int DBTAXON = 2;
-	final static int DBSUBSTRATE = 3;
-	final static int DBANATOMY = 4;
-	final static int DBQUANTIFICATION = 5;
-	final static int DBGENERATEDID = 6;
-	final static int DBPUBLICATIONTAXON = 7;
-	final static int DBLABEL = 8;
-	final static int DBPUBLICATIONANATOMY = 9;
-	final static int DBPUBLICATIONSUBSTRATE = 10;
-	final static int DBTAXONSOURCEID = 11;
-	final static int DBTAXONGENERATEDID = 12;
-    final static int DBSUBSTRATESOURCEID = 13;
-    final static int DBSUBSTRATEGENERATEDID = 14;
-	final static int DBANATOMYSOURCEID = 15;
-    final static int DBANATOMYGENERATEDID = 16;
+	final static int DBQUANTIFICATION = 2;
+	final static int DBLABEL = 3;
+	final static int DBGENERATEDID = 4;
+	final static int DBPROPERTY = 5;
+	final static int DBPUBLICATIONTAXON = 6;
+	final static int DBPUBLICATIONANATOMY = 7;
+	final static int DBPUBLICATIONSUBSTRATE = 8;
+	final static int DBPARTICIPATIONPROPERTY = 9;  //replaced by property
+	final static int DBHEADELEMENT = 10;
 
 	final static String BADTAXONIRI =
 			"Term without IRI referenced as participant taxon: participant id = %s; taxon id = %s";
@@ -46,6 +42,7 @@ public class ParticipantBean {
 	private int anatomy;
 	private String quantification;
 	private String generatedId;
+	private int property;
 	private String publicationTaxon;
 	private String label;
 	private String publicationAnatomy;
@@ -53,6 +50,7 @@ public class ParticipantBean {
 	private String taxonIRI = null;
 	private String substrateIRI = null;
 	private String anatomyIRI = null;
+	private int participationProperty;
 	private int headElement;
 	
 	public final static String INDIVIDUALQUANTIFIER = "INDIVIDUAL";
@@ -61,55 +59,18 @@ public class ParticipantBean {
 	private static Logger log = Logger.getLogger(ParticipantBean.class);
 
 	
-	
 	//maybe make this a constructor
 	public void fill(AbstractResults record) throws SQLException{
 		id = record.getInt(DBID);
-		taxon = record.getInt(DBTAXON);
-		substrate = record.getInt(DBSUBSTRATE);
-		anatomy = record.getInt(DBANATOMY);
 		quantification = record.getString(DBQUANTIFICATION);
 		label = record.getString(DBLABEL);
 		generatedId = record.getString(DBGENERATEDID);
+		property = record.getInt(DBPROPERTY);
 		publicationTaxon = record.getString(DBPUBLICATIONTAXON);
 		publicationAnatomy = record.getString(DBPUBLICATIONANATOMY);
 		publicationSubstrate = record.getString(DBPUBLICATIONSUBSTRATE);
-		if (taxon != 0){
-			if (record.getString(DBTAXONSOURCEID) != null){
-				taxonIRI =record.getString(DBTAXONSOURCEID);
-			}
-			else if (record.getString(DBTAXONGENERATEDID) != null){
-				taxonIRI = record.getString(DBTAXONGENERATEDID);
-			}
-			else{
-				final String msg = String.format(BADTAXONIRI, id, taxon);
-				throw new IllegalStateException(msg);
-			}
-		}
-		if (anatomy != 0){
-			if (record.getString(DBANATOMYSOURCEID) != null){
-				anatomyIRI = record.getString(DBANATOMYSOURCEID);
-			}
-			else if (record.getString(DBANATOMYGENERATEDID) != null){
-				anatomyIRI = record.getString(DBANATOMYGENERATEDID);
-			}
-			else{
-				final String msg = String.format(BADANATOMYIRI, id, anatomy);
-				throw new IllegalStateException(msg);
-			}
-		}
-		if (substrate != 0){
-			if (record.getString(DBSUBSTRATESOURCEID) != null){
-				substrateIRI = record.getString(DBSUBSTRATESOURCEID);
-			}
-			else if (record.getString(DBSUBSTRATEGENERATEDID) != null){
-				substrateIRI = record.getString(DBSUBSTRATEGENERATEDID);
-			}
-			else{
-				final String msg = String.format(BADSUBSTRATEIRI, id, substrate);
-				throw new IllegalStateException(msg);
-			}
-		}
+		participationProperty = record.getInt(DBPARTICIPATIONPROPERTY);
+		headElement = record.getInt(DBHEADELEMENT);
 	}
 
 

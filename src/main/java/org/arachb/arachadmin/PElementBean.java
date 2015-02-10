@@ -3,6 +3,9 @@ package org.arachb.arachadmin;
 import org.arachb.owlbuilder.lib.AbstractResults;
 
 public class PElementBean implements BeanBase {
+	
+	final static int DBID = 1;
+
 
 	@Override
 	public int getId() {
