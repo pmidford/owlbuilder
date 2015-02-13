@@ -89,14 +89,21 @@ public class DBConnection implements AbstractConnection{
 					"WHERE p2c.claim = ?";
 
 	static final String PELEMENTQUERY =
-			"SELECT ele.id, ele.type, ele.participant FROM participant_element as ele " +
+			"SELECT ele.id, ele.type, ele.participant, p2t.term, p2i.individual " +
+			        "FROM participant_element as ele " +
 				    "LEFT JOIN pelement2term as p2t ON (p2t.element = ele.id) " +
 					"LEFT JOIN pelement2individual as p2i ON (p2i.element = ele.id) " +
 				    "WHERE ele.id = ?";
 	
-	static final String PLINKQUERY =
-			"SELECT l.child, l.property FROM participant_link AS l "+
-	                "WHERE l.head = ?";
+
+	static final String PELEMENTPARENTSQUERY =
+			"SELECT link.parent,link.property FROM participant_link as link " +
+			        "WHERE link.child = ?";
+
+	static final String PELEMENTCHILDRENQUERY =
+			"SELECT link.child,link.property FROM participant_link as link " +
+			        "WHERE link.child = ?";
+	
 	
 	static final String CLAIMROWQUERY =
 			"SELECT c.id, c.publication, c.publication_behavior, c.behavior_term, " +
@@ -152,9 +159,6 @@ public class DBConnection implements AbstractConnection{
 
 	
 	
-	//Error strings
-	static final String MULTIPLEPRIMARYPARTICIPANTERROR =
-			"Assertion %s has more than one primary participant";
 	
 	static final Logger logger = Logger.getLogger(DBConnection.class.getName());
 
@@ -442,37 +446,6 @@ public class DBConnection implements AbstractConnection{
 		}
 	}
 
-	/**
-	 * @deprecated
-	 */
-	@Deprecated
-	public ParticipantBean getPrimaryParticipant(ClaimBean a) throws Exception{
-		final PreparedStatement participantStatement = 
-				c.prepareStatement(PRIMARYPARTICIPANTQUERY);
-		try{
-			participantStatement.setInt(1, a.getId());
-			final ResultSet r = participantStatement.executeQuery();  //problem here**
-			final AbstractResults participantSet = new DBResults(r);
-			if (participantSet.next()){
-				ParticipantBean result = new ParticipantBean();
-				result.fill(participantSet);
-				if (participantSet.next()){
-					final String msg = String.format(MULTIPLEPRIMARYPARTICIPANTERROR, a.getId());
-					log.error(msg);
-					throw new RuntimeException(msg);
-				}
-				else{
-					return result;
-				}
-			}
-			else {
-				return null;
-			}
-		}
-		finally {
-			participantStatement.close();
-		}
-	}
 	
 	public Set<ParticipantBean> getParticipants(ClaimBean a) throws SQLException {
 		final Set<ParticipantBean> result = new HashSet<ParticipantBean>();
@@ -486,6 +459,7 @@ public class DBConnection implements AbstractConnection{
 			while (participantSet.next()){
 				ParticipantBean p = new ParticipantBean();
 				p.fill(participantSet);
+				p.loadElements(this);
 				result.add(p);
 			}
 			return result;
@@ -733,11 +707,13 @@ public class DBConnection implements AbstractConnection{
 
 	@Override
 	public Set<PElementBean> getPElements(ParticipantBean p) throws SQLException {
+		
 		int head_id = p.getHeadElement();
 		
 		// TODO Auto-generated method stub
 		return null;
 	}
+	
 	
 	@Override
 	public PElementBean getPElement(int id) throws Exception{
@@ -749,6 +725,8 @@ public class DBConnection implements AbstractConnection{
 			if (pElementResults.next()){
 				PElementBean result = new PElementBean();
 				result.fill(pElementResults);
+				fillPElementParents(result);
+				fillPElementChildren(result);
 				return result;
 			}
 			else {
@@ -757,6 +735,33 @@ public class DBConnection implements AbstractConnection{
 		}
 		finally{
 			pElementStatement.close();
+		}
+	}
+	
+	
+	public void fillPElementParents(PElementBean result) throws Exception{
+		PreparedStatement pElementParentsStatement = c.prepareStatement(PELEMENTPARENTSQUERY);
+		try{
+			pElementParentsStatement.setInt(1, result.getId());
+			ResultSet rawResults = pElementParentsStatement.executeQuery();
+			AbstractResults parentResults = new DBResults(rawResults);
+			result.fillParents(parentResults);
+		}
+		finally{
+			pElementParentsStatement.close();
+		}
+	}
+	
+	public void fillPElementChildren(PElementBean result) throws Exception{
+		PreparedStatement pElementChildrenStatement = c.prepareStatement(PELEMENTCHILDRENQUERY);
+		try{
+			pElementChildrenStatement.setInt(1, result.getId());
+			ResultSet rawResults = pElementChildrenStatement.executeQuery();
+			AbstractResults childrenResults = new DBResults(rawResults);
+			result.fillChildren(childrenResults);			
+		}
+		finally{
+			pElementChildrenStatement.close();
 		}
 	}
 

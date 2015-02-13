@@ -1,6 +1,8 @@
 package org.arachb.arachadmin;
 
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -52,6 +54,8 @@ public class ParticipantBean {
 	private String anatomyIRI = null;
 	private int participationProperty;
 	private int headElement;
+	
+	private final Map<Integer, PElementBean> elements = new HashMap<Integer, PElementBean>();
 	
 	public final static String INDIVIDUALQUANTIFIER = "INDIVIDUAL";
 	public final static String SOMEQUANTIFIER = "SOME";
@@ -132,6 +136,13 @@ public class ParticipantBean {
 	
 	public int getHeadElement(){
 		return headElement;
+	}
+	
+	void loadElements(AbstractConnection c) throws SQLException{
+		Set<PElementBean> elementset = c.getPElements(this);
+		for (PElementBean e : elementset){
+			elements.put(e.getId(), e);
+		}
 	}
 	
 	void processTaxon(Owlbuilder builder,OWLClass taxon){

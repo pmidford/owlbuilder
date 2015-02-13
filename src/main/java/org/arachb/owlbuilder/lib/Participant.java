@@ -56,8 +56,8 @@ public class Participant implements AbstractNamedEntity{
 
 
 
-	private static String INDIVIDUALQUANTIFIER = "INDIVIDUAL";
-	private static String SOMEQUANTIFIER = "SOME";
+	private final static String INDIVIDUALQUANTIFIER = "INDIVIDUAL";
+	private final static String SOMEQUANTIFIER = "SOME";
 
 	private static Logger log = Logger.getLogger(Participant.class);
 	private final ParticipantBean bean;
