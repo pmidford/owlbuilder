@@ -98,6 +98,10 @@ public class ParticipantBean {
 		return quantification;
 	}
 	
+	public int getProperty(){
+		return property;
+	}
+	
 	public String getPublicationTaxon(){
 		return publicationTaxon;
 	}
@@ -125,6 +129,10 @@ public class ParticipantBean {
 	public String getAnatomyIri(){
 		return anatomyIRI;
 	}
+	
+	public int getParticipationProperty(){
+		return participationProperty;
+	}
 
 	public String getGeneratedId(){
 		return generatedId;
@@ -138,10 +146,26 @@ public class ParticipantBean {
 		return headElement;
 	}
 	
-	void loadElements(AbstractConnection c) throws SQLException{
+	void loadElements(AbstractConnection c) throws Exception{
 		Set<PElementBean> elementset = c.getPElements(this);
 		for (PElementBean e : elementset){
 			elements.put(e.getId(), e);
+		}
+		
+	}
+	
+	
+	public void traverseElements(){
+		int cur_element_id = getHeadElement();
+		if (!elements.containsKey(cur_element_id)){
+        	final String msgStr = 
+        			"Participant_element %s, listed as head, was not found for participant id %s";
+        	throw new RuntimeException(String.format(msgStr,cur_element_id,getId()));
+		}
+		else{
+			PElementBean cur_element = elements.get(cur_element_id);
+			Set<Integer[]> parents = cur_element.getParents();
+			Set<Integer[]> children = cur_element.getChildren();
 		}
 	}
 	

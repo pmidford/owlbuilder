@@ -52,7 +52,6 @@ public class PElementBean implements BeanBase {
 		id = record.getInt(DBID);
 		eletype = record.getInt(DBTYPE);
 		participant = record.getInt(DBPARTICIPANT);
-
 	}
 
 	public void fillParents(AbstractResults parentResults) throws Exception{		
@@ -81,7 +80,29 @@ public class PElementBean implements BeanBase {
 		
 	}
 
+	public Set<Integer[]> getParents(){
+		Set<Integer[]> result = new HashSet<Integer[]>();
+		for (Plink pl: parentLinks){
+			Integer[] l = new Integer[2];
+			l[0] = pl.element_id;
+			l[1] = pl.property_id;
+			result.add(l);
+		}
+		return result;
+	}
 	
+
+	public Set<Integer[]> getChildren(){
+		Set<Integer[]> result = new HashSet<Integer[]>();
+		for (Plink pl: childLinks){
+			Integer[] l = new Integer[2];
+			l[0] = pl.element_id;
+			l[1] = pl.property_id;
+			result.add(l);
+		}
+		return result;
+	}
+
 	static private class Plink{
 		int element_id;
 		int property_id;
