@@ -145,9 +145,17 @@ public class TestDBConnection {
 	
 	
 	@Test
-	public void testgetPElements() throws SQLException{
-		
+	public void testgetPElements() throws Exception{
+		ClaimBean testClaim = testConnection.getClaim(1);
+		Set<ParticipantBean> testSet = testConnection.getParticipants(testClaim);
+		assertNotNull(testSet);
+		assertEquals(1,testSet.size());
+		for (ParticipantBean p : testSet){
+			Set<PElementBean> elements = testConnection.getPElements(p);
+			assertEquals(2,elements.size());
+		}
 	}
+	
 	
 	@Test
 	public void testgetPElement() throws Exception{
