@@ -79,6 +79,7 @@ public class Participant implements AbstractNamedEntity{
 	
 	@Override	
 	public OWLObject generateOWL(Owlbuilder builder) throws SQLException{
+		bean.traverseElements();  //start of something new
 		if (INDIVIDUALQUANTIFIER.equalsIgnoreCase(bean.getQuantification())){
 			return generateOWLForIndividual(builder);
 		}
