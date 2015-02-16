@@ -125,7 +125,21 @@ public class MockConnection implements AbstractConnection {
 		mockTermResults3.setString(TermBean.DBGENERATEDID,null);
 		mockTermResults3.setString(TermBean.DBCOMMENT,"");
 	}
+	
+	private static MockResults mockTermResults4 = new MockResults();
+	static {
+		mockTermResults4.setInteger(TermBean.DBID, 4838);
 
+	}
+
+	private static MockResults mockTermResults5 = new MockResults();
+	static {
+		mockTermResults5.setInteger(TermBean.DBID, 10473);
+
+	}
+
+
+	
 	private static MockResults mockParticipantResults1 = new MockResults();
 	static {
 		mockParticipantResults1.setInteger(ParticipantBean.DBID,1);
@@ -185,14 +199,30 @@ public class MockConnection implements AbstractConnection {
 		mockIndividualResults2.setInteger(IndividualBean.DBID, 12);
 	}
 
+	static final String PELEMENTQUERY =
+			"SELECT ele.id, ele.type, ele.participant, p2t.term, p2i.individual " +
+			        "FROM participant_element as ele " +
+				    "LEFT JOIN pelement2term as p2t ON (p2t.element = ele.id) " +
+					"LEFT JOIN pelement2individual as p2i ON (p2i.element = ele.id) " +
+				    "WHERE ele.id = ?";
+
 	private static MockResults mockPElementResults = new MockResults();
 	static{
-		mockPElementResults.setInteger(PElementBean.DBID, 12);
+		mockPElementResults.setInteger(PElementBean.DBID, 2);
+		mockPElementResults.setInteger(PElementBean.DBTYPE, 1);
+		mockPElementResults.setInteger(PElementBean.DBPARTICIPANT, 1);
+		mockPElementResults.setInteger(PElementBean.DBTERM, 4838);
+		mockPElementResults.setInteger(PElementBean.DBINDIVIDUAL, -1);
+		
 	}
 
 	private static MockResults mockPElementResults2 = new MockResults();
 	static{
-		mockPElementResults2.setInteger(PElementBean.DBID, 12);
+		mockPElementResults2.setInteger(PElementBean.DBID, 2);
+		mockPElementResults.setInteger(PElementBean.DBTYPE, 1);
+		mockPElementResults.setInteger(PElementBean.DBPARTICIPANT, 1);
+		mockPElementResults.setInteger(PElementBean.DBTERM, 10473);
+		mockPElementResults.setInteger(PElementBean.DBINDIVIDUAL, -1);
 	}
 	
 	private static Map<String,String> mockImportSourceMap = new HashMap<String,String>();
@@ -434,8 +464,7 @@ public class MockConnection implements AbstractConnection {
 	}
 
 	@Override
-	public Set<ParticipantBean> getParticipantsWithProperty(ClaimBean a,
-			Object p) {
+	public Set<ParticipantBean> getParticipantsWithProperty(ClaimBean a,Object p) {
 		// TODO Auto-generated method stub
 		throw new RuntimeException("Need to implement getParticipantWithProperty");
 	}
@@ -452,11 +481,25 @@ public class MockConnection implements AbstractConnection {
 		PElementBean result = new PElementBean();
 		if (id == 1){
 			result.fill(mockPElementResults);
+			fillPElementParents(result);
+			fillPElementChildren(result);
 		}
 		else {
 			result.fill(mockPElementResults2);			
 		}
 		return result;
+	}
+
+	private void fillPElementChildren(PElementBean result) {
+		throw new RuntimeException("Need to implement fillPElementChildren");
+		// TODO Auto-generated method stub
+		
+	}
+
+	private void fillPElementParents(PElementBean result) {
+		throw new RuntimeException("Need to implement fillPElementParents");
+		// TODO Auto-generated method stub
+		
 	}
 
 

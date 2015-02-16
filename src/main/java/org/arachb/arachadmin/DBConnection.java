@@ -87,6 +87,9 @@ public class DBConnection implements AbstractConnection{
 					"FROM participant2claim as p2c " + 
 					"JOIN participant AS part ON (p2c.participant = part.id) " +
 					"WHERE p2c.claim = ?";
+	
+	static final String PELEMENTSFROMPARTICIPANTQUERY =
+			"SELECT id,type,participant FROM participant_element WHERE participant = ?";
 
 	static final String PELEMENTQUERY =
 			"SELECT ele.id, ele.type, ele.participant, p2t.term, p2i.individual " +
@@ -447,7 +450,7 @@ public class DBConnection implements AbstractConnection{
 	}
 
 	
-	public Set<ParticipantBean> getParticipants(ClaimBean a) throws SQLException {
+	public Set<ParticipantBean> getParticipants(ClaimBean a) throws Exception {
 		final Set<ParticipantBean> result = new HashSet<ParticipantBean>();
 		final int assertion_id = a.getId();
 		PreparedStatement participantsStatement =
@@ -706,12 +709,25 @@ public class DBConnection implements AbstractConnection{
 	}
 
 	@Override
-	public Set<PElementBean> getPElements(ParticipantBean p) throws SQLException {
-		
-		int head_id = p.getHeadElement();
-		
-		// TODO Auto-generated method stub
-		return null;
+	public Set<PElementBean> getPElements(ParticipantBean p) throws Exception {
+		PreparedStatement pElementStatement = c.prepareStatement(PELEMENTSFROMPARTICIPANTQUERY);
+		final Set<PElementBean> result = new HashSet<PElementBean>();
+		try{
+			pElementStatement.setInt(1,p.getId());
+			ResultSet rawResults = pElementStatement.executeQuery();
+			AbstractResults pElementsResults = new DBResults(rawResults);
+			while (pElementsResults.next()){
+				PElementBean bean = new PElementBean();
+				bean.fill(pElementsResults);
+				fillPElementParents(bean);
+				fillPElementChildren(bean);
+				result.add(bean);
+			}
+		}
+		finally{
+			pElementStatement.close();
+		}
+		return result;
 	}
 	
 	

@@ -62,7 +62,7 @@ public interface AbstractConnection {
 	 * @return
 	 * @throws SQLException
 	 */
-	Set<ParticipantBean> getParticipants(ClaimBean a) throws SQLException;
+	Set<ParticipantBean> getParticipants(ClaimBean a) throws Exception;
 	
 	/**
 	 * 
@@ -83,7 +83,7 @@ public interface AbstractConnection {
 	 * @param p specifies the participant that packages these elements
 	 * @throws SQLException
 	 */
-	Set<PElementBean> getPElements(ParticipantBean p) throws SQLException;
+	Set<PElementBean> getPElements(ParticipantBean p) throws Exception;
 	
 	
 	/**
