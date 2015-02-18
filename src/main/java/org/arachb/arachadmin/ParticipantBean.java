@@ -157,6 +157,8 @@ public class ParticipantBean {
 	
 	public void traverseElements(){
 		int cur_element_id = getHeadElement();
+		assert elements.size() > 0;
+		System.out.print("Elements: " + elements.keySet());
 		if (!elements.containsKey(cur_element_id)){
         	final String msgStr = 
         			"Participant_element %s, listed as head, was not found for participant id %s";

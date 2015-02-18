@@ -41,12 +41,12 @@ public class TestParticipantBean {
 			assertEquals(1, pb.getId());
 			assertEquals("some",pb.getQuantification());
 			assertEquals("",pb.getLabel());  //should improve this
-			assertEquals(null,pb.getGeneratedId());  //improve ??
+			assertEquals("",pb.getGeneratedId());  //improve ??
 			assertEquals(306,pb.getProperty());
 			assertEquals("Tetragnatha straminea", pb.getPublicationTaxon());
 			assertEquals("", pb.getPublicationAnatomy());
 			assertEquals(0, pb.getSubstrate());
-			assertEquals(0, pb.getParticipationProperty());
+			assertEquals(306, pb.getParticipationProperty());
 			assertEquals(1, pb.getHeadElement());
 		}
 	}
@@ -60,5 +60,7 @@ public class TestParticipantBean {
 			pb.loadElements(testConnection);
 			pb.traverseElements();
 		}
-		}
 	}
+
+
+}

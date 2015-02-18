@@ -208,7 +208,7 @@ public class MockConnection implements AbstractConnection {
 
 	private static MockResults mockPElementResults = new MockResults();
 	static{
-		mockPElementResults.setInteger(PElementBean.DBID, 2);
+		mockPElementResults.setInteger(PElementBean.DBID, 1);
 		mockPElementResults.setInteger(PElementBean.DBTYPE, 1);
 		mockPElementResults.setInteger(PElementBean.DBPARTICIPANT, 1);
 		mockPElementResults.setInteger(PElementBean.DBTERM, 4838);
@@ -219,11 +219,26 @@ public class MockConnection implements AbstractConnection {
 	private static MockResults mockPElementResults2 = new MockResults();
 	static{
 		mockPElementResults2.setInteger(PElementBean.DBID, 2);
-		mockPElementResults.setInteger(PElementBean.DBTYPE, 1);
-		mockPElementResults.setInteger(PElementBean.DBPARTICIPANT, 1);
-		mockPElementResults.setInteger(PElementBean.DBTERM, 10473);
-		mockPElementResults.setInteger(PElementBean.DBINDIVIDUAL, -1);
+		mockPElementResults2.setInteger(PElementBean.DBTYPE, 1);
+		mockPElementResults2.setInteger(PElementBean.DBPARTICIPANT, 1);
+		mockPElementResults2.setInteger(PElementBean.DBTERM, 10473);
+		mockPElementResults2.setInteger(PElementBean.DBINDIVIDUAL, -1);
 	}
+	
+	
+	private static MockResults mockPEParentResults = new MockResults();
+	static {
+		mockPEParentResults.setInteger(PElementBean.DBPARENTID, 1);
+		mockPEParentResults.setInteger(PElementBean.DBPARENTPROPERTY, 1);
+	}
+	
+	
+	private static MockResults mockPEChildResults = new MockResults();
+	static {
+		mockPEChildResults.setInteger(PElementBean.DBCHILDID, 1);
+		mockPEChildResults.setInteger(PElementBean.DBCHILDPROPERTY, 1);		
+	}
+	
 	
 	private static Map<String,String> mockImportSourceMap = new HashMap<String,String>();
 	static{
@@ -470,35 +485,64 @@ public class MockConnection implements AbstractConnection {
 	}
 
 	@Override
-	public Set<PElementBean> getPElements(ParticipantBean p)
-			throws SQLException {
-		// TODO Auto-generated method stub
-		throw new RuntimeException("Need to implement getPElements");
-	}
-
-	@Override
-	public PElementBean getPElement(int id) throws Exception {
-		PElementBean result = new PElementBean();
-		if (id == 1){
-			result.fill(mockPElementResults);
-			fillPElementParents(result);
-			fillPElementChildren(result);
-		}
-		else {
-			result.fill(mockPElementResults2);			
+	public Set<PElementBean> getPElements(ParticipantBean p) throws Exception {
+		final Set<PElementBean> result = new HashSet<PElementBean>();
+		switch (p.getId()){
+		case 1:
+			PElementBean e1 = new PElementBean();
+			PElementBean e2 = new PElementBean();
+			e1.fill(mockPElementResults);
+			e2.fill(mockPElementResults2);
+			fillPElementParents(e1);
+			fillPElementChildren(e1);
+			fillPElementChildren(e2);
+			fillPElementChildren(e2);
+			result.add(e1);
+			result.add(e2);
+			break;
+		default:
+			throw new RuntimeException("getPElements (Mock) got participant with bad id: " + p.getId());
 		}
 		return result;
 	}
 
-	private void fillPElementChildren(PElementBean result) {
-		throw new RuntimeException("Need to implement fillPElementChildren");
-		// TODO Auto-generated method stub
-		
+	@Override
+	public PElementBean getPElement(int id) throws Exception {
+		final PElementBean result = new PElementBean();
+		switch (id){
+		case 1:{
+			result.fill(mockPElementResults);
+			fillPElementParents(result);
+			fillPElementChildren(result);
+			break;
+		}
+		default: {
+			result.fill(mockPElementResults2);
+			fillPElementParents(result);
+			fillPElementChildren(result);
+		}
+		}
+		return result;
 	}
 
-	private void fillPElementParents(PElementBean result) {
-		throw new RuntimeException("Need to implement fillPElementParents");
-		// TODO Auto-generated method stub
+	private void fillPElementParents(PElementBean result) throws Exception{
+		switch (result.getId()){
+		case 1:
+			result.fillParents(mockPEParentResults);
+			break;
+		default:
+			result.fillParents(mockPEParentResults);
+		}
+	}
+
+	private void fillPElementChildren(PElementBean result) throws Exception{
+		switch (result.getId()){
+		case 1:
+			result.fillChildren(mockPEChildResults);
+			break;
+		default:
+			result.fillChildren(mockPEChildResults);
+		}
 		
 	}
 

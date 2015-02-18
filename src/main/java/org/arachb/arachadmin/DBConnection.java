@@ -88,6 +88,8 @@ public class DBConnection implements AbstractConnection{
 					"JOIN participant AS part ON (p2c.participant = part.id) " +
 					"WHERE p2c.claim = ?";
 	
+	static final String PARTICIPANTUPDATESTATEMENT = "";
+	
 	static final String PELEMENTSFROMPARTICIPANTQUERY =
 			"SELECT id,type,participant FROM participant_element WHERE participant = ?";
 
@@ -156,10 +158,6 @@ public class DBConnection implements AbstractConnection{
 			"SELECT i.id, i.source_id, i.generated_id, i.label, i.term " +
 			"FROM individual AS i";
 	
-	//This is probably going away, individuals are their own things
-	static final String INDIVIDUALPARTICIPANTUPDATESTATEMENT = 
-			"UPDATE participant SET generated_id = ? WHERE id = ?";
-
 	
 	
 	
@@ -479,7 +477,7 @@ public class DBConnection implements AbstractConnection{
 	
 	public void updateParticipant(ParticipantBean b) throws SQLException{
 		PreparedStatement updateStatement = 
-				c.prepareStatement(INDIVIDUALPARTICIPANTUPDATESTATEMENT);
+				c.prepareStatement(PARTICIPANTUPDATESTATEMENT);
 		try{
 			updateStatement.setString(1, b.getGeneratedId());  //getIRI_String() is wrong - 
 			updateStatement.setInt(2, b.getId());
