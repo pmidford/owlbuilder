@@ -164,6 +164,22 @@ public class TestDBConnection {
 		
 	}
 	
+	
+	final static String ACTIVELYPARTICIPATESINURL = "http://purl.obolibrary.org/obo/RO_0002217";
+	final static String ACTIVELYPARTICIPATESINLABEL = "actively participates in";
+	
+	@Test
+	public void testgetProperty() throws Exception{
+		PropertyBean testProperty = testConnection.getProperty(306);
+		assertNotNull(testProperty);
+		assertEquals(306,testProperty.getId());
+		assertEquals(ACTIVELYPARTICIPATESINURL,testProperty.getSourceId());
+		assertEquals(0,testProperty.getAuthority());
+		assertEquals(ACTIVELYPARTICIPATESINLABEL,testProperty.getLabel());
+		assertEquals(null,testProperty.getGeneratedId());
+		assertEquals(null,testProperty.getComment());
+	}
+	
 	@Test
 	public void testloadImportSourceMap() throws Exception{
 		Map<String,String> testmap = testConnection.loadImportSourceMap();

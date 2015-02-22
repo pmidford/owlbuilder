@@ -169,7 +169,14 @@ public interface AbstractConnection {
 	 */
 	IndividualBean getIndividual(int inId) throws SQLException;
 
-
+	/**
+	 * returns bean representation of an OWL property from connection or
+	 * property class's cache
+	 * @param pId
+	 * @return
+	 * @throws Exception 
+	 */
+	PropertyBean getProperty(int pId) throws Exception;
 
 	/**
 	 * 

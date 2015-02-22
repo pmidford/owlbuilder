@@ -158,8 +158,10 @@ public class DBConnection implements AbstractConnection{
 			"SELECT i.id, i.source_id, i.generated_id, i.label, i.term " +
 			"FROM individual AS i";
 	
-	
-	
+	static final String PROPERTYROWQUERY = 
+			"SELECT p.id, p.source_id, p.authority, p.label, p.generated_id, p.comment " +
+			"FROM property AS p WHERE p.id = ?";
+
 	
 	static final Logger logger = Logger.getLogger(DBConnection.class.getName());
 
@@ -460,7 +462,6 @@ public class DBConnection implements AbstractConnection{
 			while (participantSet.next()){
 				ParticipantBean p = new ParticipantBean();
 				p.fill(participantSet);
-				p.loadElements(this);
 				result.add(p);
 			}
 			return result;
@@ -568,6 +569,34 @@ public class DBConnection implements AbstractConnection{
 			individualStatement.close();
 		}
 	}
+	
+	public PropertyBean getProperty(int id) throws Exception{
+		if (PropertyBean.isCached(id)){
+			return PropertyBean.getCached(id);
+		}
+		else{
+			final PreparedStatement propertyStatement = c.prepareStatement(PROPERTYROWQUERY);
+			try{
+				propertyStatement.setInt(1, id);
+				ResultSet propertySet = propertyStatement.executeQuery();
+				AbstractResults propertyResults = new DBResults(propertySet);
+				if (propertyResults.next()){
+					PropertyBean result = new PropertyBean();
+					result.fill(propertyResults);
+					PropertyBean.cache(result);
+					return result;
+				}
+				else {
+					return null;
+				}
+			}
+			finally{
+				propertyStatement.close();
+			}
+		}
+	}
+
+
 
 	
 	private final String ONTOLOGYSOURCEQUERY = "SELECT source_url,domain FROM ontology_source";

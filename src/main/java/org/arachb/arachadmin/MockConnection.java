@@ -1,5 +1,7 @@
 package org.arachb.arachadmin;
 
+import static org.junit.Assert.assertEquals;
+
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -145,12 +147,12 @@ public class MockConnection implements AbstractConnection {
 		mockParticipantResults1.setInteger(ParticipantBean.DBID,1);
 		mockParticipantResults1.setString(ParticipantBean.DBQUANTIFICATION,"some");
 		mockParticipantResults1.setString(ParticipantBean.DBLABEL,"");
-		mockParticipantResults1.setString(ParticipantBean.DBGENERATEDID,"");
+		mockParticipantResults1.setString(ParticipantBean.DBGENERATEDID,null);
 		mockParticipantResults1.setInteger(ParticipantBean.DBPROPERTY, 306);  //used
 		mockParticipantResults1.setString(ParticipantBean.DBPUBLICATIONTAXON,TESTPUBTAXON);
 		mockParticipantResults1.setString(ParticipantBean.DBPUBLICATIONANATOMY,"");
 		mockParticipantResults1.setString(ParticipantBean.DBPUBLICATIONSUBSTRATE,"");
-		mockParticipantResults1.setInteger(ParticipantBean.DBPARTICIPATIONPROPERTY,306); //bogus
+		mockParticipantResults1.setInteger(ParticipantBean.DBPARTICIPATIONPROPERTY,0); //bogus
 		mockParticipantResults1.setInteger(ParticipantBean.DBHEADELEMENT,1);
 	}
 
@@ -159,11 +161,11 @@ public class MockConnection implements AbstractConnection {
 		mockParticipantResults2.setInteger(ParticipantBean.DBID,2);
 		mockParticipantResults2.setString(ParticipantBean.DBQUANTIFICATION,"some");
 		mockParticipantResults2.setString(ParticipantBean.DBLABEL,"");
-		mockParticipantResults2.setString(ParticipantBean.DBGENERATEDID,"");
+		mockParticipantResults2.setString(ParticipantBean.DBGENERATEDID,null);
 		mockParticipantResults2.setString(ParticipantBean.DBPUBLICATIONTAXON,TESTPUBTAXON);
 		mockParticipantResults2.setString(ParticipantBean.DBPUBLICATIONANATOMY,"");
 		mockParticipantResults2.setString(ParticipantBean.DBPUBLICATIONSUBSTRATE,"");
-		mockParticipantResults2.setInteger(ParticipantBean.DBPARTICIPATIONPROPERTY,306); //bogus
+		mockParticipantResults2.setInteger(ParticipantBean.DBPARTICIPATIONPROPERTY,0); //bogus
 		mockParticipantResults2.setInteger(ParticipantBean.DBHEADELEMENT,51);
 	}
 	
@@ -199,12 +201,6 @@ public class MockConnection implements AbstractConnection {
 		mockIndividualResults2.setInteger(IndividualBean.DBID, 12);
 	}
 
-	static final String PELEMENTQUERY =
-			"SELECT ele.id, ele.type, ele.participant, p2t.term, p2i.individual " +
-			        "FROM participant_element as ele " +
-				    "LEFT JOIN pelement2term as p2t ON (p2t.element = ele.id) " +
-					"LEFT JOIN pelement2individual as p2i ON (p2i.element = ele.id) " +
-				    "WHERE ele.id = ?";
 
 	private static MockResults mockPElementResults = new MockResults();
 	static{
@@ -237,6 +233,21 @@ public class MockConnection implements AbstractConnection {
 	static {
 		mockPEChildResults.setInteger(PElementBean.DBCHILDID, 1);
 		mockPEChildResults.setInteger(PElementBean.DBCHILDPROPERTY, 1);		
+	}
+	
+	
+	final static String ACTIVELYPARTICIPATESINURL = "http://purl.obolibrary.org/obo/RO_0002217";
+	final static String ACTIVELYPARTICIPATESINLABEL = "actively participates in";
+	
+
+	private static MockResults mockPropertyResults1 = new MockResults();
+	static {
+		mockPropertyResults1.setInteger(PropertyBean.DBID, 306);
+		mockPropertyResults1.setString(PropertyBean.DBSOURCEID, ACTIVELYPARTICIPATESINURL);
+		mockPropertyResults1.setInteger(PropertyBean.DBAUTHORITY,0);
+		mockPropertyResults1.setString(PropertyBean.DBLABEL,ACTIVELYPARTICIPATESINLABEL);
+		mockPropertyResults1.setString(PropertyBean.DBGENERATEDID,null);
+		mockPropertyResults1.setString(PropertyBean.DBCOMMENT,null);		
 	}
 	
 	
@@ -544,6 +555,19 @@ public class MockConnection implements AbstractConnection {
 			result.fillChildren(mockPEChildResults);
 		}
 		
+	}
+
+	@Override
+	public PropertyBean getProperty(int id) throws Exception {
+		final PropertyBean result = new PropertyBean();
+		switch (id){
+		case 306:
+			result.fill(mockPropertyResults1);
+			break;
+		default:
+			return null;
+		}
+		return result;
 	}
 
 
