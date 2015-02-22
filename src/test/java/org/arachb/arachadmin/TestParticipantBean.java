@@ -41,12 +41,12 @@ public class TestParticipantBean {
 			assertEquals(1, pb.getId());
 			assertEquals("some",pb.getQuantification());
 			assertEquals("",pb.getLabel());  //should improve this
-			assertEquals("",pb.getGeneratedId());  //improve ??
+			assertEquals(null,pb.getGeneratedId());  //improve ??
 			assertEquals(306,pb.getProperty());
 			assertEquals("Tetragnatha straminea", pb.getPublicationTaxon());
 			assertEquals("", pb.getPublicationAnatomy());
 			assertEquals(0, pb.getSubstrate());
-			assertEquals(306, pb.getParticipationProperty());
+			assertEquals(0, pb.getParticipationProperty());
 			assertEquals(1, pb.getHeadElement());
 		}
 	}
@@ -57,8 +57,10 @@ public class TestParticipantBean {
 		Set<ParticipantBean> pbs = testConnection.getParticipants(testClaim);
 		assertEquals(1, pbs.size());
 		for (ParticipantBean pb : pbs){
+			log.info("What is this: " + pb.getElementBean(1));
+			assertNull(pb.getElementBean(1));
 			pb.loadElements(testConnection);
-			pb.traverseElements();
+			assertNotNull(pb.getElementBean(1));
 		}
 	}
 

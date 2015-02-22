@@ -1,12 +1,14 @@
 package org.arachb.owlbuilder.lib;
 
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.arachb.arachadmin.AbstractConnection;
+import org.arachb.arachadmin.PElementBean;
 import org.arachb.arachadmin.ParticipantBean;
 import org.arachb.owlbuilder.Owlbuilder;
 import org.semanticweb.owlapi.model.IRI;
@@ -79,7 +81,11 @@ public class Participant implements AbstractNamedEntity{
 	
 	@Override	
 	public OWLObject generateOWL(Owlbuilder builder) throws SQLException{
+		final Map<Integer, OWLObject> owlElements = new HashMap<Integer, OWLObject>();
 		bean.traverseElements();  //start of something new
+		PElementBean headBean = bean.getElementBean(bean.getHeadElement());
+		int propIndex = bean.getParticipationProperty();
+		traverseElements(builder, owlElements, headBean, propIndex);
 		if (INDIVIDUALQUANTIFIER.equalsIgnoreCase(bean.getQuantification())){
 			return generateOWLForIndividual(builder);
 		}
@@ -92,6 +98,27 @@ public class Participant implements AbstractNamedEntity{
 			throw new IllegalArgumentException(msg);
 		}
 
+	}
+	
+	private void traverseElements(Owlbuilder builder, 
+			Map<Integer, OWLObject> owlElements, 
+			PElementBean pe,
+			Integer prop){
+		if (!owlElements.containsKey(pe.getId())){
+			Set<Integer[]>children = pe.getChildren();
+			OWLObject o = generateParticipantOWL(pe,prop);
+			owlElements.put(pe.getId(), o);
+			for (Integer[] child : children) {
+				PElementBean childBean = bean.getElementBean(child[0]);
+				int childProperty = child[1];
+				traverseElements(builder,owlElements,childBean,childProperty);
+			}
+		}
+	}
+
+	
+	private OWLObject generateParticipantOWL(PElementBean pe, Integer prop){
+		return null;
 	}
 
 	OWLObject generateOWLForClass(Owlbuilder builder) {
