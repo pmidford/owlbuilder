@@ -146,19 +146,24 @@ public class ParticipantBean {
 		return headElement;
 	}
 	
-	void loadElements(AbstractConnection c) throws Exception{
+
+	public PElementBean getElementBean(int index){
+		return elements.get(index);
+	}
+
+//TODO should these be merged?
+	
+	public void loadElements(AbstractConnection c) throws Exception{
 		Set<PElementBean> elementset = c.getPElements(this);
 		for (PElementBean e : elementset){
 			elements.put(e.getId(), e);
 		}
 		
 	}
-	
-	
+
 	public void traverseElements(){
 		int cur_element_id = getHeadElement();
 		assert elements.size() > 0;
-		System.out.print("Elements: " + elements.keySet());
 		if (!elements.containsKey(cur_element_id)){
         	final String msgStr = 
         			"Participant_element %s, listed as head, was not found for participant id %s";
@@ -217,6 +222,8 @@ public class ParticipantBean {
 		builder.initializeMiscTermAndParents(substrateClass);
 		
 	}
+
+
 
 
 
