@@ -6,6 +6,8 @@ import java.util.Set;
 
 import org.arachb.owlbuilder.lib.AbstractNamedEntity;
 
+
+
 public interface AbstractConnection {
 
 	/**

@@ -17,7 +17,6 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.arachb.owlbuilder.lib.AbstractNamedEntity;
-import org.arachb.owlbuilder.lib.AbstractResults;
 import org.arachb.owlbuilder.lib.IRIManager;
 
 
@@ -100,6 +99,13 @@ public class DBConnection implements AbstractConnection{
 					"LEFT JOIN pelement2individual as p2i ON (p2i.element = ele.id) " +
 				    "WHERE ele.id = ?";
 	
+	
+	static final String PELEMENTTERMQUERY =
+			"SELECT p2t.term FROM pelement2term as p2t WHERE element = ?";
+	
+	
+	static final String PELEMENTINDIVIDUALQUERY =
+			"SELECT p2i.individual FROM pelement2individual as p2i WHERE element = ?";
 
 	static final String PELEMENTPARENTSQUERY =
 			"SELECT link.parent,link.property FROM participant_link as link " +
@@ -572,7 +578,7 @@ public class DBConnection implements AbstractConnection{
 	
 	public PropertyBean getProperty(int id) throws Exception{
 		if (PropertyBean.isCached(id)){
-			return PropertyBean.getCached(id);
+			return (PropertyBean)PropertyBean.getCached(id);
 		}
 		else{
 			final PreparedStatement propertyStatement = c.prepareStatement(PROPERTYROWQUERY);
@@ -746,6 +752,8 @@ public class DBConnection implements AbstractConnection{
 			while (pElementsResults.next()){
 				PElementBean bean = new PElementBean();
 				bean.fill(pElementsResults);
+				fillPElementTerm(bean);
+				fillPElementIndividual(bean);
 				fillPElementParents(bean);
 				fillPElementChildren(bean);
 				result.add(bean);
@@ -781,6 +789,35 @@ public class DBConnection implements AbstractConnection{
 		}
 	}
 	
+	public void fillPElementTerm(PElementBean pb) throws Exception{
+		PreparedStatement pElementTermStatement = c.prepareStatement(PELEMENTTERMQUERY);
+		try{
+			pElementTermStatement.setInt(1, pb.getId());
+			ResultSet results = pElementTermStatement.executeQuery();
+			if (results.next()){
+				AbstractResults tresults = new DBResults(results);
+				pb.fillTerm(tresults);
+			}
+		}
+		finally{
+			pElementTermStatement.close();
+		}
+	}
+	
+	public void fillPElementIndividual(PElementBean pb) throws Exception{
+		PreparedStatement pElementIndividualStatement = c.prepareStatement(PELEMENTINDIVIDUALQUERY);
+		try{
+			pElementIndividualStatement.setInt(1, pb.getId());
+			ResultSet results = pElementIndividualStatement.executeQuery();
+			if (results.next()){
+				AbstractResults iresults = new DBResults(results);
+				pb.fillIndividual(iresults);
+			}
+		}
+		finally{
+			pElementIndividualStatement.close();
+		}
+	}
 	
 	public void fillPElementParents(PElementBean result) throws Exception{
 		PreparedStatement pElementParentsStatement = c.prepareStatement(PELEMENTPARENTSQUERY);

@@ -3,7 +3,6 @@ package org.arachb.arachadmin;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.arachb.owlbuilder.lib.AbstractResults;
 
 public class DBResults implements AbstractResults {
 

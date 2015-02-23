@@ -3,7 +3,6 @@ package org.arachb.arachadmin;
 import java.sql.SQLException;
 
 import org.apache.log4j.Logger;
-import org.arachb.owlbuilder.lib.AbstractResults;
 
 
 /**

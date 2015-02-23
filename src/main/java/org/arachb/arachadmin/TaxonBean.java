@@ -4,7 +4,6 @@ import java.sql.SQLException;
 
 import org.arachb.owlbuilder.Owlbuilder;
 import org.arachb.owlbuilder.lib.AbstractNamedEntity;
-import org.arachb.owlbuilder.lib.AbstractResults;
 import org.semanticweb.owlapi.model.OWLObject;
 
 public class TaxonBean implements AbstractNamedEntity{

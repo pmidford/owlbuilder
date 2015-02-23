@@ -4,6 +4,8 @@ import java.sql.SQLException;
 
 import org.arachb.arachadmin.AbstractConnection;
 
+
+
 public interface AbstractNamedEntity extends AbstractEntity{
 		
 	public void setGeneratedId(String id);

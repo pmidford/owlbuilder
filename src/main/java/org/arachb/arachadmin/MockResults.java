@@ -4,7 +4,6 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.arachb.owlbuilder.lib.AbstractResults;
 
 public class MockResults implements AbstractResults {
 

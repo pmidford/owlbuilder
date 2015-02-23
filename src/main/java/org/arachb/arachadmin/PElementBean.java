@@ -1,17 +1,19 @@
 package org.arachb.arachadmin;
 
+import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.arachb.owlbuilder.lib.AbstractResults;
 
 public class PElementBean implements BeanBase {
 	
 	final static int DBID = 1;
 	final static int DBTYPE = 2;
 	final static int DBPARTICIPANT = 3;
-	final static int DBTERM = 4;
-	final static int DBINDIVIDUAL = 5;
+	
+	// these have their own results types
+	final static int DBTERM = 1;
+	final static int DBINDIVIDUAL = 1;
 	
 	final static int DBPARENTID = 1;
 	final static int DBPARENTPROPERTY = 2;
@@ -25,8 +27,8 @@ public class PElementBean implements BeanBase {
 	final private Set<Plink> parentLinks = new HashSet<Plink>();
 	final private Set<Plink> childLinks = new HashSet<Plink>();
 	
-	private ParticipantBean part;
-	private IndividualBean ind;
+	private ParticipantBean part = null;
+	private IndividualBean ind = null;
 	private TermBean term;
 	
 	
@@ -36,16 +38,26 @@ public class PElementBean implements BeanBase {
 		return id;
 	}
 
+	
 	public int getType(){
 		return eletype;
 	}
+	
 	
 	public int getParticipant(){
 		return participant;
 	}
 	
+	
+	public TermBean getTerm(){
+		return term;
+	}
 
-
+	
+	public IndividualBean getIndividual(){
+		return ind;
+	}
+	
 	
 	@Override
 	public void fill(AbstractResults record) throws Exception {
@@ -54,6 +66,17 @@ public class PElementBean implements BeanBase {
 		participant = record.getInt(DBPARTICIPANT);
 	}
 
+	public void fillTerm(AbstractResults record) throws SQLException{
+		int termId = record.getInt(DBTERM);
+		
+	}
+
+	
+	public void fillIndividual(AbstractResults record) throws SQLException{
+		int individualId = record.getInt(DBINDIVIDUAL);
+	}
+
+	
 	public void fillParents(AbstractResults parentResults) throws Exception{		
 		while (parentResults.next()){
 			int parentid = parentResults.getInt(DBPARENTID);

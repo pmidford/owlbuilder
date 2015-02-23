@@ -1,6 +1,5 @@
 package org.arachb.arachadmin;
 
-import org.arachb.owlbuilder.lib.AbstractResults;
 
 public interface BeanBase {
 

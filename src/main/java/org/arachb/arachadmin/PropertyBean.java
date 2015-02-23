@@ -1,13 +1,9 @@
 package org.arachb.arachadmin;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.log4j.Logger;
-import org.arachb.owlbuilder.lib.AbstractResults;
 
 
-public class PropertyBean implements BeanBase {
+public class PropertyBean extends CachingBean {
 
 	final static int DBID = 1;
 	final static int DBSOURCEID = 2;
@@ -23,27 +19,12 @@ public class PropertyBean implements BeanBase {
 	private String generatedId;  //this is dubious
 	private String comment;
 	
-	private static final Map<Integer, PropertyBean> cache = new HashMap<Integer, PropertyBean>();
 	
 	public final static String INDIVIDUALQUANTIFIER = "INDIVIDUAL";
 	public final static String SOMEQUANTIFIER = "SOME";
 	
 	private static Logger log = Logger.getLogger(PropertyBean.class);
 
-
-	static boolean isCached(int id){
-		return cache.containsKey(id);
-	}
-	
-	static PropertyBean getCached(int id){
-		assert(cache.containsKey(id));  //shouldn't be calling this w/o checking first
-		return cache.get(id);
-	}
-
-	static void cache(PropertyBean pb){
-		final int id = pb.getId();
-		cache.put(id, pb);
-	}
 
 	
 	@Override

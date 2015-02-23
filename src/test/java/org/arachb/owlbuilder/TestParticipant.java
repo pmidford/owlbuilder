@@ -1,10 +1,5 @@
 package org.arachb.owlbuilder;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
-
-import java.sql.SQLException;
 import java.util.Set;
 
 import org.apache.log4j.Logger;

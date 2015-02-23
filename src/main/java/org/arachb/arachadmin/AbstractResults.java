@@ -1,4 +1,4 @@
-package org.arachb.owlbuilder.lib;
+package org.arachb.arachadmin;
 
 import java.sql.SQLException;
 

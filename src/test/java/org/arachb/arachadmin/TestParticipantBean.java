@@ -1,12 +1,12 @@
 package org.arachb.arachadmin;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
-import java.sql.SQLException;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.arachb.owlbuilder.lib.AbstractResults;
 import org.junit.Before;
 import org.junit.Test;
 

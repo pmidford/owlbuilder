@@ -2,7 +2,6 @@ package org.arachb.arachadmin;
 
 import java.sql.SQLException;
 
-import org.arachb.owlbuilder.lib.AbstractResults;
 
 
 public class PublicationBean implements BeanBase{

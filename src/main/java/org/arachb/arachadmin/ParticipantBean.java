@@ -7,14 +7,13 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.arachb.owlbuilder.Owlbuilder;
-import org.arachb.owlbuilder.lib.AbstractResults;
 import org.semanticweb.owlapi.model.OWLAnnotationAssertionAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 
-public class ParticipantBean {
+public class ParticipantBean{
 
 	
 
@@ -76,7 +75,7 @@ public class ParticipantBean {
 		participationProperty = record.getInt(DBPARTICIPATIONPROPERTY);
 		headElement = record.getInt(DBHEADELEMENT);
 	}
-
+	
 
 	public int getId(){
 		return id;

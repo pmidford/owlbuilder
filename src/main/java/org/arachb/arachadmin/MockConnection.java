@@ -1,7 +1,5 @@
 package org.arachb.arachadmin;
 
-import static org.junit.Assert.assertEquals;
-
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -9,6 +7,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.arachb.owlbuilder.lib.AbstractNamedEntity;
+
+
 
 public class MockConnection implements AbstractConnection {
 	
