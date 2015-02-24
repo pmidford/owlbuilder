@@ -8,8 +8,10 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.arachb.arachadmin.AbstractConnection;
+import org.arachb.arachadmin.IndividualBean;
 import org.arachb.arachadmin.PElementBean;
 import org.arachb.arachadmin.ParticipantBean;
+import org.arachb.arachadmin.TermBean;
 import org.arachb.owlbuilder.Owlbuilder;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAnnotation;
@@ -32,22 +34,6 @@ import org.semanticweb.owlapi.reasoner.OWLReasoner;
 public class Participant implements AbstractNamedEntity{
 
 
-	final static int DBID = 1;
-	final static int DBTAXON = 2;
-	final static int DBSUBSTRATE = 3;
-	final static int DBANATOMY = 4;
-	final static int DBQUANTIFICATION = 5;
-	final static int DBGENERATEDID = 6;
-	final static int DBPUBLICATIONTAXON = 7;
-	final static int DBLABEL = 8;
-	final static int DBPUBLICATIONANATOMY = 9;
-	final static int DBPUBLICATIONSUBSTRATE = 10;
-	final static int DBTAXONSOURCEID = 11;
-	final static int DBTAXONGENERATEDID = 12;
-	final static int DBSUBSTRATESOURCEID = 13;
-	final static int DBSUBSTRATEGENERATEDID = 14;
-	final static int DBANATOMYSOURCEID = 15;
-	final static int DBANATOMYGENERATEDID = 16;
 
 	final static String BADTAXQuantifiedParticipant =
 			"Term without IRI referenced as participant taxon: participant QuantifiedParticipantxon id = %s";
@@ -86,17 +72,7 @@ public class Participant implements AbstractNamedEntity{
 		PElementBean headBean = bean.getElementBean(bean.getHeadElement());
 		int propIndex = bean.getParticipationProperty();
 		OWLObject headObject = traverseElements(builder, owlElements, headBean, propIndex);
-		if (INDIVIDUALQUANTIFIER.equalsIgnoreCase(bean.getQuantification())){
-			return generateOWLForIndividual(builder);
-		}
-		else if (SOMEQUANTIFIER.equalsIgnoreCase(bean.getQuantification())){
-			return generateOWLForClass(builder);
-		}
-		else{
-			final String msg = "Participant had bad quantification: " + bean.getQuantification();
-			log.error(msg);
-			throw new IllegalArgumentException(msg);
-		}
+		return headObject;  //TODO something else is needed
 
 	}
 	
@@ -106,7 +82,7 @@ public class Participant implements AbstractNamedEntity{
 			Integer prop){
 		if (!owlElements.containsKey(pe.getId())){
 			Set<Integer[]>children = pe.getChildren();
-			OWLObject o = generateElementOWL(pe,prop);
+			OWLObject o = generateElementOWL(pe,prop,builder);
 			owlElements.put(pe.getId(), o);
 			for (Integer[] child : children) {
 				PElementBean childBean = bean.getElementBean(child[0]);
@@ -118,8 +94,20 @@ public class Participant implements AbstractNamedEntity{
 	}
 
 	
-	private OWLObject generateElementOWL(PElementBean pe, Integer prop){
-		
+	private OWLObject generateElementOWL(PElementBean pe, Integer prop, Owlbuilder builder){
+		final OWLDataFactory factory = builder.getDataFactory();
+		if (pe.getTerm() != null){
+			TermBean tb = pe.getTerm();
+			IRI termIRI = IRI.create(tb.getSourceId());
+		}
+		else if (pe.getIndividual() != null){
+			IndividualBean ib = pe.getIndividual();
+			IRI individualIRI = IRI.create(ib.getSourceId());
+			
+		}
+		else {
+			throw new IllegalStateException("Element is neither term nor individual");
+		}
 		return null;
 	}
 
@@ -621,12 +609,7 @@ public class Participant implements AbstractNamedEntity{
 	}	
 
 
-
-
-
-
-
-
+	
 	public int getId(){
 		return bean.getId();
 	}

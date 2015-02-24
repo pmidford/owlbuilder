@@ -50,15 +50,5 @@ public class TestIRIManager {
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
 
-	@Test
-	public void testValidateIRI() throws Exception {
-		thrown.expect(IllegalStateException.class);
-		thrown.expectMessage("Term has neither assigned nor generated id");
-		IRIManager testManager = new IRIManager(c);
-		TermBean badTerm = new TermBean();  //uninitialized - should throw error
-		testManager.validateIRI(badTerm);
-		// should work
-		testManager.validateIRI(t);
-	}
 
 }

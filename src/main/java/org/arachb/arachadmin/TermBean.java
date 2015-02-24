@@ -6,7 +6,7 @@ import org.arachb.owlbuilder.Owlbuilder;
 import org.arachb.owlbuilder.lib.AbstractNamedEntity;
 import org.semanticweb.owlapi.model.OWLObject;
 
-public class TermBean implements AbstractNamedEntity{
+public class TermBean extends CachingBean{
 
 
 	static final int DBID = 1;
@@ -52,20 +52,6 @@ public class TermBean implements AbstractNamedEntity{
 		}
 	}
 
-	@Override
-	public String checkIriString(){
-		if (getSourceId() == null){
-			if (getGeneratedId() == null){
-				throw new IllegalStateException("Term has neither assigned nor generated id");
-			}
-			else {
-				return getGeneratedId();
-			}
-		}
-		else {
-			return getSourceId();
-		}
-	}
 
 	
 	public String getSourceId(){
@@ -104,11 +90,6 @@ public class TermBean implements AbstractNamedEntity{
 		c.updateTerm(this);
 	}
 
-	@Override
-	public OWLObject generateOWL(Owlbuilder b) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 
 }

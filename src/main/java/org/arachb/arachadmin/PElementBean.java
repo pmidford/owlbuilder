@@ -28,7 +28,7 @@ public class PElementBean implements BeanBase {
 	final private Set<Plink> childLinks = new HashSet<Plink>();
 	
 	private ParticipantBean part = null;
-	private IndividualBean ind = null;
+	private IndividualBean individual = null;
 	private TermBean term;
 	
 	
@@ -55,7 +55,7 @@ public class PElementBean implements BeanBase {
 
 	
 	public IndividualBean getIndividual(){
-		return ind;
+		return individual;
 	}
 	
 	
@@ -66,14 +66,15 @@ public class PElementBean implements BeanBase {
 		participant = record.getInt(DBPARTICIPANT);
 	}
 
-	public void fillTerm(AbstractResults record) throws SQLException{
+	public void fillTerm(AbstractResults record, AbstractConnection c) throws SQLException{
 		int termId = record.getInt(DBTERM);
-		
+		term = c.getTerm(termId);		
 	}
 
 	
-	public void fillIndividual(AbstractResults record) throws SQLException{
+	public void fillIndividual(AbstractResults record, AbstractConnection c) throws SQLException{
 		int individualId = record.getInt(DBINDIVIDUAL);
+		individual = c.getIndividual(individualId);
 	}
 
 	

@@ -345,25 +345,33 @@ public class DBConnection implements AbstractConnection{
 		}
 	}
 	
+	
 	public TermBean getTerm(int id) throws SQLException{
-		PreparedStatement termStatement = c.prepareStatement(TERMROWQUERY);
-		try{
-			termStatement.setInt(1, id);
-			ResultSet termSet = termStatement.executeQuery();
-			AbstractResults termResults = new DBResults(termSet);
-			if (termSet.next()){
-				TermBean result = new TermBean();
-				result.fill(termResults);
-				return result;
-			}
-			else {
-				return null;
-			}
+		if (TermBean.isCached(id)){
+			return (TermBean)TermBean.getCached(id);
 		}
-		finally{
-			termStatement.close();
+		else{
+			final PreparedStatement termStatement = c.prepareStatement(TERMROWQUERY);
+			try{
+				termStatement.setInt(1, id);
+				final ResultSet termSet = termStatement.executeQuery();
+				if (termSet.next()){
+					TermBean result = new TermBean();
+					final AbstractResults termResults = new DBResults(termSet);
+					result.fill(termResults);
+					TermBean.cache(result);
+					return result;
+				}
+				else {
+					return null;
+				}
+			}
+			finally{
+				termStatement.close();
+			}
 		}
 	}
+
 	
 	public Set<TermBean> getTerms() throws SQLException{
 		final Set<TermBean> result = new HashSet<TermBean>();
@@ -557,22 +565,28 @@ public class DBConnection implements AbstractConnection{
 
 	
 	public IndividualBean getIndividual(int id) throws SQLException{
-		PreparedStatement individualStatement = c.prepareStatement(INDIVIDUALROWQUERY);
-		try{
-			individualStatement.setInt(1, id);
-			ResultSet individualSet = individualStatement.executeQuery();
-			AbstractResults individualResults = new DBResults(individualSet);
-			if (individualSet.next()){
-				IndividualBean result = new IndividualBean();
-				result.fill(individualResults);
-				return result;
-			}
-			else {
-				return null;
-			}
+		if (IndividualBean.isCached(id)){
+			return (IndividualBean)IndividualBean.getCached(id);
 		}
-		finally{
-			individualStatement.close();
+		else{
+			final PreparedStatement individualStatement = c.prepareStatement(INDIVIDUALROWQUERY);
+			try{
+				individualStatement.setInt(1, id);
+				final ResultSet individualSet = individualStatement.executeQuery();
+				if (individualSet.next()){
+					IndividualBean result = new IndividualBean();
+					final AbstractResults individualResults = new DBResults(individualSet);
+					result.fill(individualResults);
+					IndividualBean.cache(result);
+					return result;
+				}
+				else {
+					return null;
+				}
+			}
+			finally{
+				individualStatement.close();
+			}
 		}
 	}
 	
@@ -601,7 +615,6 @@ public class DBConnection implements AbstractConnection{
 			}
 		}
 	}
-
 
 
 	
@@ -796,7 +809,7 @@ public class DBConnection implements AbstractConnection{
 			ResultSet results = pElementTermStatement.executeQuery();
 			if (results.next()){
 				AbstractResults tresults = new DBResults(results);
-				pb.fillTerm(tresults);
+				pb.fillTerm(tresults, this);
 			}
 		}
 		finally{
@@ -811,7 +824,7 @@ public class DBConnection implements AbstractConnection{
 			ResultSet results = pElementIndividualStatement.executeQuery();
 			if (results.next()){
 				AbstractResults iresults = new DBResults(results);
-				pb.fillIndividual(iresults);
+				pb.fillIndividual(iresults, this);
 			}
 		}
 		finally{

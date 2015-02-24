@@ -10,7 +10,7 @@ import org.apache.log4j.Logger;
  * @author pmidford
  *
  */
-public class IndividualBean implements BeanBase {
+public class IndividualBean extends CachingBean {
 	
 	static final int DBID = 1;
 	static final int DBSOURCEID = 2;

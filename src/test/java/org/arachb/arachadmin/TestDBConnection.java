@@ -83,20 +83,6 @@ public class TestDBConnection {
 		assertEquals(3,testSet.size());
 	}
 
-	@Test
-	public void testupdateTerm() throws SQLException{
-		TermBean testTerm = testConnection.getTerm(2);
-		assertNotNull(testTerm);
-        String old_id = testTerm.getGeneratedId();
-		testTerm.setGeneratedId(testAnatomy);
-		testConnection.updateNamedEntity(testTerm);
-		TermBean updatedTerm = testConnection.getTerm(2);
-		assertEquals(testAnatomy,updatedTerm.getGeneratedId());
-		updatedTerm.setGeneratedId(old_id);
-		testConnection.updateNamedEntity(updatedTerm);
-		TermBean updatedTerm2 = testConnection.getTerm(2);
-		assertEquals(old_id, updatedTerm2.getGeneratedId());
-	}
 
 	@Test
 	public void testgetClaim() throws Exception{
