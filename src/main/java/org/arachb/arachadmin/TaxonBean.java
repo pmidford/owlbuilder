@@ -139,15 +139,15 @@ public class TaxonBean implements AbstractNamedEntity{
 		c.updateTaxon(this);
 	}
 	
+	
 	@Override
-	public OWLObject generateOWL(Owlbuilder b) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+	public String checkIriString() {
+		if (get_available_id() == null){
+			throw new IllegalStateException("Term has neither assigned nor generated id");
+		}
+		else {
+			return get_available_id();
+		}
 	}
 
-	@Override
-	public Object checkIriString() {
-		// TODO Auto-generated method stub
-		return null;
-	}
 }
