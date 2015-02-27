@@ -51,7 +51,7 @@ public class TestParticipant {
 	public void testGenerateOWL() throws Exception {
 		for (ParticipantBean pb : beanSet){
 			pb.loadElements(testConnection);
-			pb.traverseElements();
+			pb.resolveElements(testConnection);
 			Participant p = new Participant(pb);
 			OWLObject o = p.generateOWL(builder);
 			//assertNotNull(o);
