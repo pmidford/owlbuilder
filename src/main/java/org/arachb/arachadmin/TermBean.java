@@ -44,12 +44,7 @@ public class TermBean extends CachingBean{
 	}
 	
 	public String getIriString(){
-		if (getSourceId() == null){
-			return getGeneratedId();
-		}
-		else {
-			return getSourceId();
-		}
+		return source_id;
 	}
 
 
@@ -74,21 +69,7 @@ public class TermBean extends CachingBean{
 		return comment;
 	}
 	
-	public String getGeneatedID(){
-		return generated_id;
-	}
-
-	public void setGeneratedId(String new_id){
-		generated_id = new_id;
-	}
 	
-	public String getGeneratedId(){
-		return generated_id;
-	}
-	
-	public void updateDB(AbstractConnection c) throws SQLException{
-		c.updateTerm(this);
-	}
 
 
 
