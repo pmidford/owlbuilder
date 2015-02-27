@@ -18,7 +18,7 @@ import org.semanticweb.owlapi.model.OWLIndividual;
 import org.semanticweb.owlapi.model.OWLObject;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 
-public class Publication implements AbstractNamedEntity {
+public class Publication implements GeneratingEntity {
 	
 	
 	private final PublicationBean bean;
@@ -35,11 +35,6 @@ public class Publication implements AbstractNamedEntity {
         generatedLabel = generateLabel();
 	}
 
-
-	@Override
-	public int getId() {
-		return bean.getId();
-	}
 
 
 	public boolean hasGeneratedLabel(){
@@ -60,26 +55,6 @@ public class Publication implements AbstractNamedEntity {
 	}
 
 
-	/**
-	 * This cleans up doi's (which tend to have lots of URI unfriendly characters) and returns a properly prefixed doi
-	 * @param doi
-	 * @return IRI using using doi prefix
-	 * @throws Exception either MalformedURL or Encoding exceptions can be thrown
-	 */
-	public static String cleanupDoi(String doi) throws Exception{
-		if (doi == null || doi.length() == 0){
-			throw new RuntimeException("Invalid empty DOI in publication");
-		}
-		URL raw = new URL(doi);
-		String cleanpath = URLEncoder.encode(raw.getPath().substring(1),"UTF-8");
-		if (log.isDebugEnabled()){
-			log.debug("raw is " + raw);
-		}
-		if (log.isDebugEnabled()){
-			log.debug("clean path is " + cleanpath);
-		}
-		return IRI.create("http://dx.doi.org/",cleanpath).toString();
-	}
 
 	@Override
 	public OWLObject generateOWL(Owlbuilder builder) throws SQLException {
@@ -88,8 +63,8 @@ public class Publication implements AbstractNamedEntity {
 		final OWLClass pubAboutInvestigationClass = 
 				factory.getOWLClass(IRIManager.pubAboutInvestigation);
 
-		builder.getIRIManager().validateIRI(this);
-		IRI publication_id = IRI.create(getIriString());
+		builder.getIRIManager().validateIRI(bean);
+		IRI publication_id = IRI.create(bean.getIriString());
 		assert(publication_id != null);
 		OWLIndividual pub_ind = factory.getOWLNamedIndividual(publication_id);
 		OWLClassAssertionAxiom classAssertion = 
@@ -106,69 +81,11 @@ public class Publication implements AbstractNamedEntity {
 	}
 	
 	
-	final static String PUBBADDOIGENID = "Publication has neither doi nor generated id";
-	@Override
-	public String getIriString() {
-		if (bean.getDoi() == null){
-			if (bean.getGeneratedId() == null){
-				throw new IllegalStateException(PUBBADDOIGENID);
-			}
-			return getGeneratedId();
-		}
-		else {
-			try {
-				return cleanupDoi(bean.getDoi());
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				return "";
-			}
-		}
-	}
 
 
 	
 	
 	
-	@Override
-	public String checkIriString() {
-		if (bean.getDoi() == null){
-			return getGeneratedId();
-		}
-		else {
-			try {
-				return cleanupDoi(bean.getDoi());
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				return "";
-			}
-		}
-	}
-
-	
-
-
-	
-
-	@Override
-	public void setGeneratedId(String id) {
-		bean.setGeneratedId(id);
-	}
-
-
-	@Override
-	public String getGeneratedId() {
-		return bean.getGeneratedId();
-	}
-
-
-	@Override
-	public void updateDB(AbstractConnection c) throws SQLException {
-		// TODO Auto-generated method stub
-		
-	}
-
 
 	
 	

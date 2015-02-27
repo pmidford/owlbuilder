@@ -1,5 +1,7 @@
 package org.arachb.owlbuilder.lib;
 
+import java.net.URL;
+import java.net.URLEncoder;
 import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Set;
@@ -74,4 +76,26 @@ public class IRIManager {
 			
 	}
 	
+	
+	/**
+	 * This cleans up doi's (which tend to have lots of URI unfriendly characters) and returns a properly prefixed doi
+	 * @param doi
+	 * @return IRI using using doi prefix
+	 * @throws Exception either MalformedURL or Encoding exceptions can be thrown
+	 */
+	public static String cleanupDoi(String doi) throws Exception{
+		if (doi == null || doi.length() == 0){
+			throw new RuntimeException("Invalid empty DOI in publication");
+		}
+		URL raw = new URL(doi);
+		String cleanpath = URLEncoder.encode(raw.getPath().substring(1),"UTF-8");
+		if (log.isDebugEnabled()){
+			log.debug("raw is " + raw);
+		}
+		if (log.isDebugEnabled()){
+			log.debug("clean path is " + cleanpath);
+		}
+		return IRI.create("http://dx.doi.org/",cleanpath).toString();
+	}
+
 }

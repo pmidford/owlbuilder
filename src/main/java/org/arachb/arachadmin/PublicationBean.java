@@ -2,9 +2,12 @@ package org.arachb.arachadmin;
 
 import java.sql.SQLException;
 
+import org.arachb.owlbuilder.lib.AbstractNamedEntity;
+import org.arachb.owlbuilder.lib.IRIManager;
 
 
-public class PublicationBean implements BeanBase{
+
+public class PublicationBean implements BeanBase,AbstractNamedEntity{
 
 
 	static final int DBID = 1;
@@ -170,6 +173,31 @@ public class PublicationBean implements BeanBase{
 		c.updatePublication(this);
 	}
 	
+	final static String PUBBADDOIGENID = "Publication has neither doi nor generated id";
+	@Override
+	public String getIriString() {
+		if (getDoi() == null){
+			if (getGeneratedId() == null){
+				throw new IllegalStateException(PUBBADDOIGENID);
+			}
+			return getGeneratedId();
+		}
+		else {
+			try {
+				return IRIManager.cleanupDoi(getDoi());
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				return "";
+			}
+		}
+	}
+
+	@Override
+	public Object checkIriString() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 	
 }
