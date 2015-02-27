@@ -7,13 +7,14 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.arachb.owlbuilder.Owlbuilder;
+import org.arachb.owlbuilder.lib.AbstractNamedEntity;
 import org.semanticweb.owlapi.model.OWLAnnotationAssertionAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 
-public class ParticipantBean{
+public class ParticipantBean implements BeanBase, AbstractNamedEntity{
 
 	
 
@@ -26,8 +27,7 @@ public class ParticipantBean{
 	final static int DBPUBLICATIONTAXON = 6;
 	final static int DBPUBLICATIONANATOMY = 7;
 	final static int DBPUBLICATIONSUBSTRATE = 8;
-	final static int DBPARTICIPATIONPROPERTY = 9;  //replaced by property
-	final static int DBHEADELEMENT = 10;
+	final static int DBHEADELEMENT = 9;
 
 	final static String BADTAXONIRI =
 			"Term without IRI referenced as participant taxon: participant id = %s; taxon id = %s";
@@ -51,8 +51,10 @@ public class ParticipantBean{
 	private String taxonIRI = null;
 	private String substrateIRI = null;
 	private String anatomyIRI = null;
-	private int participationProperty;
+	private PropertyBean propertyBean;
 	private int headElement;
+	private PElementBean headBean;
+
 	
 	private final Map<Integer, PElementBean> elements = new HashMap<Integer, PElementBean>();
 	
@@ -72,11 +74,9 @@ public class ParticipantBean{
 		publicationTaxon = record.getString(DBPUBLICATIONTAXON);
 		publicationAnatomy = record.getString(DBPUBLICATIONANATOMY);
 		publicationSubstrate = record.getString(DBPUBLICATIONSUBSTRATE);
-		participationProperty = record.getInt(DBPARTICIPATIONPROPERTY);
 		headElement = record.getInt(DBHEADELEMENT);
 	}
 	
-
 	public int getId(){
 		return id;
 	}
@@ -129,10 +129,6 @@ public class ParticipantBean{
 		return anatomyIRI;
 	}
 	
-	public int getParticipationProperty(){
-		return participationProperty;
-	}
-
 	public String getGeneratedId(){
 		return generatedId;
 	}
@@ -149,29 +145,37 @@ public class ParticipantBean{
 	public PElementBean getElementBean(int index){
 		return elements.get(index);
 	}
+	
+	public PropertyBean getParticipationBean(){
+		return propertyBean;
+	}
 
 //TODO should these be merged?
 	
 	public void loadElements(AbstractConnection c) throws Exception{
+		// special handling for head participation property
+		if (property > 0){
+			propertyBean = c.getProperty(property);
+		}
+		else {
+			throw new IllegalStateException("No participantProperty specified");
+		}
 		Set<PElementBean> elementset = c.getPElements(this);
 		for (PElementBean e : elementset){
 			elements.put(e.getId(), e);
 		}
-		
 	}
 
-	public void traverseElements(){
-		int cur_element_id = getHeadElement();
+	public void resolveElements(AbstractConnection c) throws Exception{
 		assert elements.size() > 0;
-		if (!elements.containsKey(cur_element_id)){
-        	final String msgStr = 
-        			"Participant_element %s, listed as head, was not found for participant id %s";
-        	throw new RuntimeException(String.format(msgStr,cur_element_id,getId()));
-		}
-		else{
-			PElementBean cur_element = elements.get(cur_element_id);
-			Set<Integer[]> parents = cur_element.getParents();
-			Set<Integer[]> children = cur_element.getChildren();
+		assert elements.containsKey(getHeadElement());
+		headBean = c.getPElement(getHeadElement());
+		propertyBean = c.getProperty(getProperty());
+		assert headBean != null;
+		assert propertyBean != null;
+		for (PElementBean element : elements.values()){
+			element.resolveParents(c);
+			element.resolveChildren(c);
 		}
 	}
 	
@@ -219,6 +223,24 @@ public class ParticipantBean{
 
 	public void processSubstrate(Owlbuilder builder, OWLClass substrateClass) {
 		builder.initializeMiscTermAndParents(substrateClass);
+		
+	}
+
+	@Override
+	public String getIriString() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Object checkIriString() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void updateDB(AbstractConnection c) throws SQLException {
+		// TODO Auto-generated method stub
 		
 	}
 

@@ -46,7 +46,6 @@ public class TestParticipantBean {
 			assertEquals("Tetragnatha straminea", pb.getPublicationTaxon());
 			assertEquals("", pb.getPublicationAnatomy());
 			assertEquals(0, pb.getSubstrate());
-			assertEquals(0, pb.getParticipationProperty());
 			assertEquals(1, pb.getHeadElement());
 		}
 	}
