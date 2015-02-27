@@ -187,5 +187,33 @@ public interface AbstractConnection {
 	 */
 	int scanPrivateIDs() throws Exception;
 
+	/**
+	 * 
+	 * @param pb
+	 * @throws Exception
+	 */
+	void fillPElementTerm(PElementBean pb) throws Exception;
+
+	/**
+	 * 
+	 * @param pb
+	 * @throws Exception
+	 */
+	void fillPElementIndividual(PElementBean pb) throws Exception;
+
+	/**
+	 * 
+	 * @param result
+	 * @throws Exception
+	 */
+	void fillPElementParents(PElementBean result) throws Exception;
+
+	/**
+	 * 
+	 * @param result
+	 * @throws Exception
+	 */
+	void fillPElementChildren(PElementBean result) throws Exception;
+
 
 }

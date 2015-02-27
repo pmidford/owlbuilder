@@ -82,7 +82,7 @@ public class DBConnection implements AbstractConnection{
 	static final String PARTICIPANTSQUERY = 
 			"SELECT part.id, part.quantification, part.label, part.generated_id, " +
 					"p2c.property, part.publication_taxon, part.publication_anatomy, " +
-					"part.publication_substrate, part.participation_property, part.head_element " +
+					"part.publication_substrate, part.head_element " +
 					"FROM participant2claim as p2c " + 
 					"JOIN participant AS part ON (p2c.participant = part.id) " +
 					"WHERE p2c.claim = ?";
@@ -200,19 +200,7 @@ public class DBConnection implements AbstractConnection{
 			final String password = properties.getProperty("password");
 			c = DriverManager.getConnection(String.format(CONNECTIONSPEC,host,db),user,password);
 		}
-		catch (SQLException e){
-			log.error("DBConnection setup failed, encountered:",e);
-			return false;
-		}
-		catch (IOException e){
-			log.error("DBConnection setup failed, encountered:",e);
-			return false;
-		}
-		catch (ClassNotFoundException e){
-			log.error("DBConnection setup failed, encountered:",e);
-			return false;
-		}
-		catch (NullPointerException e){
+		catch (Exception e){
 			log.error("DBConnection setup failed, encountered:",e);
 			return false;
 		}
@@ -222,8 +210,8 @@ public class DBConnection implements AbstractConnection{
 					c.close();
 				}
 			}
-			catch (SQLException e){
-				log.error("Error while closing test connection" + e);
+			catch (Exception e){
+				// log.error("Error while closing test connection" + e);
 				return false;
 			}
 		}
@@ -476,6 +464,7 @@ public class DBConnection implements AbstractConnection{
 			while (participantSet.next()){
 				ParticipantBean p = new ParticipantBean();
 				p.fill(participantSet);
+				p.resolveElements(this);
 				result.add(p);
 			}
 			return result;
@@ -787,11 +776,11 @@ public class DBConnection implements AbstractConnection{
 			ResultSet rawResults = pElementStatement.executeQuery();
 			AbstractResults pElementResults = new DBResults(rawResults);
 			if (pElementResults.next()){
-				PElementBean result = new PElementBean();
-				result.fill(pElementResults);
-				fillPElementParents(result);
-				fillPElementChildren(result);
-				return result;
+				PElementBean pb = new PElementBean();
+				pb.fill(pElementResults);
+				fillPElementParents(pb);
+				fillPElementChildren(pb);
+				return pb;
 			}
 			else {
 				return null;
@@ -802,6 +791,7 @@ public class DBConnection implements AbstractConnection{
 		}
 	}
 	
+	@Override
 	public void fillPElementTerm(PElementBean pb) throws Exception{
 		PreparedStatement pElementTermStatement = c.prepareStatement(PELEMENTTERMQUERY);
 		try{
@@ -817,6 +807,7 @@ public class DBConnection implements AbstractConnection{
 		}
 	}
 	
+	@Override
 	public void fillPElementIndividual(PElementBean pb) throws Exception{
 		PreparedStatement pElementIndividualStatement = c.prepareStatement(PELEMENTINDIVIDUALQUERY);
 		try{
@@ -832,26 +823,28 @@ public class DBConnection implements AbstractConnection{
 		}
 	}
 	
+	@Override
 	public void fillPElementParents(PElementBean result) throws Exception{
 		PreparedStatement pElementParentsStatement = c.prepareStatement(PELEMENTPARENTSQUERY);
 		try{
 			pElementParentsStatement.setInt(1, result.getId());
 			ResultSet rawResults = pElementParentsStatement.executeQuery();
 			AbstractResults parentResults = new DBResults(rawResults);
-			result.fillParents(parentResults);
+			result.fillParents(parentResults,this);
 		}
 		finally{
 			pElementParentsStatement.close();
 		}
 	}
 	
+	@Override
 	public void fillPElementChildren(PElementBean result) throws Exception{
 		PreparedStatement pElementChildrenStatement = c.prepareStatement(PELEMENTCHILDRENQUERY);
 		try{
 			pElementChildrenStatement.setInt(1, result.getId());
 			ResultSet rawResults = pElementChildrenStatement.executeQuery();
 			AbstractResults childrenResults = new DBResults(rawResults);
-			result.fillChildren(childrenResults);			
+			result.fillChildren(childrenResults,this);			
 		}
 		finally{
 			pElementChildrenStatement.close();

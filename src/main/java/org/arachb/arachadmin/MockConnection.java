@@ -152,7 +152,6 @@ public class MockConnection implements AbstractConnection {
 		mockParticipantResults1.setString(ParticipantBean.DBPUBLICATIONTAXON,TESTPUBTAXON);
 		mockParticipantResults1.setString(ParticipantBean.DBPUBLICATIONANATOMY,"");
 		mockParticipantResults1.setString(ParticipantBean.DBPUBLICATIONSUBSTRATE,"");
-		mockParticipantResults1.setInteger(ParticipantBean.DBPARTICIPATIONPROPERTY,0); //bogus
 		mockParticipantResults1.setInteger(ParticipantBean.DBHEADELEMENT,1);
 	}
 
@@ -165,7 +164,6 @@ public class MockConnection implements AbstractConnection {
 		mockParticipantResults2.setString(ParticipantBean.DBPUBLICATIONTAXON,TESTPUBTAXON);
 		mockParticipantResults2.setString(ParticipantBean.DBPUBLICATIONANATOMY,"");
 		mockParticipantResults2.setString(ParticipantBean.DBPUBLICATIONSUBSTRATE,"");
-		mockParticipantResults2.setInteger(ParticipantBean.DBPARTICIPATIONPROPERTY,0); //bogus
 		mockParticipantResults2.setInteger(ParticipantBean.DBHEADELEMENT,51);
 	}
 	
@@ -193,12 +191,14 @@ public class MockConnection implements AbstractConnection {
 	
 	private static MockResults mockIndividualResults = new MockResults();
 	static{
-		mockIndividualResults.setInteger(IndividualBean.DBID, 12);
+		mockIndividualResults.setInteger(IndividualBean.DBID, 94);
+		mockIndividualResults.setString(IndividualBean.DBLABEL, "female");
 	}
 
 	private static MockResults mockIndividualResults2 = new MockResults();
 	static{
-		mockIndividualResults2.setInteger(IndividualBean.DBID, 12);
+		mockIndividualResults2.setInteger(IndividualBean.DBID, 95);
+		mockIndividualResults2.setString(IndividualBean.DBLABEL, "whole organism of female");
 	}
 
 
@@ -206,10 +206,7 @@ public class MockConnection implements AbstractConnection {
 	static{
 		mockPElementResults.setInteger(PElementBean.DBID, 1);
 		mockPElementResults.setInteger(PElementBean.DBTYPE, 1);
-		mockPElementResults.setInteger(PElementBean.DBPARTICIPANT, 1);
-		mockPElementResults.setInteger(PElementBean.DBTERM, 4838);
-		mockPElementResults.setInteger(PElementBean.DBINDIVIDUAL, -1);
-		
+		mockPElementResults.setInteger(PElementBean.DBPARTICIPANT, 1);		
 	}
 
 	private static MockResults mockPElementResults2 = new MockResults();
@@ -217,10 +214,30 @@ public class MockConnection implements AbstractConnection {
 		mockPElementResults2.setInteger(PElementBean.DBID, 2);
 		mockPElementResults2.setInteger(PElementBean.DBTYPE, 1);
 		mockPElementResults2.setInteger(PElementBean.DBPARTICIPANT, 1);
-		mockPElementResults2.setInteger(PElementBean.DBTERM, 10473);
-		mockPElementResults2.setInteger(PElementBean.DBINDIVIDUAL, -1);
 	}
 	
+	private static MockResults mockPElementResults3 = new MockResults();
+	static{
+		mockPElementResults3.setInteger(PElementBean.DBID, 61);
+		mockPElementResults2.setInteger(PElementBean.DBTYPE, 1);
+		mockPElementResults2.setInteger(PElementBean.DBPARTICIPANT, 29);
+		
+	}
+	
+	private static MockResults mockPETermResults1 = new MockResults();
+	static{
+		mockPETermResults1.setInteger(PElementBean.DBTERM, 4838);
+	}
+	
+	private static MockResults mockPETermResults2 = new MockResults();
+	static{
+		mockPETermResults2.setInteger(PElementBean.DBTERM, 10473);
+	}
+	
+	private static MockResults mockPEIndividualResults3 = new MockResults();
+	static{
+		mockPEIndividualResults3.setInteger(PElementBean.DBINDIVIDUAL, 94);
+	}
 	
 	private static MockResults mockPEParentResults = new MockResults();
 	static {
@@ -536,23 +553,23 @@ public class MockConnection implements AbstractConnection {
 		return result;
 	}
 
-	private void fillPElementParents(PElementBean result) throws Exception{
+	public void fillPElementParents(PElementBean result) throws Exception{
 		switch (result.getId()){
 		case 1:
-			result.fillParents(mockPEParentResults);
+			result.fillParents(mockPEParentResults, this);
 			break;
 		default:
-			result.fillParents(mockPEParentResults);
+			result.fillParents(mockPEParentResults, this);
 		}
 	}
 
-	private void fillPElementChildren(PElementBean result) throws Exception{
+	public void fillPElementChildren(PElementBean result) throws Exception{
 		switch (result.getId()){
 		case 1:
-			result.fillChildren(mockPEChildResults);
+			result.fillChildren(mockPEChildResults, this);
 			break;
 		default:
-			result.fillChildren(mockPEChildResults);
+			result.fillChildren(mockPEChildResults, this);
 		}
 		
 	}
@@ -568,6 +585,18 @@ public class MockConnection implements AbstractConnection {
 			return null;
 		}
 		return result;
+	}
+
+	@Override
+	public void fillPElementTerm(PElementBean pb) throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void fillPElementIndividual(PElementBean pb) throws Exception {
+		// TODO Auto-generated method stub
+		
 	}
 
 
