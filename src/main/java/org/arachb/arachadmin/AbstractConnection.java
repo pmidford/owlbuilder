@@ -141,12 +141,6 @@ public interface AbstractConnection {
 	 */
 	Set<TermBean> getTerms() throws SQLException;
 
-	/**
-	 * 
-	 * @param t
-	 * @throws SQLException
-	 */
-	void updateTerm(TermBean t) throws SQLException;
 	
 	/**
 	 * should update the database record corresponding to the entity
@@ -170,6 +164,13 @@ public interface AbstractConnection {
 	 * @throws SQLException
 	 */
 	IndividualBean getIndividual(int inId) throws SQLException;
+
+	/**
+	 * 
+	 * @param t
+	 * @throws SQLException
+	 */
+	void updateIndividual(IndividualBean t) throws SQLException;
 
 	/**
 	 * returns bean representation of an OWL property from connection or

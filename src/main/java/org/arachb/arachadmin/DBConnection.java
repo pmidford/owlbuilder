@@ -164,6 +164,9 @@ public class DBConnection implements AbstractConnection{
 			"SELECT i.id, i.source_id, i.generated_id, i.label, i.term " +
 			"FROM individual AS i";
 	
+	static final String INDIVIDUALUPDATESTATEMENT =
+			"UPDATE individual SET generated_id = ? WHERE id = ?";
+	
 	static final String PROPERTYROWQUERY = 
 			"SELECT p.id, p.source_id, p.authority, p.label, p.generated_id, p.comment " +
 			"FROM property AS p WHERE p.id = ?";
@@ -380,21 +383,6 @@ public class DBConnection implements AbstractConnection{
 	}
 
 	
-	public void updateTerm(TermBean t) throws SQLException{
-		PreparedStatement updateStatement = 
-				c.prepareStatement(TERMUPDATESTATEMENT);
-		try{
-			updateStatement.setString(1, t.getGeneratedId());  //getIRI_String() is wrong - 
-			updateStatement.setInt(2, t.getId());
-			int count = updateStatement.executeUpdate();
-			if (count != 1){
-				logger.error("entity update failed; row count = " + count);
-			}
-		}
-		finally{
-			updateStatement.close();
-		}
-	}
 
 
 	public ClaimBean getClaim(int id) throws Exception{
@@ -578,6 +566,24 @@ public class DBConnection implements AbstractConnection{
 			}
 		}
 	}
+	
+	public void updateIndividual(IndividualBean ib) throws SQLException{
+		PreparedStatement updateStatement = 
+				c.prepareStatement(INDIVIDUALUPDATESTATEMENT);
+		try{
+		updateStatement.setString(1, ib.getGeneratedId());  //getIRI_String() is wrong - 
+		updateStatement.setInt(2,ib.getId());
+		int count = updateStatement.executeUpdate();
+		if (count != 1){
+			logger.error("individual update failed; row count = " + count);
+		}
+		}
+		finally{
+			updateStatement.close();
+		}
+	}
+
+	
 	
 	public PropertyBean getProperty(int id) throws Exception{
 		if (PropertyBean.isCached(id)){

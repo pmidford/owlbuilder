@@ -462,17 +462,6 @@ public class MockConnection implements AbstractConnection {
 		}
 	}		
 	
-	@Override
-	public void updateTerm(TermBean t){
-		switch (t.getId()){
-		case 1:
-			mockTermResults.setString(TermBean.DBGENERATEDID, t.getGeneratedId());
-			break;
-		default:
-			mockTermResults2.setString(TermBean.DBGENERATEDID, t.getGeneratedId());
-		}
-		
-	}
 	
 	@Override
 	public void updateTaxon(TaxonBean t){
@@ -500,6 +489,21 @@ public class MockConnection implements AbstractConnection {
 		}
 		return result;
 	}
+	
+	@Override
+	public void updateIndividual(IndividualBean ib){
+		switch (ib.getId()){
+		case 94:
+			mockIndividualResults.setString(PublicationBean.DBGENERATEDID, ib.getGeneratedId());
+			break;
+		case 95:
+			mockPublicationResults2.setString(PublicationBean.DBGENERATEDID, ib.getGeneratedId());
+			break;
+		default:
+			throw new IllegalStateException("mock Individual Bean has unknown id");
+		}
+	}		
+
 
 	@Override
 	public int scanPrivateIDs(){
