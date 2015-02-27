@@ -2,6 +2,7 @@ package org.arachb.arachadmin;
 
 import static org.junit.Assert.*;
 
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -50,8 +51,9 @@ public class TestPElementBean {
 	}
 
 	@Test
-	public void testFillIndividual() {
-		fail("Not yet implemented"); // TODO
+	public void testFillIndividual() throws SQLException {
+		IndividualBean i1 = testConnection.getIndividual(94);
+		assertEquals(i1, testElement.getIndividual());
 	}
 
 	@Test
