@@ -3,6 +3,9 @@ package org.arachb.arachadmin;
 import java.sql.SQLException;
 
 import org.apache.log4j.Logger;
+import org.arachb.owlbuilder.Owlbuilder;
+import org.arachb.owlbuilder.lib.AbstractNamedEntity;
+import org.semanticweb.owlapi.model.OWLObject;
 
 
 /**
@@ -10,7 +13,7 @@ import org.apache.log4j.Logger;
  * @author pmidford
  *
  */
-public class IndividualBean extends CachingBean {
+public class IndividualBean extends CachingBean implements AbstractNamedEntity{
 	
 	static final int DBID = 1;
 	static final int DBSOURCEID = 2;
@@ -57,6 +60,31 @@ public class IndividualBean extends CachingBean {
 
 	public int getTerm(){
 		return term;
+	}
+
+
+	@Override
+	public void setGeneratedId(String id) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public String getIriString() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Object checkIriString() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void updateDB(AbstractConnection c) throws SQLException {
+		// TODO Auto-generated method stub
+		
 	}
 
 }
