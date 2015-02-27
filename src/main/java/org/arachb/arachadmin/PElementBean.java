@@ -1,7 +1,9 @@
 package org.arachb.arachadmin;
 
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 
@@ -24,8 +26,8 @@ public class PElementBean implements BeanBase {
 	private int id;
 	private int eletype;
 	private int participant;
-	final private Set<Plink> parentLinks = new HashSet<Plink>();
-	final private Set<Plink> childLinks = new HashSet<Plink>();
+	final private Map<Integer,Plink> parentLinks = new HashMap<Integer,Plink>();
+	final private Map<Integer,Plink> childLinks = new HashMap<Integer,Plink>();
 	
 	private ParticipantBean part = null;
 	private IndividualBean individual = null;
@@ -78,58 +80,76 @@ public class PElementBean implements BeanBase {
 	}
 
 	
-	public void fillParents(AbstractResults parentResults) throws Exception{		
+	public void fillParents(AbstractResults parentResults, AbstractConnection c) throws Exception{		
 		while (parentResults.next()){
-			int parentid = parentResults.getInt(DBPARENTID);
-			int propertyid = parentResults.getInt(DBCHILDID);
-			Plink r = new Plink();
-			r.element_id = parentid;
-			r.property_id = propertyid;
-			r.element = null;
-			parentLinks.add(r);
+			Plink pl = new Plink();
+			pl.element_id = parentResults.getInt(DBPARENTID);
+			pl.property_id = parentResults.getInt(DBPARENTPROPERTY);
+			parentLinks.put(pl.element_id,pl);
 		}
 	}
 
-	public void fillChildren(AbstractResults childrenResults) throws Exception{
+
+	public void fillChildren(AbstractResults childrenResults, AbstractConnection c) throws Exception{
 		while (childrenResults.next()){
-			int childid = childrenResults.getInt(DBCHILDID);
-			int propertyid = childrenResults.getInt(DBCHILDID);
-			Plink r = new Plink();
-			r.element_id = childid;
-			r.property_id = propertyid;
-			r.element = null;
-			childLinks.add(r);
-			
+			Plink pl = new Plink();
+			pl.element_id = childrenResults.getInt(DBCHILDID);
+			pl.property_id = childrenResults.getInt(DBCHILDPROPERTY);
+			childLinks.put(pl.element_id, pl);			
 		}
-		
-	}
-
-	public Set<Integer[]> getParents(){
-		Set<Integer[]> result = new HashSet<Integer[]>();
-		for (Plink pl: parentLinks){
-			Integer[] l = new Integer[2];
-			l[0] = pl.element_id;
-			l[1] = pl.property_id;
-			result.add(l);
-		}
-		return result;
 	}
 	
 
-	public Set<Integer[]> getChildren(){
-		Set<Integer[]> result = new HashSet<Integer[]>();
-		for (Plink pl: childLinks){
-			Integer[] l = new Integer[2];
-			l[0] = pl.element_id;
-			l[1] = pl.property_id;
-			result.add(l);
+	public void resolveParents(AbstractConnection c) throws Exception{
+		resolveDependents(c, parentLinks);
+	}
+	
+	public void resolveChildren (AbstractConnection c) throws Exception{
+		resolveDependents(c, childLinks);
+	}
+	
+	private void resolveDependents(AbstractConnection c, Map<Integer, Plink> links) throws Exception{
+		for (Plink pl : links.values()){
+			pl.element = c.getPElement(pl.element_id);
+			pl.property = c.getProperty(pl.property_id);
 		}
-		return result;
+	}
+
+
+
+	public Set<Integer> getParents(){
+		return parentLinks.keySet();
+	}
+	
+
+	public Set<Integer> getChildren(){
+		return childLinks.keySet();
+	}
+	
+	public PElementBean getChildElement(int index){
+		return childLinks.get(index).getElement();
+	}
+
+
+	public PropertyBean getChildProperty(int index){
+		return childLinks.get(index).getProperty();
 	}
 
 	static private class Plink{
-		int element_id;
-		int property_id;
-		PElementBean element;
+		private int property_id;
+		private int element_id;
+		private PropertyBean property;
+		private PElementBean element;		
+		
+		public PropertyBean getProperty() {
+			return property;
+		}
+		
+		public PElementBean getElement() {
+			return element;
+		}
 	}
+	
+	
+	
 }
