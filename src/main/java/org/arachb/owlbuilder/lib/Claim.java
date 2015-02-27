@@ -20,7 +20,7 @@ import org.semanticweb.owlapi.model.OWLObjectPropertyAssertionAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 
-public class Claim implements AbstractNamedEntity {
+public class Claim implements GeneratingEntity {
 	
 	private final ClaimBean bean;
 
@@ -42,47 +42,9 @@ public class Claim implements AbstractNamedEntity {
 	}
 
 
-	@Override
-	public int getId() {
-		return bean.getId();
-	}
-
-	@Override
-	public void setGeneratedId(String id) {
-		// TODO Auto-generated method stub
-
-	}
-
 	
-	final static String NOASSERTIONGENID = "Assertion has no generated id; db id = %s";
-
-	@Override
-	public String getIriString(){
-		final String genId = bean.getGeneratedId();
-		if (genId == null){
-			final String msg = String.format(NOASSERTIONGENID, bean.getId());
-			throw new IllegalStateException(msg);
-		}
-		return genId;
-	}
-
-	//this seems a little dubious
-	@Override
-	public String checkIriString(){
-		return bean.getGeneratedId();
-	}
-
-	@Override
-	public String getGeneratedId() {
-		return bean.getGeneratedId();
-	}
 
 
-	@Override
-	public void updateDB(AbstractConnection c) throws SQLException {
-		// TODO Auto-generated method stub
-
-	}
 
 	@Override
 	public OWLObject generateOWL(Owlbuilder builder) throws Exception{		
@@ -91,7 +53,7 @@ public class Claim implements AbstractNamedEntity {
 		OWLOntologyManager manager = builder.getOntologyManager();
 		final OWLDataFactory factory = builder.getDataFactory();
 		final OWLObjectProperty partofProperty = factory.getOWLObjectProperty(IRIManager.partOfProperty);
-		final OWLIndividual claim_ind = factory.getOWLNamedIndividual(IRI.create(getIriString()));
+		final OWLIndividual claim_ind = factory.getOWLNamedIndividual(IRI.create(bean.getIriString()));
 		OWLClass behaviorClass = factory.getOWLClass(IRI.create(bean.getBehaviorIri()));
 		builder.initializeMiscTermAndParents(behaviorClass);
 		final Set<Participant> participants = 
@@ -162,5 +124,9 @@ public class Claim implements AbstractNamedEntity {
 		
 	}
 
+	
+	public void validateIRI(IRIManager manager) throws SQLException{
+		manager.validateIRI(bean);
+	}
 
 }

@@ -3,9 +3,11 @@ package org.arachb.arachadmin;
 import java.sql.SQLException;
 
 import org.apache.log4j.Logger;
+import org.arachb.owlbuilder.lib.AbstractNamedEntity;
+import org.arachb.owlbuilder.lib.IRIManager;
 import org.arachb.owlbuilder.lib.Publication;
 
-public class ClaimBean implements BeanBase{
+public class ClaimBean implements AbstractNamedEntity,BeanBase{
 	
 	final static int DBID = 1;
 	final static int DBPUBLICATION = 2;
@@ -65,7 +67,7 @@ public class ClaimBean implements BeanBase{
 	
 	private void updatePublicationIRI(AbstractResults record) throws Exception{
 		if (record.getString(DBPUBDOI) != null){
-			this.setPublicationIri(Publication.cleanupDoi(record.getString(DBPUBDOI)));
+			this.setPublicationIri(IRIManager.cleanupDoi(record.getString(DBPUBDOI)));
 		}
 		else if (record.getString(DBPUBGENERATEDID) != null){
 			this.setPublicationIri(record.getString(DBPUBGENERATEDID));
@@ -157,4 +159,27 @@ public class ClaimBean implements BeanBase{
 	public String getBehaviorIri(){
 		return behaviorIRI;
 	}
+	
+	
+	final static String NOASSERTIONGENID = "Assertion has no generated id; db id = %s";
+
+	@Override
+	public String getIriString(){
+		final String genId = getGeneratedId();
+		if (genId == null){
+			final String msg = String.format(NOASSERTIONGENID, getId());
+			throw new IllegalStateException(msg);
+		}
+		return genId;
+	}
+
+	@Override
+	public Object checkIriString() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	
+	
+	
 }
