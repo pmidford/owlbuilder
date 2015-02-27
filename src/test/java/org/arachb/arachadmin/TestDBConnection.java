@@ -72,8 +72,15 @@ public class TestDBConnection {
 		TermBean testTerm = testConnection.getTerm(1);
 		assertNotNull(testTerm);
         assertEquals(1,testTerm.getId());
-		testTerm.setGeneratedId(testID);
-		testConnection.updateTerm(testTerm);
+	}
+	
+	@Test
+	public void testgetIndividual() throws SQLException{
+		IndividualBean testIndividual = testConnection.getIndividual(94);
+		assertNotNull(testIndividual);
+		assertEquals(1,testIndividual.getId());
+		testIndividual.setGeneratedId(testID);
+		testConnection.updateIndividual(testIndividual);
 	}
 	
 	@Test
