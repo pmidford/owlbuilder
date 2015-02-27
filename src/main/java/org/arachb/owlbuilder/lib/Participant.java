@@ -11,6 +11,7 @@ import org.arachb.arachadmin.AbstractConnection;
 import org.arachb.arachadmin.IndividualBean;
 import org.arachb.arachadmin.PElementBean;
 import org.arachb.arachadmin.ParticipantBean;
+import org.arachb.arachadmin.PropertyBean;
 import org.arachb.arachadmin.TermBean;
 import org.arachb.owlbuilder.Owlbuilder;
 import org.semanticweb.owlapi.model.IRI;
@@ -31,7 +32,7 @@ import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.reasoner.NodeSet;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 
-public class Participant implements AbstractNamedEntity{
+public class Participant implements GeneratingEntity{
 
 
 
@@ -52,6 +53,7 @@ public class Participant implements AbstractNamedEntity{
 
 	public Participant(ParticipantBean b){
 		bean = b;
+
 	}
 
 	/**
@@ -68,10 +70,9 @@ public class Participant implements AbstractNamedEntity{
 	@Override	
 	public OWLObject generateOWL(Owlbuilder builder) throws SQLException{
 		final Map<Integer, OWLObject> owlElements = new HashMap<Integer, OWLObject>();
-		bean.traverseElements();  //start of something new
 		PElementBean headBean = bean.getElementBean(bean.getHeadElement());
-		int propIndex = bean.getParticipationProperty();
-		OWLObject headObject = traverseElements(builder, owlElements, headBean, propIndex);
+		PropertyBean propBean= bean.getParticipationBean();
+		OWLObject headObject = traverseElements(builder, owlElements, headBean, propBean);
 		return headObject;  //TODO something else is needed
 
 	}
@@ -79,14 +80,14 @@ public class Participant implements AbstractNamedEntity{
 	private OWLObject traverseElements(Owlbuilder builder, 
 			Map<Integer, OWLObject> owlElements, 
 			PElementBean pe,
-			Integer prop){
+			PropertyBean pb){
 		if (!owlElements.containsKey(pe.getId())){
-			Set<Integer[]>children = pe.getChildren();
-			OWLObject o = generateElementOWL(pe,prop,builder);
+			Set<Integer>children = pe.getChildren();
+			OWLObject o = generateElementOWL(pe,pb,builder);
 			owlElements.put(pe.getId(), o);
-			for (Integer[] child : children) {
-				PElementBean childBean = bean.getElementBean(child[0]);
-				int childProperty = child[1];
+			for (Integer child : children) {
+				PElementBean childBean = pe.getChildElement(child);
+				PropertyBean childProperty = pe.getChildProperty(child);
 				OWLObject childObject = traverseElements(builder,owlElements,childBean,childProperty);
 			}
 		}
@@ -94,16 +95,17 @@ public class Participant implements AbstractNamedEntity{
 	}
 
 	
-	private OWLObject generateElementOWL(PElementBean pe, Integer prop, Owlbuilder builder){
+	private OWLObject generateElementOWL(PElementBean pe, PropertyBean pb, Owlbuilder builder){
 		final OWLDataFactory factory = builder.getDataFactory();
 		if (pe.getTerm() != null){
 			TermBean tb = pe.getTerm();
 			IRI termIRI = IRI.create(tb.getSourceId());
+			OWLClass termClass = factory.getOWLClass(termIRI);
 		}
 		else if (pe.getIndividual() != null){
 			IndividualBean ib = pe.getIndividual();
 			IRI individualIRI = IRI.create(ib.getSourceId());
-			
+			OWLIndividual individualExpression = factory.getOWLNamedIndividual(individualIRI);
 		}
 		else {
 			throw new IllegalStateException("Element is neither term nor individual");
@@ -161,7 +163,7 @@ public class Participant implements AbstractNamedEntity{
 	 */
 	OWLObject generateOWLForIndividual(Owlbuilder builder) throws SQLException {
 		IRIManager iriManager = builder.getIRIManager();
-		iriManager.validateIRI(this);
+		validateIRI(iriManager);
 		final OWLDataFactory factory = builder.getDataFactory();
 		final OWLIndividual ind = factory.getOWLNamedIndividual(IRI.create(getIriString()));
 		log.info("individual is " + ind);
@@ -658,6 +660,10 @@ public class Participant implements AbstractNamedEntity{
 		return bean.getAnatomyIri();
 	}
 
+	public void validateIRI(IRIManager manager) throws SQLException{
+		manager.validateIRI(bean);
+	}
+	
 	public String getGeneratedId(){
 		return bean.getGeneratedId();
 	}
@@ -671,20 +677,6 @@ public class Participant implements AbstractNamedEntity{
 			throw new IllegalStateException("Individual has neither assigned nor generated id");
 		}
 		return getGeneratedId();
-	}
-
-
-	@Override
-	public Object checkIriString() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-
-	@Override
-	public void updateDB(AbstractConnection c) throws SQLException {
-		// TODO Auto-generated method stub
-		
 	}
 
 
