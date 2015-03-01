@@ -19,8 +19,12 @@ public class TestDBConnection {
     private final static String testID = "http://arachb.org/arachb/ARACHB_0000001";
     private final static String testGenID = "http://arachb.org/arachb/ARACHB_0000099";
     private final static String testTaxon = "http://purl.obolibrary.org/obo/NCBITaxon_336608";
+    private final static int TESTPUBTAXONDBID = 4838;
     private final static String testPubTaxon = "Tetragnatha straminea";
     private final static String testAnatomy = "http://purl.obolibrary.org/obo/SPD_0000001";
+    
+    private final static int TESTPUBANATOMYID = 10473;
+
     
 	@Before
 	public void setup() throws Exception {
@@ -69,16 +73,16 @@ public class TestDBConnection {
 	
 	@Test 
 	public void testgetTerm() throws SQLException{
-		TermBean testTerm = testConnection.getTerm(1);
+		TermBean testTerm = testConnection.getTerm(TESTPUBTAXONDBID);
 		assertNotNull(testTerm);
-        assertEquals(1,testTerm.getId());
+        assertEquals(TESTPUBTAXONDBID,testTerm.getId());
 	}
 	
 	@Test
 	public void testgetIndividual() throws SQLException{
 		IndividualBean testIndividual = testConnection.getIndividual(94);
 		assertNotNull(testIndividual);
-		assertEquals(1,testIndividual.getId());
+		assertEquals(94,testIndividual.getId());
 		testIndividual.setGeneratedId(testID);
 		testConnection.updateIndividual(testIndividual);
 	}
