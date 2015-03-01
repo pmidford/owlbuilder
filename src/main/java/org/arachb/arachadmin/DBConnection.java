@@ -113,7 +113,7 @@ public class DBConnection implements AbstractConnection{
 
 	static final String PELEMENTCHILDRENQUERY =
 			"SELECT link.child,link.property FROM participant_link as link " +
-			        "WHERE link.child = ?";
+			        "WHERE link.parent = ?";
 	
 	
 	static final String CLAIMROWQUERY =

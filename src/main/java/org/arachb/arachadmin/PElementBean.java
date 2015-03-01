@@ -126,12 +126,12 @@ public class PElementBean implements BeanBase {
 		return childLinks.keySet();
 	}
 	
-	public PElementBean getChildElement(int index){
+	public PElementBean getChildElement(Integer index){
 		return childLinks.get(index).getElement();
 	}
 
 
-	public PropertyBean getChildProperty(int index){
+	public PropertyBean getChildProperty(Integer index){
 		return childLinks.get(index).getProperty();
 	}
 

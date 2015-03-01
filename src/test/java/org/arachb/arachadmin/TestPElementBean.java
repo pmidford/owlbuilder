@@ -21,6 +21,7 @@ public class TestPElementBean {
     private int TESTCLAIMID = 1;
     private ClaimBean testClaim;
     private PElementBean testElement;
+    private PElementBean testElement2;
 	
 	@Before
 	public void setUp() throws Exception {
@@ -34,6 +35,7 @@ public class TestPElementBean {
 		}
 		testClaim = testConnection.getClaim(TESTCLAIMID);
 		testElement = testConnection.getPElement(1);
+		testElement2 = testConnection.getPElement(61);
 	}
 
 
@@ -42,28 +44,51 @@ public class TestPElementBean {
 		assertEquals(1, testElement.getId());
 		assertEquals(1, testElement.getType());
 		assertEquals(1, testElement.getParticipant());
+		assertEquals(61, testElement2.getId());
+		assertEquals(3, testElement2.getType());
+		assertEquals(29, testElement2.getParticipant());
 	}
 
 	@Test
 	public void testFillTerm() throws Exception{
-		TermBean t1 = testConnection.getTerm(4838);
-		assertEquals(t1, testElement.getTerm());
+		final TermBean t1 = testConnection.getTerm(4838);
+		testConnection.fillPElementTerm(testElement);
+		TermBean tx = testElement.getTerm();
+		assertNotNull(tx);
+		assertEquals(t1, tx);
+		testConnection.fillPElementTerm(testElement2);
+		assertNull(testElement2.getTerm());
 	}
 
 	@Test
-	public void testFillIndividual() throws SQLException {
-		IndividualBean i1 = testConnection.getIndividual(94);
-		assertEquals(i1, testElement.getIndividual());
+	public void testFillIndividual() throws Exception {
+		final IndividualBean i1 = testConnection.getIndividual(94);
+		testConnection.fillPElementIndividual(testElement2);
+		IndividualBean ix = testElement2.getIndividual();
+		assertNotNull(ix);
+		assertEquals(i1, ix);
+		testConnection.fillPElementIndividual(testElement);
+		assertNull(testElement.getIndividual());
 	}
 
 	@Test
-	public void testFillParents() {
-		fail("Not yet implemented"); // TODO
+	public void testFillParents() throws Exception{
+		testConnection.fillPElementParents(testElement);
+		Set<Integer> parentset = testElement.getParents();
+		assertEquals(1, parentset.size());
+		testConnection.fillPElementParents(testElement2);
+		Set<Integer> parentset2 = testElement2.getParents();
+		assertEquals(1, parentset2.size());
 	}
 
 	@Test
-	public void testFillChildren() {
-		fail("Not yet implemented"); // TODO
+	public void testFillChildren() throws Exception{
+		testConnection.fillPElementChildren(testElement);
+		Set<Integer> childset = testElement.getChildren();
+		assertEquals(0, childset.size());
+		testConnection.fillPElementChildren(testElement2);
+		Set<Integer> childset2 = testElement2.getChildren();
+		assertEquals(0, childset2.size());
 	}
 
 	@Test
