@@ -6,7 +6,7 @@ import org.arachb.arachadmin.AbstractConnection;
 
 
 
-public interface AbstractNamedEntity extends AbstractEntity{
+public interface AbstractNamedEntity {
 		
 	public void setGeneratedId(String id);
 		
