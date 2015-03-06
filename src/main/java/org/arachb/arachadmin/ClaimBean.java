@@ -3,11 +3,10 @@ package org.arachb.arachadmin;
 import java.sql.SQLException;
 
 import org.apache.log4j.Logger;
-import org.arachb.owlbuilder.lib.AbstractNamedEntity;
 import org.arachb.owlbuilder.lib.IRIManager;
 import org.arachb.owlbuilder.lib.Publication;
 
-public class ClaimBean implements AbstractNamedEntity,BeanBase{
+public class ClaimBean implements BeanWithIRI{
 	
 	final static int DBID = 1;
 	final static int DBPUBLICATION = 2;

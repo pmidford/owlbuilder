@@ -4,8 +4,6 @@ import java.sql.SQLException;
 import java.util.Map;
 import java.util.Set;
 
-import org.arachb.owlbuilder.lib.AbstractNamedEntity;
-
 
 
 public interface AbstractConnection {
@@ -147,7 +145,7 @@ public interface AbstractConnection {
 	 * @param e
 	 * @throws SQLException
 	 */
-	void updateNamedEntity(AbstractNamedEntity e) throws SQLException;
+	void updateNamedEntity(BeanWithIRI b) throws SQLException;
 
 	/**
 	 * returns representation of a single claim

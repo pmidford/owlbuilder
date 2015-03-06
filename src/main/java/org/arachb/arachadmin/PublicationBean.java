@@ -2,12 +2,11 @@ package org.arachb.arachadmin;
 
 import java.sql.SQLException;
 
-import org.arachb.owlbuilder.lib.AbstractNamedEntity;
 import org.arachb.owlbuilder.lib.IRIManager;
 
 
 
-public class PublicationBean implements BeanBase,AbstractNamedEntity{
+public class PublicationBean implements BeanWithIRI{
 
 
 	static final int DBID = 1;

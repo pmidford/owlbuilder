@@ -7,14 +7,13 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.arachb.owlbuilder.Owlbuilder;
-import org.arachb.owlbuilder.lib.AbstractNamedEntity;
 import org.semanticweb.owlapi.model.OWLAnnotationAssertionAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 
-public class ParticipantBean implements BeanBase, AbstractNamedEntity{
+public class ParticipantBean implements BeanWithIRI{
 
 	
 
@@ -167,8 +166,9 @@ public class ParticipantBean implements BeanBase, AbstractNamedEntity{
 	}
 
 	public void resolveElements(AbstractConnection c) throws Exception{
-		assert elements.size() > 0;
-		assert elements.containsKey(getHeadElement());
+		assert elements.size() > 0 : "Participant: " + this.id + " has no elements";
+		log.info("      pb: " + this.getId() + " element count: " + elements.size());
+		assert elements.containsKey(getHeadElement()) : "Participant: " + this.id + " has unregistered head element: " + getHeadElement();
 		headBean = c.getPElement(getHeadElement());
 		propertyBean = c.getProperty(getProperty());
 		assert headBean != null;

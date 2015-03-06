@@ -6,7 +6,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.arachb.owlbuilder.lib.AbstractNamedEntity;
 
 
 
@@ -428,8 +427,8 @@ public class MockConnection implements AbstractConnection {
 
 	// Sort of ugly (do better somehow?)
 	@Override
-	public void updateNamedEntity(AbstractNamedEntity e) throws SQLException{
-		e.updateDB(this);
+	public void updateNamedEntity(BeanWithIRI b) throws SQLException{
+		b.updateDB(this);
 	}
 	
 	@Override

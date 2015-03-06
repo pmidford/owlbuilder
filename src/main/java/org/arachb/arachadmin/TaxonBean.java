@@ -2,11 +2,7 @@ package org.arachb.arachadmin;
 
 import java.sql.SQLException;
 
-import org.arachb.owlbuilder.Owlbuilder;
-import org.arachb.owlbuilder.lib.AbstractNamedEntity;
-import org.semanticweb.owlapi.model.OWLObject;
-
-public class TaxonBean implements AbstractNamedEntity{
+public class TaxonBean implements BeanWithIRI{
 	
 	final static String BADPARENTIRI =
 			"Taxon without IRI referenced as parent of taxon: taxon id = %s; parent id = %s";

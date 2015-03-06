@@ -8,6 +8,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.arachb.arachadmin.AbstractConnection;
+import org.arachb.arachadmin.BeanWithIRI;
 import org.semanticweb.owlapi.model.IRI;
 
 public class IRIManager {
@@ -66,13 +67,13 @@ public class IRIManager {
 		return IRI.create(ncbiprefix+ncbiID);
 	}
 	
-	public void validateIRI(AbstractNamedEntity e) throws SQLException{
-		if (e.checkIriString() != null)
+	public void validateIRI(BeanWithIRI b) throws SQLException{
+		if (b.checkIriString() != null)
 			return;
 		//need to generate
 		String newIRI = generateARACHB_IRI_String();
-		e.setGeneratedId(newIRI);
-		c.updateNamedEntity(e);			
+		b.setGeneratedId(newIRI);
+		c.updateNamedEntity(b);			
 			
 	}
 	

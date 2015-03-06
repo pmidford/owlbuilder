@@ -3,9 +3,6 @@ package org.arachb.arachadmin;
 import java.sql.SQLException;
 
 import org.apache.log4j.Logger;
-import org.arachb.owlbuilder.Owlbuilder;
-import org.arachb.owlbuilder.lib.AbstractNamedEntity;
-import org.semanticweb.owlapi.model.OWLObject;
 
 
 /**
@@ -13,7 +10,7 @@ import org.semanticweb.owlapi.model.OWLObject;
  * @author pmidford
  *
  */
-public class IndividualBean extends CachingBean implements AbstractNamedEntity{
+public class IndividualBean extends CachingBean implements BeanWithIRI{
 	
 	static final int DBID = 1;
 	static final int DBSOURCEID = 2;
