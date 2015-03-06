@@ -16,7 +16,6 @@ import java.util.Properties;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.arachb.owlbuilder.lib.AbstractNamedEntity;
 import org.arachb.owlbuilder.lib.IRIManager;
 
 
@@ -452,6 +451,9 @@ public class DBConnection implements AbstractConnection{
 			while (participantSet.next()){
 				ParticipantBean p = new ParticipantBean();
 				p.fill(participantSet);
+				log.info("Initializing ParticipantBean: " + p.getId());
+				p.loadElements(this);
+				log.info("Resolving Elements for ParticipantBean: " + p.getId());
 				p.resolveElements(this);
 				result.add(p);
 			}
@@ -463,8 +465,8 @@ public class DBConnection implements AbstractConnection{
 	}
 
 	@Override
-	public void updateNamedEntity(AbstractNamedEntity e) throws SQLException{
-		e.updateDB(this);
+	public void updateNamedEntity(BeanWithIRI b) throws SQLException{
+		b.updateDB(this);
 	}
 	
 	public void updateParticipant(ParticipantBean b) throws SQLException{
