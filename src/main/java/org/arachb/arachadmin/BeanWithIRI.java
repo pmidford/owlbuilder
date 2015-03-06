@@ -1,12 +1,11 @@
-package org.arachb.owlbuilder.lib;
+package org.arachb.arachadmin;
 
 import java.sql.SQLException;
 
-import org.arachb.arachadmin.AbstractConnection;
 
 
 
-public interface AbstractNamedEntity {
+public interface BeanWithIRI extends BeanBase {
 		
 	public void setGeneratedId(String id);
 		
