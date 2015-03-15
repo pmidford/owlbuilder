@@ -56,12 +56,24 @@ public class TestParticipantBean {
 		Set<ParticipantBean> pbs = testConnection.getParticipants(testClaim);
 		assertEquals(1, pbs.size());
 		for (ParticipantBean pb : pbs){
-			log.info("What is this: " + pb.getElementBean(1));
 			assertNull(pb.getElementBean(1));
 			pb.loadElements(testConnection);
 			assertNotNull(pb.getElementBean(1));
 		}
 	}
 
+	//TODO add testing for individual participants
+	@Test
+	public void testresolveElements() throws Exception {
+		Set<ParticipantBean> pbs = testConnection.getParticipants(testClaim);
+		assertEquals(1, pbs.size());
+		for (ParticipantBean pb : pbs){
+			assertNull(pb.getElementBean(1));
+			pb.loadElements(testConnection);
+			assertNotNull(pb.getElementBean(1));
+			pb.resolveElements(testConnection);
+			assertNotNull(pb.getElementBean(1).getTerm());
+		}
+	}
 
 }

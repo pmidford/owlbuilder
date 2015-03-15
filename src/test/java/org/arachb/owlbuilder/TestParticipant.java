@@ -1,5 +1,7 @@
 package org.arachb.owlbuilder;
 
+import static org.junit.Assert.assertNotNull;
+
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -54,7 +56,7 @@ public class TestParticipant {
 			pb.resolveElements(testConnection);
 			Participant p = new Participant(pb);
 			OWLObject o = p.generateOWL(builder);
-			//assertNotNull(o);
+			assertNotNull(o);
 		}
 	}
 

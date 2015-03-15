@@ -52,7 +52,7 @@ public class TestDBConnection {
 	public void testgetPublications() throws SQLException{
 		Set<PublicationBean> testSet = testConnection.getPublications();
 		assertNotNull(testSet);
-		assertEquals(3,testSet.size());
+		assertEquals(4,testSet.size());
 	}
 
 	@Test
@@ -91,7 +91,7 @@ public class TestDBConnection {
 	public void testgetTerms() throws SQLException{
 		Set<TermBean> testSet = testConnection.getTerms();
 		assertNotNull(testSet);
-		assertEquals(3,testSet.size());
+		assertEquals(4,testSet.size());
 	}
 
 

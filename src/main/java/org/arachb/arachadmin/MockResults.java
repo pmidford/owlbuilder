@@ -2,7 +2,9 @@ package org.arachb.arachadmin;
 
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 
 public class MockResults implements AbstractResults {
@@ -10,6 +12,7 @@ public class MockResults implements AbstractResults {
 	private final Map<Integer,Integer> intResults = new HashMap<Integer,Integer>();
 	private final Map<Integer,String> stringResults = new HashMap<Integer,String>();
 	private final Map<Integer,Boolean> booleanResults = new HashMap<Integer,Boolean>();
+	private final Set<Integer> nullFields = new HashSet<Integer>();
 	private int count = 0;
 	private int size = 0;
 	
@@ -17,6 +20,9 @@ public class MockResults implements AbstractResults {
 	public int getInt(int field) throws SQLException {
 		if (intResults.containsKey(field)){
 			return intResults.get(field);
+		}
+		else if (nullFields.contains(field)){
+			return 0;
 		}
 		else {
 			throw new SQLException("Bad integer field in MockResults: " + field);
@@ -54,8 +60,13 @@ public class MockResults implements AbstractResults {
 	}
 	
 	
-	public void setInteger(int f,int i){
-		intResults.put(f, i);
+	public void setInteger(int f,Integer i){
+		if (i != null){
+			intResults.put(f, i);
+		}
+		else {
+			nullFields.add(f);
+		}
 	}
 	
 	public void setString(int f, String s){

@@ -4,9 +4,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import org.arachb.arachadmin.AbstractConnection;
+import org.arachb.arachadmin.IRIManager;
 import org.arachb.arachadmin.MockConnection;
 import org.arachb.arachadmin.TermBean;
-import org.arachb.owlbuilder.lib.IRIManager;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -21,7 +21,7 @@ public class TestIRIManager {
 	@Before
 	public void setup() throws Exception {
 		c = new MockConnection();
-		t = c.getTerm(1);
+		t = c.getTerm(4838);
 
 	}
 
