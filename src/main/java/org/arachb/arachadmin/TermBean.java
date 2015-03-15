@@ -3,7 +3,7 @@ package org.arachb.arachadmin;
 import java.sql.SQLException;
 
 
-public class TermBean extends CachingBean{
+public class TermBean extends CachingBean implements UpdateableBean{
 
 
 	static final int DBID = 1;
@@ -40,9 +40,6 @@ public class TermBean extends CachingBean{
 		return id;
 	}
 	
-	public String getIriString(){
-		return source_id;
-	}
 
 
 	
@@ -64,6 +61,45 @@ public class TermBean extends CachingBean{
 	
 	public String getComment(){
 		return comment;
+	}
+
+
+	@Override
+	public void setGeneratedId(String id) {
+		generated_id = id;
+	}
+
+
+	@Override
+	public String getGeneratedId() {
+		return generated_id;
+	}
+
+
+	final static String NOTERMGENID = "Term has no source or generated id; db id = %s";
+
+	@Override
+	public String getIRIString(){
+		final String genId = getGeneratedId();
+		if (genId == null){
+			final String msg = String.format(NOTERMGENID, getId());
+			throw new IllegalStateException(msg);
+		}
+		return genId;
+	}
+
+	@Override
+	public String checkIRIString(IRIManager manager) throws SQLException{
+		if (getGeneratedId() == null){
+			manager.generateIRI(this);
+		}
+		return getGeneratedId();
+	}
+
+
+	@Override
+	public void updateDB(AbstractConnection c) throws SQLException {
+		c.updateTerm(this);
 	}
 	
 	

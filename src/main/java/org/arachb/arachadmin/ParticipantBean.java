@@ -13,7 +13,7 @@ import org.semanticweb.owlapi.model.OWLClassAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 
-public class ParticipantBean implements BeanWithIRI{
+public class ParticipantBean implements UpdateableBean{
 
 	
 
@@ -161,6 +161,10 @@ public class ParticipantBean implements BeanWithIRI{
 		}
 		Set<PElementBean> elementset = c.getPElements(this);
 		for (PElementBean e : elementset){
+			log.info("    loading element" + e);
+			log.info("     id is" + e.getId());
+			log.info("     term is " + e.getTerm());
+			log.info("     individual is " + e.getIndividual());
 			elements.put(e.getId(), e);
 		}
 	}
@@ -174,8 +178,8 @@ public class ParticipantBean implements BeanWithIRI{
 		assert headBean != null;
 		assert propertyBean != null;
 		for (PElementBean element : elements.values()){
-			element.resolveParents(c);
-			element.resolveChildren(c);
+			element.resolveParents(this,c);
+			element.resolveChildren(this,c);
 		}
 	}
 	
@@ -226,16 +230,24 @@ public class ParticipantBean implements BeanWithIRI{
 		
 	}
 
+	final static String NOPARTICGENID = "Participant has no generated id; db id = %s";
+
 	@Override
-	public String getIriString() {
-		// TODO Auto-generated method stub
-		return null;
+	public String getIRIString() {
+		final String genId = getGeneratedId();
+		if (genId == null){
+			final String msg = String.format(NOPARTICGENID, getId());
+			throw new IllegalStateException(msg);
+		}
+		return genId;
 	}
 
 	@Override
-	public Object checkIriString() {
-		// TODO Auto-generated method stub
-		return null;
+	public String checkIRIString(IRIManager manager) throws SQLException{
+		if (getGeneratedId() == null){
+			manager.generateIRI(this);
+		}
+		return getGeneratedId();
 	}
 
 	@Override

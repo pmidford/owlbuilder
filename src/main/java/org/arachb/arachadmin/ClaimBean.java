@@ -3,10 +3,9 @@ package org.arachb.arachadmin;
 import java.sql.SQLException;
 
 import org.apache.log4j.Logger;
-import org.arachb.owlbuilder.lib.IRIManager;
 import org.arachb.owlbuilder.lib.Publication;
 
-public class ClaimBean implements BeanWithIRI{
+public class ClaimBean implements UpdateableBean{  //do all claims need IRI's?
 	
 	final static int DBID = 1;
 	final static int DBPUBLICATION = 2;
@@ -106,9 +105,6 @@ public class ClaimBean implements BeanWithIRI{
 	}
 	
 
-	public void updateDB(AbstractConnection c) throws SQLException{
-		c.updateClaim(this);
-	}
 
 	@Override
 	public int getId(){
@@ -160,25 +156,30 @@ public class ClaimBean implements BeanWithIRI{
 	}
 	
 	
-	final static String NOASSERTIONGENID = "Assertion has no generated id; db id = %s";
+	final static String NOCLAIMGENID = "Claim has no generated id; db id = %s";
 
 	@Override
-	public String getIriString(){
+	public String getIRIString(){
 		final String genId = getGeneratedId();
 		if (genId == null){
-			final String msg = String.format(NOASSERTIONGENID, getId());
+			final String msg = String.format(NOCLAIMGENID, getId());
 			throw new IllegalStateException(msg);
 		}
 		return genId;
 	}
 
 	@Override
-	public Object checkIriString() {
-		// TODO Auto-generated method stub
-		return null;
+	public String checkIRIString(IRIManager manager) throws SQLException{
+		if (getGeneratedId() == null){
+			manager.generateIRI(this);
+		}
+		return getGeneratedId();
 	}
 
-	
+	@Override
+	public void updateDB(AbstractConnection c) throws SQLException{
+		c.updateClaim(this);
+	}
 	
 	
 }

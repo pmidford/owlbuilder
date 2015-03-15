@@ -6,6 +6,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
+
 
 public class PElementBean implements BeanBase {
 	
@@ -33,7 +35,7 @@ public class PElementBean implements BeanBase {
 	private IndividualBean individual = null;
 	private TermBean term;
 	
-	
+	private static Logger log = Logger.getLogger(PElementBean.class);
 	
 	@Override
 	public int getId() {
@@ -64,6 +66,7 @@ public class PElementBean implements BeanBase {
 	@Override
 	public void fill(AbstractResults record) throws Exception {
 		id = record.getInt(DBID);
+		log.info("Filling Element: " + this.toString() + " with id: " + id);
 		eletype = record.getInt(DBTYPE);
 		participant = record.getInt(DBPARTICIPANT);
 	}
@@ -100,17 +103,17 @@ public class PElementBean implements BeanBase {
 	}
 	
 
-	public void resolveParents(AbstractConnection c) throws Exception{
-		resolveDependents(c, parentLinks);
+	public void resolveParents(ParticipantBean pb, AbstractConnection c) throws Exception{
+		resolveDependents(pb, parentLinks, c);
 	}
 	
-	public void resolveChildren (AbstractConnection c) throws Exception{
-		resolveDependents(c, childLinks);
+	public void resolveChildren (ParticipantBean pb, AbstractConnection c) throws Exception{
+		resolveDependents(pb, childLinks,c );
 	}
 	
-	private void resolveDependents(AbstractConnection c, Map<Integer, Plink> links) throws Exception{
+	private void resolveDependents(ParticipantBean participantBean, Map<Integer, Plink> links, AbstractConnection c) throws Exception{
 		for (Plink pl : links.values()){
-			pl.element = c.getPElement(pl.element_id);
+			pl.element = participantBean.getElementBean(pl.element_id);
 			pl.property = c.getProperty(pl.property_id);
 		}
 	}

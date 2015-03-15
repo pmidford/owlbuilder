@@ -2,11 +2,10 @@ package org.arachb.arachadmin;
 
 import java.sql.SQLException;
 
-import org.arachb.owlbuilder.lib.IRIManager;
 
 
 
-public class PublicationBean implements BeanWithIRI{
+public class PublicationBean implements UpdateableBean{
 
 
 	static final int DBID = 1;
@@ -174,7 +173,7 @@ public class PublicationBean implements BeanWithIRI{
 	
 	final static String PUBBADDOIGENID = "Publication has neither doi nor generated id";
 	@Override
-	public String getIriString() {
+	public String getIRIString() {
 		if (getDoi() == null){
 			if (getGeneratedId() == null){
 				throw new IllegalStateException(PUBBADDOIGENID);
@@ -193,10 +192,23 @@ public class PublicationBean implements BeanWithIRI{
 	}
 
 	@Override
-	public Object checkIriString() {
-		// TODO Auto-generated method stub
-		return null;
+	public String checkIRIString(IRIManager manager) throws SQLException {
+		if (getDoi() == null){
+			manager.generateIRI(this);
+			return getGeneratedId();
+		}
+		else {
+			try {
+				return IRIManager.cleanupDoi(getDoi());
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				return "";
+			}
+
+		}
 	}
+
 
 	
 }

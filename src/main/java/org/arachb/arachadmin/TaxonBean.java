@@ -2,7 +2,7 @@ package org.arachb.arachadmin;
 
 import java.sql.SQLException;
 
-public class TaxonBean implements BeanWithIRI{
+public class TaxonBean extends CachingBean implements UpdateableBean{
 	
 	final static String BADPARENTIRI =
 			"Taxon without IRI referenced as parent of taxon: taxon id = %s; parent id = %s";
@@ -74,15 +74,12 @@ public class TaxonBean implements BeanWithIRI{
 	public int getId(){
 		return id;
 	}
-	
-	public String get_available_id(){
-		if (external_id == null){
-			return generated_id;
-		}
-		else {
-			return external_id;
-		}
+
+	//TODO rename this field?
+	public String getSourceId(){
+		return external_id;
 	}
+	
 	
 	public String getName(){
 		return name;
@@ -101,9 +98,6 @@ public class TaxonBean implements BeanWithIRI{
 		return generated_id;
 	}
 	
-	public String getIriString(){
-		return external_id;
-	}
 	
 	//Just updates the id in the bean - method for updating db is in DBConnection
 	public void setGeneratedId(String new_id){
@@ -135,15 +129,34 @@ public class TaxonBean implements BeanWithIRI{
 		c.updateTaxon(this);
 	}
 	
+	final static String PUBBADDOIGENID = "Publication has neither doi nor generated id";
 	
 	@Override
-	public String checkIriString() {
-		if (get_available_id() == null){
-			throw new IllegalStateException("Term has neither assigned nor generated id");
+	public String getIRIString() {
+		if (getSourceId() == null){
+			if (getGeneratedId() == null){
+				throw new IllegalStateException(PUBBADDOIGENID);
+			}
+			return getGeneratedId();
 		}
 		else {
-			return get_available_id();
+			return getSourceId();
 		}
 	}
+	
+	@Override
+	public String checkIRIString(IRIManager manager) throws SQLException{
+		if (getSourceId() == null){
+			if (getGeneratedId() == null){
+				manager.generateIRI(this);
+			}
+			return getGeneratedId();
+		}
+		else {
+			return getSourceId();
+		}
+	}
+
+
 
 }

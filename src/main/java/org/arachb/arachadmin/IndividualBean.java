@@ -10,7 +10,7 @@ import org.apache.log4j.Logger;
  * @author pmidford
  *
  */
-public class IndividualBean extends CachingBean implements BeanWithIRI{
+public class IndividualBean extends CachingBean implements UpdateableBean{
 	
 	static final int DBID = 1;
 	static final int DBSOURCEID = 2;
@@ -62,20 +62,31 @@ public class IndividualBean extends CachingBean implements BeanWithIRI{
 
 	@Override
 	public void setGeneratedId(String id) {
-		// TODO Auto-generated method stub
+		generated_id = id;
 		
 	}
 
+	final static String INDBADDOIGENID = "Individual has neither source id nor generated id";
+
 	@Override
-	public String getIriString() {
-		// TODO Auto-generated method stub
-		return null;
+	public String getIRIString() {
+		if (getSourceId() == null){
+			if (getGeneratedId() == null){
+				throw new IllegalStateException();
+			}
+			return getGeneratedId();
+		}
+		else {
+			return getSourceId();
+		}
 	}
 
 	@Override
-	public Object checkIriString() {
-		// TODO Auto-generated method stub
-		return null;
+	public String checkIRIString(IRIManager manager) throws SQLException{
+		if (getGeneratedId() == null){
+			manager.generateIRI(this);
+		}
+		return getGeneratedId();
 	}
 
 	@Override
