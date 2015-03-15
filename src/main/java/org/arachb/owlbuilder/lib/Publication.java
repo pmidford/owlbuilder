@@ -61,10 +61,8 @@ public class Publication implements GeneratingEntity {
 		final OWLOntologyManager manager = builder.getOntologyManager();
 		final OWLDataFactory factory = builder.getDataFactory();
 		final OWLClass pubAboutInvestigationClass = 
-				factory.getOWLClass(IRIManager.pubAboutInvestigation);
-
-		builder.getIRIManager().validateIRI(bean);
-		IRI publication_id = IRI.create(bean.getIriString());
+				factory.getOWLClass(Vocabulary.pubAboutInvestigation);
+		IRI publication_id = IRI.create(bean.checkIRIString(builder.getIRIManager()));
 		assert(publication_id != null);
 		OWLIndividual pub_ind = factory.getOWLNamedIndividual(publication_id);
 		OWLClassAssertionAxiom classAssertion = 

@@ -16,7 +16,6 @@ import java.util.Properties;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.arachb.owlbuilder.lib.IRIManager;
 
 
 
@@ -381,7 +380,22 @@ public class DBConnection implements AbstractConnection{
 		}
 	}
 
-	
+	public void updateTerm(TermBean t) throws SQLException{
+		PreparedStatement updateStatement = 
+				c.prepareStatement(TERMUPDATESTATEMENT);
+		try{
+			updateStatement.setString(1, t.getGeneratedId());  //getIRI_String() is wrong - 
+			updateStatement.setInt(2, t.getId());
+			int count = updateStatement.executeUpdate();
+			if (count != 1){
+				logger.error("term update failed; row count = " + count);
+			}
+		}
+		finally{
+			updateStatement.close();
+		}
+	}
+
 
 
 	public ClaimBean getClaim(int id) throws Exception{
@@ -448,13 +462,9 @@ public class DBConnection implements AbstractConnection{
 			participantsStatement.setInt(1, assertion_id);
 			final ResultSet r = participantsStatement.executeQuery();
 			final AbstractResults participantSet = new DBResults(r);
-			while (participantSet.next()){
+			while (participantSet.next()){                   //TODO too much going on here, hard to test
 				ParticipantBean p = new ParticipantBean();
 				p.fill(participantSet);
-				log.info("Initializing ParticipantBean: " + p.getId());
-				p.loadElements(this);
-				log.info("Resolving Elements for ParticipantBean: " + p.getId());
-				p.resolveElements(this);
 				result.add(p);
 			}
 			return result;
@@ -465,7 +475,7 @@ public class DBConnection implements AbstractConnection{
 	}
 
 	@Override
-	public void updateNamedEntity(BeanWithIRI b) throws SQLException{
+	public void updateNamedEntity(UpdateableBean b) throws SQLException{
 		b.updateDB(this);
 	}
 	

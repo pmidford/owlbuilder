@@ -8,6 +8,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.arachb.arachadmin.AbstractConnection;
+import org.arachb.arachadmin.IRIManager;
 import org.arachb.arachadmin.IndividualBean;
 import org.arachb.arachadmin.PElementBean;
 import org.arachb.arachadmin.ParticipantBean;
@@ -79,36 +80,53 @@ public class Participant implements GeneratingEntity{
 	
 	private OWLObject traverseElements(Owlbuilder builder, 
 			Map<Integer, OWLObject> owlElements, 
-			PElementBean pe,
-			PropertyBean pb){
-		if (!owlElements.containsKey(pe.getId())){
-			Set<Integer>children = pe.getChildren();
-			OWLObject o = generateElementOWL(pe,pb,builder);
-			owlElements.put(pe.getId(), o);
+			PElementBean headElement,
+			PropertyBean headProperty){
+		if (!owlElements.containsKey(headElement.getId())){
+			Set<Integer>children = headElement.getChildren();
+			OWLObject o = generateElementOWL(headElement,headProperty,builder);
+			owlElements.put(headElement.getId(), o);
 			for (Integer child : children) {
-				PElementBean childBean = pe.getChildElement(child);
-				PropertyBean childProperty = pe.getChildProperty(child);
+				log.info("child = " + child);
+				PElementBean childBean = headElement.getChildElement(child);
+				PropertyBean childProperty = headElement.getChildProperty(child);
 				OWLObject childObject = traverseElements(builder,owlElements,childBean,childProperty);
 			}
 		}
-		return owlElements.get(pe.getId());
+		return owlElements.get(headElement.getId());
 	}
 
 	
 	private OWLObject generateElementOWL(PElementBean pe, PropertyBean pb, Owlbuilder builder){
 		final OWLDataFactory factory = builder.getDataFactory();
+		IRI propertyIRI = IRI.create(pb.getSourceId());
+		OWLObjectProperty elementProperty = factory.getOWLObjectProperty(propertyIRI);
 		if (pe.getTerm() != null){
 			TermBean tb = pe.getTerm();
-			IRI termIRI = IRI.create(tb.getSourceId());
-			OWLClass termClass = factory.getOWLClass(termIRI);
+			IRI termIRI;
+			try {
+				termIRI = IRI.create(tb.checkIRIString(builder.getIRIManager()));
+				OWLClass termClass = factory.getOWLClass(termIRI);
+				return termClass;  //TODO need to say something about this (using the property?)
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		else if (pe.getIndividual() != null){
 			IndividualBean ib = pe.getIndividual();
-			IRI individualIRI = IRI.create(ib.getSourceId());
-			OWLIndividual individualExpression = factory.getOWLNamedIndividual(individualIRI);
+			IRI individualIRI;
+			try {
+				individualIRI = IRI.create(ib.checkIRIString(builder.getIRIManager()));
+				OWLIndividual individualExpression = factory.getOWLNamedIndividual(individualIRI);
+				return individualExpression;   //TODO need to say something about this (using the property?)
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		else {
-			throw new IllegalStateException("Element is neither term nor individual");
+			throw new IllegalStateException("Element " + pe.getId() + " is neither term nor individual");
 		}
 		return null;
 	}
@@ -138,7 +156,7 @@ public class Participant implements GeneratingEntity{
 			if (getAnatomyIri() != null){
 				OWLClass anatomyClass = processParticipantAnatomyForClass(builder,IRI.create(getAnatomyIri()));
 				if (taxonClass != null){
-					OWLObjectProperty partOf = factory.getOWLObjectProperty(IRIManager.partOfProperty);
+					OWLObjectProperty partOf = factory.getOWLObjectProperty(Vocabulary.partOfProperty);
 					OWLClassExpression partOfSomeTaxon = factory.getOWLObjectSomeValuesFrom(partOf,
 							taxonClass);
 					OWLClassExpression anatomyOfTaxon =
@@ -163,7 +181,6 @@ public class Participant implements GeneratingEntity{
 	 */
 	OWLObject generateOWLForIndividual(Owlbuilder builder) throws SQLException {
 		IRIManager iriManager = builder.getIRIManager();
-		validateIRI(iriManager);
 		final OWLDataFactory factory = builder.getDataFactory();
 		final OWLIndividual ind = factory.getOWLNamedIndividual(IRI.create(getIriString()));
 		log.info("individual is " + ind);
@@ -232,7 +249,7 @@ public class Participant implements GeneratingEntity{
 		final OWLDataFactory factory = builder.getDataFactory();
 		OWLOntology target = builder.getTarget();
 		OWLOntologyManager manager = builder.getOntologyManager();
-		final OWLObjectProperty partofProperty = factory.getOWLObjectProperty(IRIManager.partOfProperty);
+		final OWLObjectProperty partofProperty = factory.getOWLObjectProperty(Vocabulary.partOfProperty);
 		{
 			if (bean.getAnatomyIri() != null){
 				final OWLClass anatomyClass =processParticipantAnatomy(builder,IRI.create(bean.getAnatomyIri()));
@@ -660,9 +677,6 @@ public class Participant implements GeneratingEntity{
 		return bean.getAnatomyIri();
 	}
 
-	public void validateIRI(IRIManager manager) throws SQLException{
-		manager.validateIRI(bean);
-	}
 	
 	public String getGeneratedId(){
 		return bean.getGeneratedId();
@@ -679,7 +693,15 @@ public class Participant implements GeneratingEntity{
 		return getGeneratedId();
 	}
 
-
+	
+	public void loadElements(AbstractConnection c) throws Exception{
+		bean.loadElements(c);
+	}
+	
+	
+	public void resolveElements(AbstractConnection c) throws Exception{
+		bean.resolveElements(c);
+	}
 
 
 }

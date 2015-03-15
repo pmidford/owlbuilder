@@ -139,14 +139,21 @@ public interface AbstractConnection {
 	 */
 	Set<TermBean> getTerms() throws SQLException;
 
+	/**
+	 * 
+	 * @param termBean
+	 */
+	void updateTerm(TermBean termBean) throws SQLException;
+
 	
 	/**
 	 * should update the database record corresponding to the entity
 	 * @param e
 	 * @throws SQLException
 	 */
-	void updateNamedEntity(BeanWithIRI b) throws SQLException;
+	void updateNamedEntity(UpdateableBean b) throws SQLException;
 
+	
 	/**
 	 * returns representation of a single claim
 	 * @param claimId
@@ -213,6 +220,7 @@ public interface AbstractConnection {
 	 * @throws Exception
 	 */
 	void fillPElementChildren(PElementBean result) throws Exception;
+
 
 
 }

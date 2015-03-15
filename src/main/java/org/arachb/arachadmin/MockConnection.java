@@ -94,16 +94,6 @@ public class MockConnection implements AbstractConnection {
         mockPublicationResults3.setString(PublicationBean.DBCURATIONUPDATE,"");
 	}
 
-	private static MockResults mockTermResults = new MockResults();
-	static {
-		mockTermResults.setInteger(TermBean.DBID,1);
-		mockTermResults.setString(TermBean.DBSOURCEID,"http://purl.obolibrary.org/obo/NCBITaxon_336608");
-		mockTermResults.setInteger(TermBean.DBDOMAIN,3);
-		mockTermResults.setInteger(TermBean.DBAUTHORITY,1);
-		mockTermResults.setString(TermBean.DBLABEL,"Tetragnatha straminea");
-		mockTermResults.setString(TermBean.DBGENERATEDID,"http://purl.obolibrary.org/obo/NCBITaxon_336608");
-		mockTermResults.setString(TermBean.DBCOMMENT,"");
-	}
 
 	private static MockResults mockTermResults2 = new MockResults();
 	static {
@@ -116,27 +106,39 @@ public class MockConnection implements AbstractConnection {
 		mockTermResults2.setString(TermBean.DBCOMMENT,"");
 	}
 
-	private static MockResults mockTermResults3 = new MockResults();
+	private static MockResults mockTermResults4838 = new MockResults();
 	static {
-		mockTermResults3.setInteger(TermBean.DBID,11398);
-		mockTermResults3.setString(TermBean.DBSOURCEID,"http://purl.obolibrary.org/obo/NBO_0000358");
-		mockTermResults3.setInteger(TermBean.DBDOMAIN,1);
-		mockTermResults3.setInteger(TermBean.DBAUTHORITY,4);
-		mockTermResults3.setString(TermBean.DBLABEL,"resting posture");
-		mockTermResults3.setString(TermBean.DBGENERATEDID,null);
-		mockTermResults3.setString(TermBean.DBCOMMENT,"");
+		mockTermResults4838.setInteger(TermBean.DBID,4838);
+		mockTermResults4838.setString(TermBean.DBSOURCEID,"http://purl.obolibrary.org/obo/NCBITaxon_336608");
+		mockTermResults4838.setInteger(TermBean.DBDOMAIN,3);
+		mockTermResults4838.setInteger(TermBean.DBAUTHORITY,1);
+		mockTermResults4838.setString(TermBean.DBLABEL,"Tetragnatha straminea");
+		mockTermResults4838.setString(TermBean.DBGENERATEDID,"http://purl.obolibrary.org/obo/NCBITaxon_336608");
+		mockTermResults4838.setString(TermBean.DBCOMMENT,"");
+	}
+
+	private static MockResults mockTermResults11398 = new MockResults();
+	static {
+		mockTermResults11398.setInteger(TermBean.DBID,11398);
+		mockTermResults11398.setString(TermBean.DBSOURCEID,"http://purl.obolibrary.org/obo/NBO_0000358");
+		mockTermResults11398.setInteger(TermBean.DBDOMAIN,1);
+		mockTermResults11398.setInteger(TermBean.DBAUTHORITY,4);
+		mockTermResults11398.setString(TermBean.DBLABEL,"resting posture");
+		mockTermResults11398.setString(TermBean.DBGENERATEDID,null);
+		mockTermResults11398.setString(TermBean.DBCOMMENT,"");
 	}
 	
-	private static MockResults mockTermResults4 = new MockResults();
+
+	private static MockResults mockTermResults10473 = new MockResults();
 	static {
-		mockTermResults4.setInteger(TermBean.DBID, 4838);
-
-	}
-
-	private static MockResults mockTermResults5 = new MockResults();
-	static {
-		mockTermResults5.setInteger(TermBean.DBID, 10473);
-
+		mockTermResults10473.setInteger(TermBean.DBID, 10473);
+		mockTermResults10473.setString(TermBean.DBSOURCEID,"http://purl.obolibrary.org/obo/SPD_0000001");
+		mockTermResults10473.setInteger(TermBean.DBDOMAIN,2);
+		mockTermResults10473.setInteger(TermBean.DBAUTHORITY,4);
+		mockTermResults10473.setString(TermBean.DBLABEL,"whole organism");
+		mockTermResults10473.setString(TermBean.DBGENERATEDID,null);
+		mockTermResults10473.setString(TermBean.DBCOMMENT,"");
+		
 	}
 
 
@@ -188,16 +190,22 @@ public class MockConnection implements AbstractConnection {
 		mockTaxonResults2.setInteger(TaxonBean.DBID, 12);
 	}
 	
-	private static MockResults mockIndividualResults = new MockResults();
+	private static MockResults mockIndividualResults94 = new MockResults();
 	static{
-		mockIndividualResults.setInteger(IndividualBean.DBID, 94);
-		mockIndividualResults.setString(IndividualBean.DBLABEL, "female");
+		mockIndividualResults94.setInteger(IndividualBean.DBID, 94);
+		mockIndividualResults94.setString(IndividualBean.DBLABEL, "female");
+		mockIndividualResults94.setString(IndividualBean.DBSOURCEID, null);
+		mockIndividualResults94.setString(IndividualBean.DBGENERATEDID, null);
+		mockIndividualResults94.setInteger(IndividualBean.DBTERM, 111938);
 	}
 
-	private static MockResults mockIndividualResults2 = new MockResults();
+	private static MockResults mockIndividualResults95 = new MockResults();
 	static{
-		mockIndividualResults2.setInteger(IndividualBean.DBID, 95);
-		mockIndividualResults2.setString(IndividualBean.DBLABEL, "whole organism of female");
+		mockIndividualResults95.setInteger(IndividualBean.DBID, 95);
+		mockIndividualResults95.setString(IndividualBean.DBLABEL, "whole organism of female");
+		mockIndividualResults95.setString(IndividualBean.DBSOURCEID, null);
+		mockIndividualResults95.setString(IndividualBean.DBGENERATEDID, null);
+		mockIndividualResults95.setInteger(IndividualBean.DBTERM, 10473);
 	}
 
 
@@ -215,28 +223,14 @@ public class MockConnection implements AbstractConnection {
 		mockPElementResults2.setInteger(PElementBean.DBPARTICIPANT, 1);
 	}
 	
-	private static MockResults mockPElementResults3 = new MockResults();
+	private static MockResults mockPElementResults61 = new MockResults();
 	static{
-		mockPElementResults3.setInteger(PElementBean.DBID, 61);
-		mockPElementResults2.setInteger(PElementBean.DBTYPE, 1);
-		mockPElementResults2.setInteger(PElementBean.DBPARTICIPANT, 29);
+		mockPElementResults61.setInteger(PElementBean.DBID, 61);
+		mockPElementResults61.setInteger(PElementBean.DBTYPE, 3);
+		mockPElementResults61.setInteger(PElementBean.DBPARTICIPANT, 29);
 		
 	}
 	
-	private static MockResults mockPETermResults1 = new MockResults();
-	static{
-		mockPETermResults1.setInteger(PElementBean.DBTERM, 4838);
-	}
-	
-	private static MockResults mockPETermResults2 = new MockResults();
-	static{
-		mockPETermResults2.setInteger(PElementBean.DBTERM, 10473);
-	}
-	
-	private static MockResults mockPEIndividualResults3 = new MockResults();
-	static{
-		mockPEIndividualResults3.setInteger(PElementBean.DBINDIVIDUAL, 94);
-	}
 	
 	private static MockResults mockPEParentResults = new MockResults();
 	static {
@@ -266,6 +260,36 @@ public class MockConnection implements AbstractConnection {
 		mockPropertyResults1.setString(PropertyBean.DBCOMMENT,null);		
 	}
 	
+	private static MockResults termFillResultsNull = new MockResults();
+	static {
+		termFillResultsNull.setInteger(PElementBean.DBTERM, (Integer) null);
+	}
+	
+	private static MockResults termFillResults4838 = new MockResults();
+	static {
+		termFillResults4838.setInteger(PElementBean.DBTERM, 4838);
+	}
+
+	
+	private static MockResults termFillResults10473 = new MockResults();
+	static {
+		termFillResults10473.setInteger(PElementBean.DBTERM, 10473);
+	}
+
+	private static MockResults termFillResults11398 = new MockResults();
+	static {
+		termFillResults11398.setInteger(PElementBean.DBTERM, 11398);
+	}
+
+	private static MockResults individualFillResultsNull = new MockResults();
+	static {
+		individualFillResultsNull.setInteger(PElementBean.DBINDIVIDUAL, (Integer) null);
+	}
+
+	private static MockResults individualFillResults94 = new MockResults();
+	static {
+		individualFillResults94.setInteger(PElementBean.DBINDIVIDUAL, 94);
+	}
 	
 	private static Map<String,String> mockImportSourceMap = new HashMap<String,String>();
 	static{
@@ -291,6 +315,7 @@ public class MockConnection implements AbstractConnection {
 		mockOntologyNamesMap.put("http://purl.obolibrary.org/obo/chebi.owl", "CHEBI");
 		mockOntologyNamesMap.put("http://purl.obolibrary.org/obo/uberon.owl", "Uberon");
 	}
+
 
 	public MockConnection() {
 		// TODO Auto-generated constructor stub
@@ -339,37 +364,61 @@ public class MockConnection implements AbstractConnection {
 		return results;
 	}
 
-
+	private Map <Integer,TermBean> termBeanCache = new HashMap <Integer,TermBean>();
+	
 	@Override
 	public TermBean getTerm(int i) throws SQLException {
-		TermBean result = new TermBean();
-		switch (i){
-		case 1:
-			result.fill(mockTermResults);
-			break;
-		default:
-			result.fill(mockTermResults2);
+		if (termBeanCache.containsKey(i)){
+			return termBeanCache.get(i);
 		}
-		return result;
+		else{
+		TermBean tb = new TermBean();
+			switch (i){
+			case 4838:
+				tb.fill(mockTermResults4838);
+				break;
+			case 2:
+				tb.fill(mockTermResults2);
+				break;
+			case 10473:
+				tb.fill(mockTermResults10473);
+				break;
+			case 11398:
+				tb.fill(mockTermResults11398);
+				break;
+			case 0:
+				tb = null;
+				break;
+			default:
+				throw new RuntimeException("Bad value to getTerm: " + i);
+			}
+			termBeanCache.put(i, tb);
+			return tb;
+		}
 	}
 
 	@Override
 	public Set<TermBean> getTerms() throws SQLException {
 		Set<TermBean> results = new HashSet<TermBean>();
 		TermBean t1 = new TermBean();
-		t1.fill(mockTermResults);
+		t1.fill(mockTermResults4838);
 		results.add(t1);
 		TermBean t2 = new TermBean();
 		t2.fill(mockTermResults2);
 		results.add(t2);
-		TermBean t3 = new TermBean();
-		t3.fill(mockTermResults3);
-		results.add(t3);
+		TermBean t11398 = new TermBean();
+		t11398.fill(mockTermResults11398);
+		results.add(t11398);
 		return results;
 		
 	}
 
-	
+	@Override
+	public void updateTerm(TermBean termBean) throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
 
 	@Override
 	public Set<ParticipantBean> getParticipants(ClaimBean a) throws SQLException {
@@ -427,7 +476,7 @@ public class MockConnection implements AbstractConnection {
 
 	// Sort of ugly (do better somehow?)
 	@Override
-	public void updateNamedEntity(BeanWithIRI b) throws SQLException{
+	public void updateNamedEntity(UpdateableBean b) throws SQLException{
 		b.updateDB(this);
 	}
 	
@@ -477,26 +526,43 @@ public class MockConnection implements AbstractConnection {
 		return mockOntologyNamesMap;
 	}
 	
+	
+	private final Map <Integer,IndividualBean> individualBeanCache = new HashMap<Integer,IndividualBean>();
+	
 	@Override
 	public IndividualBean getIndividual(int id) throws SQLException {
-		IndividualBean result = new IndividualBean();
-		if (id == 1){
-			result.fill(mockIndividualResults);
+		if (individualBeanCache.containsKey(id)){
+			return individualBeanCache.get(id);
 		}
-		else {
-			result.fill(mockIndividualResults2);			
+		else{
+			IndividualBean ib = new IndividualBean();
+			switch (id){
+			case 94:
+				ib.fill(mockIndividualResults94);
+				break;
+
+			case 95: 
+				ib.fill(mockIndividualResults95);
+				break;
+			case 0:
+				ib = null;
+				break;
+			default:
+				throw new IllegalStateException("mock Individual Bean has unknown id: " + id);
+			}
+			individualBeanCache.put(id, ib);
+			return ib;
 		}
-		return result;
-	}
-	
+	}	
+
 	@Override
 	public void updateIndividual(IndividualBean ib){
 		switch (ib.getId()){
 		case 94:
-			mockIndividualResults.setString(PublicationBean.DBGENERATEDID, ib.getGeneratedId());
+			mockIndividualResults94.setString(IndividualBean.DBGENERATEDID, ib.getGeneratedId());
 			break;
 		case 95:
-			mockPublicationResults2.setString(PublicationBean.DBGENERATEDID, ib.getGeneratedId());
+			mockIndividualResults95.setString(IndividualBean.DBGENERATEDID, ib.getGeneratedId());
 			break;
 		default:
 			throw new IllegalStateException("mock Individual Bean has unknown id");
@@ -547,10 +613,20 @@ public class MockConnection implements AbstractConnection {
 			fillPElementChildren(result);
 			break;
 		}
-		default: {
+		case 2:{
 			result.fill(mockPElementResults2);
 			fillPElementParents(result);
 			fillPElementChildren(result);
+			break;
+		}
+		case 61:{
+			result.fill(mockPElementResults61);
+			fillPElementParents(result);
+			fillPElementChildren(result);
+			break;
+		}
+		default :{
+			throw new RuntimeException("Bad id " + id + " to mock getPElement");
 		}
 		}
 		return result;
@@ -592,15 +668,43 @@ public class MockConnection implements AbstractConnection {
 
 	@Override
 	public void fillPElementTerm(PElementBean pb) throws Exception {
-		// TODO Auto-generated method stub
+		switch (pb.getId()){
+		case 1:{
+			pb.fillTerm(termFillResults4838, this);
+			break;
+		}
+		case 2: {
+			pb.fillTerm(termFillResults10473, this);
+			break;
+		}
+		case 61: {
+			pb.fillTerm(termFillResultsNull, this);
+			break;
+		}
+		default:
+			throw new RuntimeException("Bad pelementbean id: " + pb.getId());
+		}
 		
 	}
 
 	@Override
 	public void fillPElementIndividual(PElementBean pb) throws Exception {
+		switch (pb.getId()){
+		case 1:
+		case 2:
+			pb.fillIndividual(individualFillResultsNull, this);
+			break;
+		case 61:{
+			pb.fillIndividual(individualFillResults94, this);
+			break;
+		}
+		default:
+			throw new RuntimeException("Bad pelementbean id: " + pb.getId());
+		}
+	}
 		// TODO Auto-generated method stub
 		
-	}
+
 
 
 

@@ -7,6 +7,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.arachb.arachadmin.AbstractConnection;
 import org.arachb.arachadmin.ClaimBean;
+import org.arachb.arachadmin.IRIManager;
 import org.arachb.owlbuilder.Owlbuilder;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLClass;
@@ -52,12 +53,20 @@ public class Claim implements GeneratingEntity {
 		OWLOntology target = builder.getTarget();
 		OWLOntologyManager manager = builder.getOntologyManager();
 		final OWLDataFactory factory = builder.getDataFactory();
-		final OWLObjectProperty partofProperty = factory.getOWLObjectProperty(IRIManager.partOfProperty);
-		final OWLIndividual claim_ind = factory.getOWLNamedIndividual(IRI.create(bean.getIriString()));
+		final OWLObjectProperty partofProperty = factory.getOWLObjectProperty(Vocabulary.partOfProperty);
+		final OWLIndividual claim_ind = factory.getOWLNamedIndividual(IRI.create(bean.getIRIString()));
 		OWLClass behaviorClass = factory.getOWLClass(IRI.create(bean.getBehaviorIri()));
 		builder.initializeMiscTermAndParents(behaviorClass);
-		final Set<Participant> participants = 
+		final Set<Participant> participants =  
 				Participant.wrapSet(c.getParticipants(bean));
+		// load participant elements
+		for (Participant p : participants){
+			p.loadElements(c);
+		}
+		for (Participant p : participants){
+			p.resolveElements(c);
+		}
+		// should be loading and resolving elements here
 		final Set<OWLObject> owlParticipants = new HashSet<OWLObject>();
 		for (Participant p : participants){
 			OWLObject op = p.generateOWL(builder);
@@ -94,9 +103,9 @@ public class Claim implements GeneratingEntity {
 		OWLOntology target = builder.getTarget();
 		OWLOntologyManager manager = builder.getOntologyManager();
 		final OWLDataFactory factory = builder.getDataFactory();
-		final OWLClass textualEntityClass = factory.getOWLClass(IRIManager.textualEntity);
-		final OWLObjectProperty denotesProp = factory.getOWLObjectProperty(IRIManager.denotesProperty);
-		OWLObjectProperty hasParticipant = factory.getOWLObjectProperty(IRIManager.hasParticipantProperty);
+		final OWLClass textualEntityClass = factory.getOWLClass(Vocabulary.textualEntity);
+		final OWLObjectProperty denotesProp = factory.getOWLObjectProperty(Vocabulary.denotesProperty);
+		OWLObjectProperty hasParticipant = factory.getOWLObjectProperty(Vocabulary.hasParticipantProperty);
 		if (owl_part instanceof OWLClassExpression){
         	Set<OWLClassExpression> supersets = new HashSet<OWLClassExpression>(); 
         	supersets.add(textualEntityClass);
@@ -125,8 +134,5 @@ public class Claim implements GeneratingEntity {
 	}
 
 	
-	public void validateIRI(IRIManager manager) throws SQLException{
-		manager.validateIRI(bean);
-	}
 
 }
