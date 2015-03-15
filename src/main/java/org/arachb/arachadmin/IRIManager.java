@@ -1,4 +1,4 @@
-package org.arachb.owlbuilder.lib;
+package org.arachb.arachadmin;
 
 import java.net.URL;
 import java.net.URLEncoder;
@@ -7,41 +7,10 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.arachb.arachadmin.AbstractConnection;
-import org.arachb.arachadmin.BeanWithIRI;
 import org.semanticweb.owlapi.model.IRI;
 
 public class IRIManager {
 	
-	public static final IRI pubAboutInvestigation = 
-			IRI.create("http://purl.obolibrary.org/obo/IAO_0000312");
-	public static final IRI denotesProperty =
-			IRI.create("http://purl.obolibrary.org/obo/IAO_0000219");
-	public static final IRI informationContentEntity = 
-			IRI.create("http://purl.obolibrary.org/obo/IAO_0000030");
-	public static final IRI textualEntity =
-			IRI.create("http://purl.obolibrary.org/obo/IAO_0000300");
-
-	public static final Set<IRI> iaoImports = new HashSet<IRI>();
-	static {
-		iaoImports.add(pubAboutInvestigation);
-		iaoImports.add(denotesProperty);
-		iaoImports.add(informationContentEntity);
-	}
-	
-	public static final IRI partOfProperty = 
-			IRI.create("http://purl.obolibrary.org/obo/BFO_0000050");
-	public static final IRI hasParticipantProperty =
-			IRI.create("http://purl.obolibrary.org/obo/BFO_0000057");
-
-	public static final Set<IRI> bfoImports = new HashSet<IRI>();
-	static {
-		bfoImports.add(partOfProperty);
-		bfoImports.add(hasParticipantProperty);
-	}
-	
-	public static final IRI arachnidaTaxon = 
-			IRI.create("http://purl.obolibrary.org/obo/NCBITaxon_6854");
 	
 	
 	private static final Logger log = Logger.getLogger(IRIManager.class);
@@ -56,25 +25,26 @@ public class IRIManager {
 	}
 	
 	
+	//TODO this should be configurable...
 	public final static String ARACHBPREFIX = "http://arachb.org/arachb/ARACHB_";
 	public String generateARACHB_IRI_String(){  //should be private
 		idCounter++;
 		return String.format("%s%07d",ARACHBPREFIX,idCounter);
 	}
 	
+	//TODO maybe this too
 	final static String ncbiprefix = "http://purl.obolibrary.org/obo/NCBITaxon_";
 	public IRI getNCBI_IRI(String ncbiID){
 		return IRI.create(ncbiprefix+ncbiID);
 	}
 	
-	public void validateIRI(BeanWithIRI b) throws SQLException{
-		if (b.checkIriString() != null)
+	public void generateIRI(UpdateableBean b) throws SQLException{
+		if (b.getGeneratedId() != null)
 			return;
 		//need to generate
 		String newIRI = generateARACHB_IRI_String();
 		b.setGeneratedId(newIRI);
 		c.updateNamedEntity(b);			
-			
 	}
 	
 	
