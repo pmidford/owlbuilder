@@ -1,3 +1,3 @@
 language: java
-before_script:
+before_install:
   - mysql -u travis -password '' -e 'create database myapp_test;'

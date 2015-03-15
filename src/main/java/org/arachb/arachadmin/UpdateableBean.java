@@ -5,7 +5,8 @@ import java.sql.SQLException;
 
 
 
-public interface BeanWithIRI extends BeanBase {
+
+public interface UpdateableBean extends BeanBase {
 		
 	public void setGeneratedId(String id);
 		
@@ -20,14 +21,14 @@ public interface BeanWithIRI extends BeanBase {
 	 * 
 	 * @return either assigned or generated identifier that can parse into an IRI
 	 */
-	public String getIriString();
+	public String getIRIString() throws IllegalStateException;
 
 	/**
 	 * Non exception throwing version for use when generating IRI's
 	 * probably better than a catch in the appropriate place
-	 * @return string for making IRI's or null (means needs to be generated)
+	 * @return string for making IRI's
 	 **/
-	public Object checkIriString();
+	public String checkIRIString(IRIManager manager) throws SQLException;
 	
 	/**
 	 * 
