@@ -55,7 +55,7 @@ public class ParticipantBean implements UpdateableBean{
 	private PElementBean headBean;
 
 	
-	private final Map<Integer, PElementBean> elements = new HashMap<Integer, PElementBean>();
+	final Map<Integer, PElementBean> elements = new HashMap<Integer, PElementBean>();
 	
 	public final static String INDIVIDUALQUANTIFIER = "INDIVIDUAL";
 	public final static String SOMEQUANTIFIER = "SOME";

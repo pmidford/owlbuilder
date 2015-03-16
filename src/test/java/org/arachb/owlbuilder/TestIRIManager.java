@@ -16,12 +16,10 @@ import org.semanticweb.owlapi.model.IRI;
 public class TestIRIManager {
 	
 	private AbstractConnection c;
-	private TermBean t;
 
 	@Before
 	public void setup() throws Exception {
 		c = new MockConnection();
-		t = c.getTerm(4838);
 
 	}
 

@@ -20,104 +20,133 @@ public class MockConnection implements AbstractConnection {
 	final private static String TESTPUBTAXON = "Tetragnatha straminea";
 	final private static int MAXMOCKIDVALUE = 10;  //might need to assign this realistically
 	
-	private static MockResults mockPublicationResults = new MockResults(1);
+	private static StaticMockResults mockPublicationResults = new StaticMockResults();
 	static {
-		mockPublicationResults.setInteger(0,PublicationBean.DBID, 1);
-		mockPublicationResults.setString(0,PublicationBean.DBPUBLICATIONTYPE,JOURNALTYPE);
-		mockPublicationResults.setString(0,PublicationBean.DBDISPENSATION,"");
-		mockPublicationResults.setString(0,PublicationBean.DBDOWNLOADED,"");
-		mockPublicationResults.setString(0,PublicationBean.DBREVIEWED,"");
-		mockPublicationResults.setString(0,PublicationBean.DBTITLE,"");
-		mockPublicationResults.setString(0,PublicationBean.DBALTERNATETITLE,"");
-		mockPublicationResults.setString(0,PublicationBean.DBAUTHORLIST,"");
-		mockPublicationResults.setString(0,PublicationBean.DBEDITORLIST,"");
-		mockPublicationResults.setString(0,PublicationBean.DBSOURCEPUBLICATION,"");
-		mockPublicationResults.setInteger(0,PublicationBean.DBVOLUME,1);
-		mockPublicationResults.setString(0,PublicationBean.DBISSUE,"");
-		mockPublicationResults.setString(0,PublicationBean.DBSERIALIDENTIFIER,"");
-		mockPublicationResults.setString(0,PublicationBean.DBPAGERANGE,"");
-		mockPublicationResults.setString(0,PublicationBean.DBPUBLICATIONDATE,"");
-		mockPublicationResults.setString(0,PublicationBean.DBPUBLICATIONYEAR,"");
-		mockPublicationResults.setString(0,PublicationBean.DBDOI,TESTDOI);
-		mockPublicationResults.setString(0,PublicationBean.DBGENERATEDID, TESTGENID);
-        mockPublicationResults.setString(0,PublicationBean.DBCURATIONSTATUS,"");
-        mockPublicationResults.setString(0,PublicationBean.DBCURATIONUPDATE,"");
+		mockPublicationResults.setInteger(PublicationBean.DBID, 1);
+		mockPublicationResults.setString(PublicationBean.DBPUBLICATIONTYPE,JOURNALTYPE);
+		mockPublicationResults.setString(PublicationBean.DBDISPENSATION,"");
+		mockPublicationResults.setString(PublicationBean.DBDOWNLOADED,"");
+		mockPublicationResults.setString(PublicationBean.DBREVIEWED,"");
+		mockPublicationResults.setString(PublicationBean.DBTITLE,"");
+		mockPublicationResults.setString(PublicationBean.DBALTERNATETITLE,"");
+		mockPublicationResults.setString(PublicationBean.DBAUTHORLIST,"");
+		mockPublicationResults.setString(PublicationBean.DBEDITORLIST,"");
+		mockPublicationResults.setString(PublicationBean.DBSOURCEPUBLICATION,"");
+		mockPublicationResults.setInteger(PublicationBean.DBVOLUME,1);
+		mockPublicationResults.setString(PublicationBean.DBISSUE,"");
+		mockPublicationResults.setString(PublicationBean.DBSERIALIDENTIFIER,"");
+		mockPublicationResults.setString(PublicationBean.DBPAGERANGE,"");
+		mockPublicationResults.setString(PublicationBean.DBPUBLICATIONDATE,"");
+		mockPublicationResults.setString(PublicationBean.DBPUBLICATIONYEAR,"");
+		mockPublicationResults.setString(PublicationBean.DBDOI,TESTDOI);
+		mockPublicationResults.setString(PublicationBean.DBGENERATEDID, TESTGENID);
+        mockPublicationResults.setString(PublicationBean.DBCURATIONSTATUS,"");
+        mockPublicationResults.setString(PublicationBean.DBCURATIONUPDATE,"");
 	}
 	
-	private static MockResults mockPublicationResults2 = new MockResults(1);
+	private static StaticMockResults mockPublicationResults2 = new StaticMockResults();
 	static {
-		mockPublicationResults2.setInteger(0,PublicationBean.DBID, 2);
-		mockPublicationResults2.setString(0,PublicationBean.DBPUBLICATIONTYPE,JOURNALTYPE);
-		mockPublicationResults2.setString(0,PublicationBean.DBDISPENSATION,"");
-		mockPublicationResults2.setString(0,PublicationBean.DBDOWNLOADED,"");
-		mockPublicationResults2.setString(0,PublicationBean.DBREVIEWED,"");
-		mockPublicationResults2.setString(0,PublicationBean.DBTITLE,"");
-		mockPublicationResults2.setString(0,PublicationBean.DBALTERNATETITLE,"");
-		mockPublicationResults2.setString(0,PublicationBean.DBAUTHORLIST,"");
-		mockPublicationResults2.setString(0,PublicationBean.DBEDITORLIST,"");
-		mockPublicationResults2.setString(0,PublicationBean.DBSOURCEPUBLICATION,"");
-		mockPublicationResults2.setInteger(0,PublicationBean.DBVOLUME,1);
-		mockPublicationResults2.setString(0,PublicationBean.DBISSUE,"");
-		mockPublicationResults2.setString(0,PublicationBean.DBSERIALIDENTIFIER,"");
-		mockPublicationResults2.setString(0,PublicationBean.DBPAGERANGE,"");
-		mockPublicationResults2.setString(0,PublicationBean.DBPUBLICATIONDATE,"");
-		mockPublicationResults2.setString(0,PublicationBean.DBPUBLICATIONYEAR,"");
-		mockPublicationResults2.setString(0,PublicationBean.DBDOI, null);
-		mockPublicationResults2.setString(0,PublicationBean.DBGENERATEDID,TESTARACHBID);
-        mockPublicationResults2.setString(0,PublicationBean.DBCURATIONSTATUS,"");
-        mockPublicationResults2.setString(0,PublicationBean.DBCURATIONUPDATE,"");
+		mockPublicationResults2.setInteger(PublicationBean.DBID, 2);
+		mockPublicationResults2.setString(PublicationBean.DBPUBLICATIONTYPE,JOURNALTYPE);
+		mockPublicationResults2.setString(PublicationBean.DBDISPENSATION,"");
+		mockPublicationResults2.setString(PublicationBean.DBDOWNLOADED,"");
+		mockPublicationResults2.setString(PublicationBean.DBREVIEWED,"");
+		mockPublicationResults2.setString(PublicationBean.DBTITLE,"");
+		mockPublicationResults2.setString(PublicationBean.DBALTERNATETITLE,"");
+		mockPublicationResults2.setString(PublicationBean.DBAUTHORLIST,"");
+		mockPublicationResults2.setString(PublicationBean.DBEDITORLIST,"");
+		mockPublicationResults2.setString(PublicationBean.DBSOURCEPUBLICATION,"");
+		mockPublicationResults2.setInteger(PublicationBean.DBVOLUME,1);
+		mockPublicationResults2.setString(PublicationBean.DBISSUE,"");
+		mockPublicationResults2.setString(PublicationBean.DBSERIALIDENTIFIER,"");
+		mockPublicationResults2.setString(PublicationBean.DBPAGERANGE,"");
+		mockPublicationResults2.setString(PublicationBean.DBPUBLICATIONDATE,"");
+		mockPublicationResults2.setString(PublicationBean.DBPUBLICATIONYEAR,"");
+		mockPublicationResults2.setString(PublicationBean.DBDOI, null);
+		mockPublicationResults2.setString(PublicationBean.DBGENERATEDID,TESTARACHBID);
+        mockPublicationResults2.setString(PublicationBean.DBCURATIONSTATUS,"");
+        mockPublicationResults2.setString(PublicationBean.DBCURATIONUPDATE,"");
 	}
 
+	
 	private final static String doi3 = 
 			"http://dx.doi.org/10.1636/0161-8202(2000)028[0097:HDLHAB]2.0.CO;2";
-	private static MockResults mockPublicationResults3 = new MockResults(1);
+	private static StaticMockResults mockPublicationResults3 = new StaticMockResults();
 	static {
-		mockPublicationResults3.setInteger(0,PublicationBean.DBID, 3);
-		mockPublicationResults3.setString(0,PublicationBean.DBPUBLICATIONTYPE,JOURNALTYPE);
-		mockPublicationResults3.setString(0,PublicationBean.DBDISPENSATION,"");
-		mockPublicationResults3.setString(0,PublicationBean.DBDOWNLOADED,"");
-		mockPublicationResults3.setString(0,PublicationBean.DBREVIEWED,"");
-		mockPublicationResults3.setString(0,PublicationBean.DBTITLE,"");
-		mockPublicationResults3.setString(0,PublicationBean.DBALTERNATETITLE,"");
-		mockPublicationResults3.setString(0,PublicationBean.DBAUTHORLIST,"");
-		mockPublicationResults3.setString(0,PublicationBean.DBEDITORLIST,"");
-		mockPublicationResults3.setString(0,PublicationBean.DBSOURCEPUBLICATION,"");
-		mockPublicationResults3.setInteger(0,PublicationBean.DBVOLUME,1);
-		mockPublicationResults3.setString(0,PublicationBean.DBISSUE,"");
-		mockPublicationResults3.setString(0,PublicationBean.DBSERIALIDENTIFIER,"");
-		mockPublicationResults3.setString(0,PublicationBean.DBPAGERANGE,"");
-		mockPublicationResults3.setString(0,PublicationBean.DBPUBLICATIONDATE,"");
-		mockPublicationResults3.setString(0,PublicationBean.DBPUBLICATIONYEAR,"");
-		mockPublicationResults3.setString(0,PublicationBean.DBDOI, doi3);
-		mockPublicationResults3.setString(0,PublicationBean.DBGENERATEDID, null);
-        mockPublicationResults3.setString(0,PublicationBean.DBCURATIONSTATUS,"");
-        mockPublicationResults3.setString(0,PublicationBean.DBCURATIONUPDATE,"");
+		mockPublicationResults3.setInteger(PublicationBean.DBID, 3);
+		mockPublicationResults3.setString(PublicationBean.DBPUBLICATIONTYPE,JOURNALTYPE);
+		mockPublicationResults3.setString(PublicationBean.DBDISPENSATION,"");
+		mockPublicationResults3.setString(PublicationBean.DBDOWNLOADED,"");
+		mockPublicationResults3.setString(PublicationBean.DBREVIEWED,"");
+		mockPublicationResults3.setString(PublicationBean.DBTITLE,"");
+		mockPublicationResults3.setString(PublicationBean.DBALTERNATETITLE,"");
+		mockPublicationResults3.setString(PublicationBean.DBAUTHORLIST,"");
+		mockPublicationResults3.setString(PublicationBean.DBEDITORLIST,"");
+		mockPublicationResults3.setString(PublicationBean.DBSOURCEPUBLICATION,"");
+		mockPublicationResults3.setInteger(PublicationBean.DBVOLUME,1);
+		mockPublicationResults3.setString(PublicationBean.DBISSUE,"");
+		mockPublicationResults3.setString(PublicationBean.DBSERIALIDENTIFIER,"");
+		mockPublicationResults3.setString(PublicationBean.DBPAGERANGE,"");
+		mockPublicationResults3.setString(PublicationBean.DBPUBLICATIONDATE,"");
+		mockPublicationResults3.setString(PublicationBean.DBPUBLICATIONYEAR,"");
+		mockPublicationResults3.setString(PublicationBean.DBDOI, doi3);
+		mockPublicationResults3.setString(PublicationBean.DBGENERATEDID, null);
+        mockPublicationResults3.setString(PublicationBean.DBCURATIONSTATUS,"");
+        mockPublicationResults3.setString(PublicationBean.DBCURATIONUPDATE,"");
+	}
+
+	private static String pub123genID = "http://arachb.org/arachb/ARACHB_0000311";
+	private static String pub123title = "Courtship, copulation, and sperm transfer in " +
+	                                    "Leucauge mariana (Araneae, Tetragnathidae) with " +
+	                                    "implications for higher classification";
+	private static StaticMockResults mockPublicationResults123 = new StaticMockResults();
+	static {
+		mockPublicationResults123.setInteger(PublicationBean.DBID, 123);
+		mockPublicationResults123.setString(PublicationBean.DBPUBLICATIONTYPE,JOURNALTYPE);
+		mockPublicationResults123.setString(PublicationBean.DBDISPENSATION,"Downloaded");
+		mockPublicationResults123.setString(PublicationBean.DBDOWNLOADED,"2011-05-11");
+		mockPublicationResults123.setString(PublicationBean.DBREVIEWED, null);
+		mockPublicationResults123.setString(PublicationBean.DBTITLE,pub123title);
+		mockPublicationResults123.setString(PublicationBean.DBALTERNATETITLE,"");
+		mockPublicationResults123.setString(PublicationBean.DBAUTHORLIST,"Eberhard, William G.; Huber, Bernhard A.");
+		mockPublicationResults123.setString(PublicationBean.DBEDITORLIST,"");
+		mockPublicationResults123.setString(PublicationBean.DBSOURCEPUBLICATION,"");
+		mockPublicationResults123.setInteger(PublicationBean.DBVOLUME,26);
+		mockPublicationResults123.setString(PublicationBean.DBISSUE,"3");
+		mockPublicationResults123.setString(PublicationBean.DBSERIALIDENTIFIER,"");
+		mockPublicationResults123.setString(PublicationBean.DBPAGERANGE,"342-368");
+		mockPublicationResults123.setString(PublicationBean.DBPUBLICATIONDATE,"");
+		mockPublicationResults123.setString(PublicationBean.DBPUBLICATIONYEAR,"1998");
+		mockPublicationResults123.setString(PublicationBean.DBDOI, null);
+		mockPublicationResults123.setString(PublicationBean.DBGENERATEDID, pub123genID);
+		mockPublicationResults123.setString(PublicationBean.DBCURATIONSTATUS,"");
+        mockPublicationResults123.setString(PublicationBean.DBCURATIONUPDATE,"");
 	}
 
 
-	private static MockResults mockTermResults2 = new MockResults(1);
+	private static StaticMockResults mockTermResults11052 = new StaticMockResults();
 	static {
-		mockTermResults2.setInteger(0,TermBean.DBID,2);
-		mockTermResults2.setString(0,TermBean.DBSOURCEID,"http://purl.obolibrary.org/obo/SPD_0000001");
-		mockTermResults2.setInteger(0,TermBean.DBDOMAIN,2);
-		mockTermResults2.setInteger(0,TermBean.DBAUTHORITY,1);
-		mockTermResults2.setString(0,TermBean.DBLABEL,"whole organism");
-		mockTermResults2.setString(0,TermBean.DBGENERATEDID,null);
-		mockTermResults2.setString(0,TermBean.DBCOMMENT,"");
+		mockTermResults11052.setInteger(TermBean.DBID,110522);
+		mockTermResults11052.setString(TermBean.DBSOURCEID,"http://purl.obolibrary.org/obo/NBO_0000002");
+		mockTermResults11052.setInteger(TermBean.DBDOMAIN,1);
+		mockTermResults11052.setInteger(TermBean.DBAUTHORITY,4);
+		mockTermResults11052.setString(TermBean.DBLABEL,"whole body movement");
+		mockTermResults11052.setString(TermBean.DBGENERATEDID,null);
+		mockTermResults11052.setString(TermBean.DBCOMMENT,"");
 	}
 
-	private static MockResults mockTermResults4838 = new MockResults(1);
+	private static StaticMockResults mockTermResults4838 = new StaticMockResults();
 	static {
-		mockTermResults4838.setInteger(0,TermBean.DBID,4838);
-		mockTermResults4838.setString(0,TermBean.DBSOURCEID,"http://purl.obolibrary.org/obo/NCBITaxon_336608");
-		mockTermResults4838.setInteger(0,TermBean.DBDOMAIN,3);
-		mockTermResults4838.setInteger(0,TermBean.DBAUTHORITY,1);
-		mockTermResults4838.setString(0,TermBean.DBLABEL,"Tetragnatha straminea");
-		mockTermResults4838.setString(0,TermBean.DBGENERATEDID,"http://purl.obolibrary.org/obo/NCBITaxon_336608");
-		mockTermResults4838.setString(0,TermBean.DBCOMMENT,"");
+		mockTermResults4838.setInteger(TermBean.DBID,4838);
+		mockTermResults4838.setString(TermBean.DBSOURCEID,"http://purl.obolibrary.org/obo/NCBITaxon_336608");
+		mockTermResults4838.setInteger(TermBean.DBDOMAIN,3);
+		mockTermResults4838.setInteger(TermBean.DBAUTHORITY,1);
+		mockTermResults4838.setString(TermBean.DBLABEL,"Tetragnatha straminea");
+		mockTermResults4838.setString(TermBean.DBGENERATEDID,"http://purl.obolibrary.org/obo/NCBITaxon_336608");
+		mockTermResults4838.setString(TermBean.DBCOMMENT,"");
 	}
 
-	private static MockResults mockTermResults11398 = new MockResults(1);
+	private static StaticMockResults mockTermResults11398 = new StaticMockResults();
 	static {
 		mockTermResults11398.setInteger(0,TermBean.DBID,11398);
 		mockTermResults11398.setString(0,TermBean.DBSOURCEID,"http://purl.obolibrary.org/obo/NBO_0000358");
@@ -129,7 +158,7 @@ public class MockConnection implements AbstractConnection {
 	}
 	
 
-	private static MockResults mockTermResults10473 = new MockResults(1);
+	private static MockResults mockTermResults10473 = new StaticMockResults();
 	static {
 		mockTermResults10473.setInteger(0,TermBean.DBID, 10473);
 		mockTermResults10473.setString(0,TermBean.DBSOURCEID,"http://purl.obolibrary.org/obo/SPD_0000001");
@@ -142,7 +171,7 @@ public class MockConnection implements AbstractConnection {
 	}
 
 	
-	private static MockResults mockParticipantResults1 = new MockResults(1);
+	private static MockResults mockParticipantResults1 = new StaticMockResults();
 	static {
 		mockParticipantResults1.setInteger(0,ParticipantBean.DBID,1);
 		mockParticipantResults1.setString(0,ParticipantBean.DBQUANTIFICATION,"some");
@@ -155,7 +184,21 @@ public class MockConnection implements AbstractConnection {
 		mockParticipantResults1.setInteger(0,ParticipantBean.DBHEADELEMENT,1);
 	}
 
-	private static MockResults mockParticipantResults2 = new MockResults(1);
+	private static MockResults mockParticipantResults29 = new StaticMockResults();
+	static {
+		mockParticipantResults29.setInteger(0,ParticipantBean.DBID,29);
+		mockParticipantResults29.setString(0,ParticipantBean.DBQUANTIFICATION,"individual");
+		mockParticipantResults29.setString(0,ParticipantBean.DBLABEL,"female");
+		mockParticipantResults29.setString(0,ParticipantBean.DBGENERATEDID,"http://arachb.org/arachb/ARACHB_0000349");
+		mockParticipantResults29.setInteger(0,ParticipantBean.DBPROPERTY, 306);  //used
+		mockParticipantResults29.setString(0,ParticipantBean.DBPUBLICATIONTAXON,"Leucauge mariana");
+		mockParticipantResults29.setString(0,ParticipantBean.DBPUBLICATIONANATOMY,"female");
+		mockParticipantResults29.setString(0,ParticipantBean.DBPUBLICATIONSUBSTRATE,"");
+		mockParticipantResults29.setInteger(0,ParticipantBean.DBHEADELEMENT,61);
+	}
+
+	
+	private static MockResults mockParticipantResults2 = new StaticMockResults();
 	static {
 		mockParticipantResults2.setInteger(0,ParticipantBean.DBID,2);
 		mockParticipantResults2.setString(0,ParticipantBean.DBQUANTIFICATION,"some");
@@ -167,29 +210,55 @@ public class MockConnection implements AbstractConnection {
 		mockParticipantResults2.setInteger(0,ParticipantBean.DBHEADELEMENT,51);
 	}
 	
-	private static MockResults mockClaimResults = new MockResults(1);
+
+	private static StaticMockResults mockClaimResults1 = new StaticMockResults();
 	static{
-		mockClaimResults.setInteger(0,ClaimBean.DBID, 1);
-		mockClaimResults.setInteger(0,ClaimBean.DBPUBLICATION,6);
-		mockClaimResults.setInteger(0,ClaimBean.DBBEHAVIORTERM,9);
-		mockClaimResults.setString(0,ClaimBean.DBPUBLICATIONBEHAVIOR,"behavior");
-		mockClaimResults.setInteger(0,ClaimBean.DBEVIDENCE,0);
-		mockClaimResults.setString(0,ClaimBean.DBGENERATEDID,"");
-		mockClaimResults.setString(0,ClaimBean.DBPUBDOI, TESTDOI);
-		mockClaimResults.setString(0,ClaimBean.DBBEHAVIORSOURCEID, TESTBEHAVIOR);
+		mockClaimResults1.setInteger(0,ClaimBean.DBID, 1);
+		mockClaimResults1.setInteger(0,ClaimBean.DBPUBLICATION,3);
+		mockClaimResults1.setInteger(0,ClaimBean.DBBEHAVIORTERM,11398);
+		mockClaimResults1.setString(0,ClaimBean.DBPUBLICATIONBEHAVIOR,"Stick-like posture");
+		mockClaimResults1.setInteger(0,ClaimBean.DBEVIDENCE,0);
+		mockClaimResults1.setString(0,ClaimBean.DBGENERATEDID,"");
+		mockClaimResults1.setString(0,ClaimBean.DBPUBDOI, TESTDOI);
+		mockClaimResults1.setString(0,ClaimBean.DBBEHAVIORSOURCEID, TESTBEHAVIOR);
 	}
+
+	private static StaticMockResults mockClaimResults2 = new StaticMockResults();
+	static{
+		mockClaimResults2.setInteger(0,ClaimBean.DBID, 2);
+		mockClaimResults2.setInteger(0,ClaimBean.DBPUBLICATION,3);
+		mockClaimResults2.setInteger(0,ClaimBean.DBBEHAVIORTERM,11132);
+		mockClaimResults2.setString(0,ClaimBean.DBPUBLICATIONBEHAVIOR,"prey capture");
+		mockClaimResults2.setInteger(0,ClaimBean.DBEVIDENCE,0);
+		mockClaimResults2.setString(0,ClaimBean.DBGENERATEDID,"");
+		mockClaimResults2.setString(0,ClaimBean.DBPUBDOI, TESTDOI);
+		mockClaimResults2.setString(0,ClaimBean.DBBEHAVIORSOURCEID, TESTBEHAVIOR);
+	}
+
+	private static StaticMockResults mockClaimResults26 = new StaticMockResults();
+	static{
+		mockClaimResults26.setInteger(0,ClaimBean.DBID, 26);
+		mockClaimResults26.setInteger(0,ClaimBean.DBPUBLICATION,123);
+		mockClaimResults26.setInteger(0,ClaimBean.DBBEHAVIORTERM,11052);
+		mockClaimResults26.setString(0,ClaimBean.DBPUBLICATIONBEHAVIOR,"turn toward male");
+		mockClaimResults26.setInteger(0,ClaimBean.DBEVIDENCE,0);
+		mockClaimResults26.setString(0,ClaimBean.DBGENERATEDID,"");
+		mockClaimResults26.setString(0,ClaimBean.DBPUBDOI, TESTDOI);
+		mockClaimResults26.setString(0,ClaimBean.DBBEHAVIORSOURCEID, TESTBEHAVIOR);
+	}
+
 	
-	private static MockResults mockTaxonResults = new MockResults(1);
+	private static MockResults mockTaxonResults = new StaticMockResults();
 	static{
 		mockTaxonResults.setInteger(0,TaxonBean.DBID, 1);
 	}
 	
-	private static MockResults mockTaxonResults2 = new MockResults(1);
+	private static MockResults mockTaxonResults2 = new StaticMockResults();
 	static{
 		mockTaxonResults2.setInteger(0,TaxonBean.DBID, 12);
 	}
 	
-	private static MockResults mockIndividualResults94 = new MockResults(1);
+	private static MockResults mockIndividualResults94 = new StaticMockResults();
 	static{
 		mockIndividualResults94.setInteger(0,IndividualBean.DBID, 94);
 		mockIndividualResults94.setString(0,IndividualBean.DBLABEL, "female");
@@ -198,7 +267,7 @@ public class MockConnection implements AbstractConnection {
 		mockIndividualResults94.setInteger(0,IndividualBean.DBTERM, 111938);
 	}
 
-	private static MockResults mockIndividualResults95 = new MockResults(1);
+	private static MockResults mockIndividualResults95 = new StaticMockResults();
 	static{
 		mockIndividualResults95.setInteger(0,IndividualBean.DBID, 95);
 		mockIndividualResults95.setString(0,IndividualBean.DBLABEL, "whole organism of female");
@@ -208,21 +277,21 @@ public class MockConnection implements AbstractConnection {
 	}
 
 
-	private static MockResults mockPElementResults = new MockResults(1);
+	private static MockResults mockPElementResults = new StaticMockResults();
 	static{
 		mockPElementResults.setInteger(0,PElementBean.DBID, 1);
 		mockPElementResults.setInteger(0,PElementBean.DBTYPE, 1);
 		mockPElementResults.setInteger(0,PElementBean.DBPARTICIPANT, 1);		
 	}
 
-	private static MockResults mockPElementResults2 = new MockResults(1);
+	private static MockResults mockPElementResults2 = new StaticMockResults();
 	static{
 		mockPElementResults2.setInteger(0,PElementBean.DBID, 2);
 		mockPElementResults2.setInteger(0,PElementBean.DBTYPE, 1);
 		mockPElementResults2.setInteger(0,PElementBean.DBPARTICIPANT, 1);
 	}
 	
-	private static MockResults mockPElementResults61 = new MockResults(1);
+	private static MockResults mockPElementResults61 = new StaticMockResults();
 	static{
 		mockPElementResults61.setInteger(0,PElementBean.DBID, 61);
 		mockPElementResults61.setInteger(0,PElementBean.DBTYPE, 3);
@@ -230,64 +299,102 @@ public class MockConnection implements AbstractConnection {
 		
 	}
 	
+	private static MockResults mockPElementResults62 = new StaticMockResults();
+	static{
+		mockPElementResults62.setInteger(0,PElementBean.DBID, 62);
+		mockPElementResults62.setInteger(0,PElementBean.DBTYPE, 3);
+		mockPElementResults62.setInteger(0,PElementBean.DBPARTICIPANT, 29);
+		
+	}
 	
-	private static MockResults mockPEParentResults = new MockResults(1);
+	private static MockResults mockPEParent1Results = new MockResults(1);
 	static {
-		mockPEParentResults.setInteger(0,PElementBean.DBPARENTID, 1);
-		mockPEParentResults.setInteger(0,PElementBean.DBPARENTPROPERTY, 1);
+		mockPEParent1Results.setInteger(0,PElementBean.DBPARENTID, 2);
+		mockPEParent1Results.setInteger(0,PElementBean.DBPARENTPROPERTY, 15);
+	}
+	
+	private static MockResults mockPEParent61Results = new MockResults(1);
+	static {
+		mockPEParent61Results.setInteger(0,PElementBean.DBPARENTID, 62);
+		mockPEParent61Results.setInteger(0,PElementBean.DBPARENTPROPERTY, 15);
 	}
 	
 	
-	private static MockResults mockPEChildResults = new MockResults(1);
+	private static MockResults mockPEChild2Results = new MockResults(1);
 	static {
-		mockPEChildResults.setInteger(0,PElementBean.DBCHILDID, 1);
-		mockPEChildResults.setInteger(0,PElementBean.DBCHILDPROPERTY, 1);		
+		mockPEChild2Results.setInteger(0,PElementBean.DBCHILDID, 1);
+		mockPEChild2Results.setInteger(0,PElementBean.DBCHILDPROPERTY, 15);		
 	}
 	
+	
+	private static MockResults mockPEChild62Results = new MockResults(1);
+	static {
+		mockPEChild62Results.setInteger(0,PElementBean.DBCHILDID, 61);
+		mockPEChild62Results.setInteger(0,PElementBean.DBCHILDPROPERTY, 15);		
+	}
 	
 	final static String ACTIVELYPARTICIPATESINURL = "http://purl.obolibrary.org/obo/RO_0002217";
-	final static String ACTIVELYPARTICIPATESINLABEL = "actively participates in";
-	
+	final static String ACTIVELYPARTICIPATESINLABEL = "actively participates in";	
 
-	private static MockResults mockPropertyResults1 = new MockResults(1);
+	private static MockResults mockPropertyResults306 = new StaticMockResults();
 	static {
-		mockPropertyResults1.setInteger(0,PropertyBean.DBID, 306);
-		mockPropertyResults1.setString(0,PropertyBean.DBSOURCEID, ACTIVELYPARTICIPATESINURL);
-		mockPropertyResults1.setInteger(0,PropertyBean.DBAUTHORITY,0);
-		mockPropertyResults1.setString(0,PropertyBean.DBLABEL,ACTIVELYPARTICIPATESINLABEL);
-		mockPropertyResults1.setString(0,PropertyBean.DBGENERATEDID,null);
-		mockPropertyResults1.setString(0,PropertyBean.DBCOMMENT,null);		
+		mockPropertyResults306.setInteger(0,PropertyBean.DBID, 306);
+		mockPropertyResults306.setString(0,PropertyBean.DBSOURCEID, ACTIVELYPARTICIPATESINURL);
+		mockPropertyResults306.setInteger(0,PropertyBean.DBAUTHORITY,0);
+		mockPropertyResults306.setString(0,PropertyBean.DBLABEL,ACTIVELYPARTICIPATESINLABEL);
+		mockPropertyResults306.setString(0,PropertyBean.DBGENERATEDID,null);
+		mockPropertyResults306.setString(0,PropertyBean.DBCOMMENT,null);		
 	}
+
+	final static String PARTOFURL = "http://purl.obolibrary.org/obo/BFO_0000050";
+	final static String PARTOFLABEL = "part_of";	
+
+	private static MockResults mockPropertyResults15 = new StaticMockResults();
+	static {
+		mockPropertyResults15.setInteger(0,PropertyBean.DBID, 15);
+		mockPropertyResults15.setString(0,PropertyBean.DBSOURCEID, PARTOFURL);
+		mockPropertyResults15.setInteger(0,PropertyBean.DBAUTHORITY,0);
+		mockPropertyResults15.setString(0,PropertyBean.DBLABEL,PARTOFLABEL);
+		mockPropertyResults15.setString(0,PropertyBean.DBGENERATEDID,null);
+		mockPropertyResults15.setString(0,PropertyBean.DBCOMMENT,null);		
+	}
+
 	
-	private static MockResults termFillResultsNull = new MockResults(1);
+	private static MockResults termFillResultsNull = new StaticMockResults();
 	static {
 		termFillResultsNull.setInteger(0,PElementBean.DBTERM, (Integer) null);
 	}
 	
-	private static MockResults termFillResults4838 = new MockResults(1);
+	private static MockResults termFillResults4838 = new StaticMockResults();
 	static {
 		termFillResults4838.setInteger(0,PElementBean.DBTERM, 4838);
 	}
 
 	
-	private static MockResults termFillResults10473 = new MockResults(1);
+	private static MockResults termFillResults10473 = new StaticMockResults();
 	static {
 		termFillResults10473.setInteger(0,PElementBean.DBTERM, 10473);
 	}
 
-	private static MockResults termFillResults11398 = new MockResults(1);
+	private static MockResults termFillResults11398 = new StaticMockResults();
 	static {
 		termFillResults11398.setInteger(0,PElementBean.DBTERM, 11398);
 	}
 
-	private static MockResults individualFillResultsNull = new MockResults(1);
+	private static MockResults individualFillResultsNull = new StaticMockResults();
 	static {
 		individualFillResultsNull.setInteger(0,PElementBean.DBINDIVIDUAL, (Integer) null);
 	}
 
-	private static MockResults individualFillResults94 = new MockResults(1);
+
+	private static MockResults individualFillResults94 = new StaticMockResults();
 	static {
 		individualFillResults94.setInteger(0,PElementBean.DBINDIVIDUAL, 94);
+	}
+
+	private static MockResults individualFillResults95 = new StaticMockResults();
+	static {
+		individualFillResults95.setInteger(0,PElementBean.DBINDIVIDUAL, 95);
 	}
 	
 	private static Map<String,String> mockImportSourceMap = new HashMap<String,String>();
@@ -326,6 +433,25 @@ public class MockConnection implements AbstractConnection {
 		
 	}
 
+	/**
+	 * Important utility - since abstract results need to work like real ResultSets and advance
+	 * a cursor using next, this wraps up that behavior for initializing from known singleton 
+	 * MockResults.
+	 * @param bn a bean to fill
+	 * @param r a result set (most likely a singleton result)
+	 * @throws SQLException because fill might have thrown if the the ResultSet actually came from SQL.
+	 */
+	private void fillOrThrow(BeanBase bn, AbstractResults r) throws SQLException{
+		if (r.next()){
+			bn.fill(r);
+		}
+		else {
+			throw new IllegalStateException();
+		}
+	}
+
+	
+	
 	@Override
 	public PublicationBean getPublication(int pub) throws SQLException {
 		PublicationBean result = new PublicationBean();
@@ -358,8 +484,11 @@ public class MockConnection implements AbstractConnection {
 		p2.fill(mockPublicationResults2);
 		results.add(p2);
 		PublicationBean p3 = new PublicationBean();
-		p3.fill(mockPublicationResults2);
+		p3.fill(mockPublicationResults3);
 		results.add(p3);
+		PublicationBean p123 = new PublicationBean();
+		p123.fill(mockPublicationResults123);
+		results.add(p123);
 		return results;
 	}
 
@@ -374,16 +503,16 @@ public class MockConnection implements AbstractConnection {
 		TermBean tb = new TermBean();
 			switch (i){
 			case 4838:
-				tb.fill(mockTermResults4838);
+				fillOrThrow(tb,mockTermResults4838);
 				break;
 			case 2:
-				tb.fill(mockTermResults2);
+				fillOrThrow(tb,mockTermResults11052);
 				break;
 			case 10473:
-				tb.fill(mockTermResults10473);
+				fillOrThrow(tb,mockTermResults10473);
 				break;
 			case 11398:
-				tb.fill(mockTermResults11398);
+				fillOrThrow(tb,mockTermResults11398);
 				break;
 			case 0:
 				tb = null;
@@ -395,19 +524,23 @@ public class MockConnection implements AbstractConnection {
 			return tb;
 		}
 	}
+	
 
 	@Override
 	public Set<TermBean> getTerms() throws SQLException {
 		Set<TermBean> results = new HashSet<TermBean>();
 		TermBean t1 = new TermBean();
-		t1.fill(mockTermResults4838);
+		fillOrThrow(t1,mockTermResults4838);
 		results.add(t1);
 		TermBean t2 = new TermBean();
-		t2.fill(mockTermResults2);
+		fillOrThrow(t2,mockTermResults11052);
 		results.add(t2);
 		TermBean t11398 = new TermBean();
-		t11398.fill(mockTermResults11398);
+		fillOrThrow(t11398,mockTermResults11398);
 		results.add(t11398);
+		TermBean t11502 = new TermBean();
+		fillOrThrow(t11502,mockTermResults11052);
+		results.add(t11502);
 		return results;
 		
 	}
@@ -421,11 +554,21 @@ public class MockConnection implements AbstractConnection {
 
 	@Override
 	public Set<ParticipantBean> getParticipants(ClaimBean a) throws SQLException {
-		Set<ParticipantBean> results = new HashSet<ParticipantBean>();		
-		final MockResults mock1 = mockParticipantResults1;
-		ParticipantBean p1 = new ParticipantBean();
-		p1.fill(mock1);
-		results.add(p1);
+		Set<ParticipantBean> results = new HashSet<ParticipantBean>();	
+		switch (a.getId()){
+		case 1:
+			ParticipantBean p1 = new ParticipantBean();
+			fillOrThrow(p1,mockParticipantResults1);
+			results.add(p1);
+			break;
+		case 26:
+			ParticipantBean p29 = new ParticipantBean();
+			fillOrThrow(p29,mockParticipantResults29);
+			results.add(p29);
+			break;
+		default:
+			throw new IllegalStateException("mock Claim Bean has unknown id: " + a.getId());
+		}
 		return results;
 	}
 
@@ -433,7 +576,19 @@ public class MockConnection implements AbstractConnection {
 	@Override
 	public ClaimBean getClaim(int i) throws Exception {
 		ClaimBean result = new ClaimBean();
-        result.fill(mockClaimResults);
+		switch (i){
+		case 1:
+			fillOrThrow(result,mockClaimResults1);
+			break;
+		case 2:
+			fillOrThrow(result,mockClaimResults1);
+			break;
+		case 26:
+			fillOrThrow(result,mockClaimResults26);
+			break;
+		default:
+			throw new IllegalStateException("bad id to getClaim has unknown id: " + i);
+		}
 		return result;
 	}
 
@@ -441,20 +596,30 @@ public class MockConnection implements AbstractConnection {
 	@Override
 	public Set<ClaimBean> getClaims() throws Exception {
 		Set<ClaimBean> results = new HashSet<ClaimBean>();
-		ClaimBean a1 = new ClaimBean();
-		a1.fill(mockClaimResults);
-		results.add(a1);
+		ClaimBean c1 = new ClaimBean();
+		fillOrThrow(c1,mockClaimResults1);
+		ClaimBean c2 = new ClaimBean();
+		fillOrThrow(c2,mockClaimResults2);
+		ClaimBean c26 = new ClaimBean();
+		fillOrThrow(c26,mockClaimResults26);
+		results.add(c1);
+		results.add(c2);
+		results.add(c26);
 		return results;
 	}
 	
 	@Override
 	public TaxonBean getTaxon(int id) throws SQLException {
 		TaxonBean result = new TaxonBean();
-		if (id == 1){
-			result.fill(mockTaxonResults);
-		}
-		else {
-			result.fill(mockTaxonResults2);			
+		switch (id){
+		case 1:
+			fillOrThrow(result,mockTaxonResults);
+			break;
+		case 2:
+			fillOrThrow(result,mockTaxonResults2);
+			break;
+		default:
+			throw new IllegalStateException("mock Taxon Bean has unknown id: " + id);
 		}
 		return result;
 	}
@@ -463,10 +628,10 @@ public class MockConnection implements AbstractConnection {
 	public Set<TaxonBean> getTaxa() throws SQLException {
 		Set<TaxonBean> results = new HashSet<TaxonBean>();
 		TaxonBean t1 = new TaxonBean();
-		t1.fill(mockTaxonResults);
+		fillOrThrow(t1,mockTaxonResults);
 		results.add(t1);
 		TaxonBean t2 = new TaxonBean();
-		t2.fill(mockTaxonResults2);
+		fillOrThrow(t2,mockTaxonResults2);
 		results.add(t2);
 		return results;
 	}
@@ -483,7 +648,7 @@ public class MockConnection implements AbstractConnection {
 	public void updateClaim(ClaimBean cl){
 		switch (cl.getId()){
 		case 1:
-			mockClaimResults.setString(0,ClaimBean.DBGENERATEDID, cl.getGeneratedId());
+			mockClaimResults1.setString(0,ClaimBean.DBGENERATEDID, cl.getGeneratedId());
 			break;
 		default:
 			break;
@@ -537,11 +702,11 @@ public class MockConnection implements AbstractConnection {
 			IndividualBean ib = new IndividualBean();
 			switch (id){
 			case 94:
-				ib.fill(mockIndividualResults94);
+				fillOrThrow(ib,mockIndividualResults94);
 				break;
 
 			case 95: 
-				ib.fill(mockIndividualResults95);
+				fillOrThrow(ib,mockIndividualResults95);
 				break;
 			case 0:
 				ib = null;
@@ -589,6 +754,10 @@ public class MockConnection implements AbstractConnection {
 			PElementBean e2 = new PElementBean();
 			e1.fill(mockPElementResults);
 			e2.fill(mockPElementResults2);
+			fillPElementTerm(e1);
+			fillPElementIndividual(e1);
+			fillPElementTerm(e2);
+			fillPElementIndividual(e2);			
 			fillPElementParents(e1);
 			fillPElementChildren(e1);
 			fillPElementChildren(e2);
@@ -596,6 +765,23 @@ public class MockConnection implements AbstractConnection {
 			result.add(e1);
 			result.add(e2);
 			break;
+		case 29:
+			PElementBean e61 = new PElementBean();
+			PElementBean e62 = new PElementBean();
+			e61.fill(mockPElementResults61);
+			e62.fill(mockPElementResults62);
+			fillPElementTerm(e61);
+			fillPElementIndividual(e61);
+			fillPElementTerm(e62);
+			fillPElementIndividual(e62);			
+			fillPElementParents(e61);
+			fillPElementChildren(e61);
+			fillPElementChildren(e62);
+			fillPElementChildren(e62);
+			result.add(e61);
+			result.add(e62);
+			break;
+			
 		default:
 			throw new RuntimeException("getPElements (Mock) got participant with bad id: " + p.getId());
 		}
@@ -624,6 +810,12 @@ public class MockConnection implements AbstractConnection {
 			fillPElementChildren(result);
 			break;
 		}
+		case 62:{
+			result.fill(mockPElementResults62);
+			fillPElementParents(result);
+			fillPElementChildren(result);
+			break;
+		}
 		default :{
 			throw new RuntimeException("Bad id " + id + " to mock getPElement");
 		}
@@ -634,20 +826,29 @@ public class MockConnection implements AbstractConnection {
 	public void fillPElementParents(PElementBean result) throws Exception{
 		switch (result.getId()){
 		case 1:
-			result.fillParents(mockPEParentResults, this);
+			mockPEParent1Results.reset();
+			result.fillParents(mockPEParent1Results, this);
 			break;
+		case 61:
+			mockPEParent61Results.reset();
+			result.fillParents(mockPEParent61Results,this);
 		default:
-			result.fillParents(mockPEParentResults, this);
+			result.fillParents(MockResults.NullResults, this);
 		}
 	}
 
 	public void fillPElementChildren(PElementBean result) throws Exception{
 		switch (result.getId()){
-		case 1:
-			result.fillChildren(mockPEChildResults, this);
+		case 2:
+			mockPEChild2Results.reset();
+			result.fillChildren(mockPEChild2Results, this);
+			break;
+		case 62:
+			mockPEChild62Results.reset();
+			result.fillChildren(mockPEChild62Results, this);
 			break;
 		default:
-			result.fillChildren(mockPEChildResults, this);
+			result.fillChildren(MockResults.NullResults, this);
 		}
 		
 	}
@@ -657,7 +858,10 @@ public class MockConnection implements AbstractConnection {
 		final PropertyBean result = new PropertyBean();
 		switch (id){
 		case 306:
-			result.fill(mockPropertyResults1);
+			result.fill(mockPropertyResults306);
+			break;
+		case 15:
+			result.fill(mockPropertyResults15);
 			break;
 		default:
 			return null;
@@ -680,6 +884,10 @@ public class MockConnection implements AbstractConnection {
 			pb.fillTerm(termFillResultsNull, this);
 			break;
 		}
+		case 62: {
+			pb.fillTerm(termFillResultsNull, this);
+			break;
+		}
 		default:
 			throw new RuntimeException("Bad pelementbean id: " + pb.getId());
 		}
@@ -691,12 +899,13 @@ public class MockConnection implements AbstractConnection {
 		switch (pb.getId()){
 		case 1:
 		case 2:
-			pb.fillIndividual(individualFillResultsNull, this);
 			break;
-		case 61:{
+		case 61:
 			pb.fillIndividual(individualFillResults94, this);
 			break;
-		}
+		case 62:
+			pb.fillIndividual(individualFillResults95, this);
+			break;
 		default:
 			throw new RuntimeException("Bad pelementbean id: " + pb.getId());
 		}

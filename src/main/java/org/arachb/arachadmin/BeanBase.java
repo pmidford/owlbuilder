@@ -1,5 +1,7 @@
 package org.arachb.arachadmin;
 
+import java.sql.SQLException;
+
 
 public interface BeanBase {
 
@@ -14,6 +16,6 @@ public interface BeanBase {
 	 * @param record key value pairs to fill instance from - typically wraps an SQL ResultSet
 	 * @throws Exception
 	 */
-	void fill(AbstractResults record) throws Exception;
+	void fill(AbstractResults record) throws SQLException;
 
 }

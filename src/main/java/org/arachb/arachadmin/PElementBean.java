@@ -64,7 +64,7 @@ public class PElementBean implements BeanBase {
 	
 	
 	@Override
-	public void fill(AbstractResults record) throws Exception {
+	public void fill(AbstractResults record) throws SQLException {
 		id = record.getInt(DBID);
 		log.info("Filling Element: " + this.toString() + " with id: " + id);
 		eletype = record.getInt(DBTYPE);
@@ -104,6 +104,7 @@ public class PElementBean implements BeanBase {
 	
 
 	public void resolveParents(ParticipantBean pb, AbstractConnection c) throws Exception{
+		System.out.println("id = " + pb.getId() + " elements = " + pb.elements);
 		resolveDependents(pb, parentLinks, c);
 	}
 	
@@ -125,6 +126,8 @@ public class PElementBean implements BeanBase {
 	}
 	
 	public PElementBean getParentElement(Integer index){
+		log.info("index = " + index);
+		log.info("link = " + parentLinks.get(index).toString());
 		return parentLinks.get(index).getElement();
 	}
 

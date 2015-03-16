@@ -1,5 +1,7 @@
 package org.arachb.arachadmin;
 
+import java.sql.SQLException;
+
 import org.apache.log4j.Logger;
 
 
@@ -33,7 +35,7 @@ public class PropertyBean extends CachingBean {
 	}
 
 	@Override
-	public void fill(AbstractResults record) throws Exception {
+	public void fill(AbstractResults record) throws SQLException {
 		id = record.getInt(DBID);
 		sourceId = record.getString(DBSOURCEID);
 		authority = record.getInt(DBAUTHORITY);

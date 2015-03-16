@@ -52,6 +52,7 @@ public class TestPElementBean {
 		testElement1 = testConnection.getPElement(1);
 		testElement2 = testConnection.getPElement(2);
 		testElement61 = testConnection.getPElement(61);
+		testElement62 = testConnection.getPElement(62);
 		assertNotNull(testElement61);
 	}
 	
@@ -114,7 +115,7 @@ public class TestPElementBean {
 		testConnection.fillPElementParents(testElement1);
 		final Set<Integer> parentset = testElement1.getParents();
 		assertEquals(1, parentset.size());
-		testConnection.fillPElementParents(testElement1);
+		testConnection.fillPElementParents(testElement2);
 		final Set<Integer> parentset2 = testElement2.getParents();
 		assertEquals(0, parentset2.size());
 		testConnection.fillPElementParents(testElement61);
@@ -143,6 +144,8 @@ public class TestPElementBean {
 		testElement2.resolveParents(testParticipant1,testConnection);
 		testConnection.fillPElementParents(testElement61);
 		testElement61.resolveParents(testParticipant29,testConnection);	
+		testConnection.fillPElementChildren(testElement62);
+		testElement62.resolveParents(testParticipant29,testConnection);
 	}
 
 	@Test
@@ -153,6 +156,8 @@ public class TestPElementBean {
 		testElement2.resolveParents(testParticipant1,testConnection);
 		testConnection.fillPElementChildren(testElement61);
 		testElement61.resolveParents(testParticipant29,testConnection);
+		testConnection.fillPElementChildren(testElement62);
+		testElement62.resolveParents(testParticipant29,testConnection);
 	}
 
 
@@ -161,6 +166,7 @@ public class TestPElementBean {
 		testConnection.fillPElementParents(testElement1);
 		testElement1.resolveParents(testParticipant1,testConnection);
 		for (Integer index : testElement1.getParents()){
+			assertEquals(2,index.intValue());
 			PElementBean parent = testElement1.getParentElement(index);
 			assertNotNull(parent);
 			PropertyBean parentProp = testElement1.getParentProperty(index);
@@ -173,11 +179,14 @@ public class TestPElementBean {
 		testElement61.resolveParents(testParticipant29,testConnection);	
 		for (Integer index : testElement61.getParents()){
 			assertEquals(62,index.intValue());
-			PElementBean parent = testElement61.getParentElement(index);
-			assertNotNull(parent);
 			PropertyBean parentProp = testElement61.getParentProperty(index);
 			assertNotNull(parentProp);
+			PElementBean parent = testElement61.getParentElement(index);
+			assertNotNull(parent);
 		}
+		testConnection.fillPElementParents(testElement62);
+		testElement62.resolveParents(testParticipant29,testConnection);
+		assertEquals(0,testElement62.getParents().size());
 	}
 
 	@Test

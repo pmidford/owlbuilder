@@ -45,7 +45,7 @@ public class ClaimBean implements UpdateableBean{  //do all claims need IRI's?
 	
 	//maybe make this a constructor
 	@Override
-	public void fill(AbstractResults record) throws Exception{
+	public void fill(AbstractResults record) throws SQLException{
 		id = record.getInt(DBID);
 		publication = record.getInt(DBPUBLICATION);
 		publicationBehavior = record.getString(DBPUBLICATIONBEHAVIOR);
@@ -63,7 +63,7 @@ public class ClaimBean implements UpdateableBean{  //do all claims need IRI's?
 		}
 	}
 	
-	private void updatePublicationIRI(AbstractResults record) throws Exception{
+	private void updatePublicationIRI(AbstractResults record) throws SQLException{
 		if (record.getString(DBPUBDOI) != null){
 			this.setPublicationIri(IRIManager.cleanupDoi(record.getString(DBPUBDOI)));
 		}
@@ -75,7 +75,7 @@ public class ClaimBean implements UpdateableBean{  //do all claims need IRI's?
 		}
 	}
 
-	private void updateBehaviorIRI(AbstractResults record) throws Exception{
+	private void updateBehaviorIRI(AbstractResults record) throws SQLException{
 		if (record.getString(DBBEHAVIORSOURCEID) != null){
 			this.setBehaviorIri(record.getString(DBBEHAVIORSOURCEID));
 		}
@@ -87,7 +87,7 @@ public class ClaimBean implements UpdateableBean{  //do all claims need IRI's?
 		}
 	}
 
-	private void updateEvidenceIRI(AbstractResults record) throws Exception{
+	private void updateEvidenceIRI(AbstractResults record) throws SQLException{
 		if (record.getString(DBEVIDENCESOURCEID) != null){
 			this.setEvidenceIri(record.getString(DBEVIDENCESOURCEID));
 		}

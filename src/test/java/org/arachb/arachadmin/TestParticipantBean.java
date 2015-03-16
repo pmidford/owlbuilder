@@ -16,8 +16,8 @@ public class TestParticipantBean {
 
     private AbstractConnection testConnection;
 
-    private int TESTCLAIMID = 1;
-    private ClaimBean testClaim;
+    private ClaimBean testClaim1;
+    private ClaimBean testClaim26;
     
 	
 	@Before
@@ -30,14 +30,15 @@ public class TestParticipantBean {
 			log.info("Testing with mock connection");
 			testConnection = DBConnection.getMockConnection();
 		}
-		testClaim = testConnection.getClaim(TESTCLAIMID);
+		testClaim1 = testConnection.getClaim(1);
+		testClaim26 = testConnection.getClaim(26);
 	}
 
 	@Test
 	public void testFill() throws Exception {
-		Set<ParticipantBean> pbs = testConnection.getParticipants(testClaim);
-		assertEquals(1, pbs.size());
-		for (ParticipantBean pb : pbs){
+		Set<ParticipantBean> pbs1 = testConnection.getParticipants(testClaim1);
+		assertEquals(1, pbs1.size());
+		for (ParticipantBean pb : pbs1){
 			assertEquals(1, pb.getId());
 			assertEquals("some",pb.getQuantification());
 			assertEquals("",pb.getLabel());  //should improve this
@@ -48,32 +49,39 @@ public class TestParticipantBean {
 			assertEquals(0, pb.getSubstrate());
 			assertEquals(1, pb.getHeadElement());
 		}
+		Set<ParticipantBean> pbs29 = testConnection.getParticipants(testClaim26);
+		assertEquals(1, pbs29.size());
+		for (ParticipantBean pb : pbs29){
+			assertEquals(29, pb.getId());
+			assertEquals("individual",pb.getQuantification());
+			assertEquals("female",pb.getLabel());  //should improve this
+			assertEquals("http://arachb.org/arachb/ARACHB_0000349",pb.getGeneratedId());  //improve ??
+			assertEquals(306,pb.getProperty());
+			assertEquals("Leucauge mariana", pb.getPublicationTaxon());
+			assertEquals("female", pb.getPublicationAnatomy());
+			assertEquals(0, pb.getSubstrate());
+			assertEquals(61, pb.getHeadElement());
+		}
 	}
 
 
 	@Test
 	public void testLoadElements() throws Exception {
-		Set<ParticipantBean> pbs = testConnection.getParticipants(testClaim);
-		assertEquals(1, pbs.size());
-		for (ParticipantBean pb : pbs){
+		final Set<ParticipantBean> pbs1 = testConnection.getParticipants(testClaim1);
+		assertEquals(1, pbs1.size());
+		for (ParticipantBean pb : pbs1){
 			assertNull(pb.getElementBean(1));
 			pb.loadElements(testConnection);
 			assertNotNull(pb.getElementBean(1));
+		}
+		Set<ParticipantBean> pbs29 = testConnection.getParticipants(testClaim26);
+		assertEquals(1, pbs29.size());
+		for (ParticipantBean pb : pbs29){
+			assertNull(pb.getElementBean(1));
+			pb.loadElements(testConnection);
+			assertNotNull(pb.getElementBean(61));
 		}
 	}
 
-	//TODO add testing for individual participants
-	@Test
-	public void testresolveElements() throws Exception {
-		Set<ParticipantBean> pbs = testConnection.getParticipants(testClaim);
-		assertEquals(1, pbs.size());
-		for (ParticipantBean pb : pbs){
-			assertNull(pb.getElementBean(1));
-			pb.loadElements(testConnection);
-			assertNotNull(pb.getElementBean(1));
-			pb.resolveElements(testConnection);
-			assertNotNull(pb.getElementBean(1).getTerm());
-		}
-	}
 
 }

@@ -1,5 +1,7 @@
 package org.arachb.arachadmin;
 
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.sql.SQLException;
@@ -47,6 +49,7 @@ public class IRIManager {
 		c.updateNamedEntity(b);			
 	}
 	
+	final static String DOICHARENCODING = "UTF-8";
 	
 	/**
 	 * This cleans up doi's (which tend to have lots of URI unfriendly characters) and returns a properly prefixed doi
@@ -54,12 +57,23 @@ public class IRIManager {
 	 * @return IRI using using doi prefix
 	 * @throws Exception either MalformedURL or Encoding exceptions can be thrown
 	 */
-	public static String cleanupDoi(String doi) throws Exception{
+	public static String cleanupDoi(String doi){
 		if (doi == null || doi.length() == 0){
 			throw new RuntimeException("Invalid empty DOI in publication");
 		}
-		URL raw = new URL(doi);
-		String cleanpath = URLEncoder.encode(raw.getPath().substring(1),"UTF-8");
+		URL raw = null;
+		String cleanpath = null;
+		try {
+			raw = new URL(doi);
+			cleanpath = URLEncoder.encode(raw.getPath().substring(1),DOICHARENCODING);
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+			throw new RuntimeException("DOI could not be converted to URL: " + doi);
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+			throw new RuntimeException("Claims that " + DOICHARENCODING + " is not supported");
+		} 
+		
 		if (log.isDebugEnabled()){
 			log.debug("raw is " + raw);
 		}

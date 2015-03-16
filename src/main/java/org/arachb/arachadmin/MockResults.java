@@ -6,13 +6,17 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 
-public class MockResults implements AbstractResults {
 
-	private int count = 0;
+public class MockResults implements AbstractResults, ResetableResults{
+
+	protected int count = -1;
 	final private int size;
 	final private RowResult[] rows;
 	
+    private static Logger log = Logger.getLogger(MockResults.class);
+
 	public MockResults(int rowCount){
 		size = rowCount;
 		rows = new RowResult[size];
@@ -20,6 +24,8 @@ public class MockResults implements AbstractResults {
 			rows[i] = new RowResult();
 		}
 	}
+	
+	final public static MockResults NullResults = new MockResults(0);
 	
 	@Override
 	public int getInt(int field) throws SQLException {
@@ -57,13 +63,16 @@ public class MockResults implements AbstractResults {
 
 	@Override
 	public boolean next() {
-		if (count < size){
+		if (count < size-1){
 			count++;
 			return true;
 		}
 		return false;
 	}
 	
+	public void reset(){
+		count = -1;
+	}
 	
 	public void setInteger(int row,int f,Integer i){
 		if (i != null){
