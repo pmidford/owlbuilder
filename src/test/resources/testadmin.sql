@@ -766,7 +766,10 @@ CREATE TABLE `term` (
 LOCK TABLES `term` WRITE;
 /*!40000 ALTER TABLE `term` DISABLE KEYS */;
 INSERT INTO `term` VALUES 
-(4838,'http://purl.obolibrary.org/obo/NCBITaxon_336608',3,NULL,'Tetragnatha straminea','http://arachb.org/arachb/TEST_0000001',NULL),(10473,'http://purl.obolibrary.org/obo/SPD_0000001',2,NULL,'whole organism','http://purl.obolibrary.org/obo/SPD_0000001',NULL),(11398,'http://purl.obolibrary.org/obo/NBO_0000358',1,4,'resting posture',NULL,'\"Intentionally or habitually assumed arrangement of the body and its limbs in inactivity.\" [NBO:GVG]'),(11052,1,NULL,NULL,NULL,'whole body movement','http://purl.obolibrary.org/obo/NBO_0000002');
+(4838,'http://purl.obolibrary.org/obo/NCBITaxon_336608',3,NULL,'Tetragnatha straminea','http://arachb.org/arachb/TEST_0000001',NULL),
+(10473,'http://purl.obolibrary.org/obo/SPD_0000001',2,NULL,'whole organism','http://purl.obolibrary.org/obo/SPD_0000001',NULL),
+(11398,'http://purl.obolibrary.org/obo/NBO_0000358',1,4,'resting posture',NULL,'\"Intentionally or habitually assumed arrangement of the body and its limbs in inactivity.\" [NBO:GVG]'),
+(11052,'http://purl.obolibrary.org/obo/NBO_0000002',1,4,'whole body movement',NULL,NULL);
 /*!40000 ALTER TABLE `term` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
