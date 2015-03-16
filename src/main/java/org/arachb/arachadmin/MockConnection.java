@@ -20,229 +20,228 @@ public class MockConnection implements AbstractConnection {
 	final private static String TESTPUBTAXON = "Tetragnatha straminea";
 	final private static int MAXMOCKIDVALUE = 10;  //might need to assign this realistically
 	
-	private static MockResults mockPublicationResults = new MockResults();
+	private static MockResults mockPublicationResults = new MockResults(1);
 	static {
-		mockPublicationResults.setInteger(PublicationBean.DBID, 1);
-		mockPublicationResults.setString(PublicationBean.DBPUBLICATIONTYPE,JOURNALTYPE);
-		mockPublicationResults.setString(PublicationBean.DBDISPENSATION,"");
-		mockPublicationResults.setString(PublicationBean.DBDOWNLOADED,"");
-		mockPublicationResults.setString(PublicationBean.DBREVIEWED,"");
-		mockPublicationResults.setString(PublicationBean.DBTITLE,"");
-		mockPublicationResults.setString(PublicationBean.DBALTERNATETITLE,"");
-		mockPublicationResults.setString(PublicationBean.DBAUTHORLIST,"");
-		mockPublicationResults.setString(PublicationBean.DBEDITORLIST,"");
-		mockPublicationResults.setString(PublicationBean.DBSOURCEPUBLICATION,"");
-		mockPublicationResults.setInteger(PublicationBean.DBVOLUME,1);
-		mockPublicationResults.setString(PublicationBean.DBISSUE,"");
-		mockPublicationResults.setString(PublicationBean.DBSERIALIDENTIFIER,"");
-		mockPublicationResults.setString(PublicationBean.DBPAGERANGE,"");
-		mockPublicationResults.setString(PublicationBean.DBPUBLICATIONDATE,"");
-		mockPublicationResults.setString(PublicationBean.DBPUBLICATIONYEAR,"");
-		mockPublicationResults.setString(PublicationBean.DBDOI,TESTDOI);
-		mockPublicationResults.setString(PublicationBean.DBGENERATEDID, TESTGENID);
-        mockPublicationResults.setString(PublicationBean.DBCURATIONSTATUS,"");
-        mockPublicationResults.setString(PublicationBean.DBCURATIONUPDATE,"");
+		mockPublicationResults.setInteger(0,PublicationBean.DBID, 1);
+		mockPublicationResults.setString(0,PublicationBean.DBPUBLICATIONTYPE,JOURNALTYPE);
+		mockPublicationResults.setString(0,PublicationBean.DBDISPENSATION,"");
+		mockPublicationResults.setString(0,PublicationBean.DBDOWNLOADED,"");
+		mockPublicationResults.setString(0,PublicationBean.DBREVIEWED,"");
+		mockPublicationResults.setString(0,PublicationBean.DBTITLE,"");
+		mockPublicationResults.setString(0,PublicationBean.DBALTERNATETITLE,"");
+		mockPublicationResults.setString(0,PublicationBean.DBAUTHORLIST,"");
+		mockPublicationResults.setString(0,PublicationBean.DBEDITORLIST,"");
+		mockPublicationResults.setString(0,PublicationBean.DBSOURCEPUBLICATION,"");
+		mockPublicationResults.setInteger(0,PublicationBean.DBVOLUME,1);
+		mockPublicationResults.setString(0,PublicationBean.DBISSUE,"");
+		mockPublicationResults.setString(0,PublicationBean.DBSERIALIDENTIFIER,"");
+		mockPublicationResults.setString(0,PublicationBean.DBPAGERANGE,"");
+		mockPublicationResults.setString(0,PublicationBean.DBPUBLICATIONDATE,"");
+		mockPublicationResults.setString(0,PublicationBean.DBPUBLICATIONYEAR,"");
+		mockPublicationResults.setString(0,PublicationBean.DBDOI,TESTDOI);
+		mockPublicationResults.setString(0,PublicationBean.DBGENERATEDID, TESTGENID);
+        mockPublicationResults.setString(0,PublicationBean.DBCURATIONSTATUS,"");
+        mockPublicationResults.setString(0,PublicationBean.DBCURATIONUPDATE,"");
 	}
 	
-	private static MockResults mockPublicationResults2 = new MockResults();
+	private static MockResults mockPublicationResults2 = new MockResults(1);
 	static {
-		mockPublicationResults2.setInteger(PublicationBean.DBID, 2);
-		mockPublicationResults2.setString(PublicationBean.DBPUBLICATIONTYPE,JOURNALTYPE);
-		mockPublicationResults2.setString(PublicationBean.DBDISPENSATION,"");
-		mockPublicationResults2.setString(PublicationBean.DBDOWNLOADED,"");
-		mockPublicationResults2.setString(PublicationBean.DBREVIEWED,"");
-		mockPublicationResults2.setString(PublicationBean.DBTITLE,"");
-		mockPublicationResults2.setString(PublicationBean.DBALTERNATETITLE,"");
-		mockPublicationResults2.setString(PublicationBean.DBAUTHORLIST,"");
-		mockPublicationResults2.setString(PublicationBean.DBEDITORLIST,"");
-		mockPublicationResults2.setString(PublicationBean.DBSOURCEPUBLICATION,"");
-		mockPublicationResults2.setInteger(PublicationBean.DBVOLUME,1);
-		mockPublicationResults2.setString(PublicationBean.DBISSUE,"");
-		mockPublicationResults2.setString(PublicationBean.DBSERIALIDENTIFIER,"");
-		mockPublicationResults2.setString(PublicationBean.DBPAGERANGE,"");
-		mockPublicationResults2.setString(PublicationBean.DBPUBLICATIONDATE,"");
-		mockPublicationResults2.setString(PublicationBean.DBPUBLICATIONYEAR,"");
-		mockPublicationResults2.setString(PublicationBean.DBDOI, null);
-		mockPublicationResults2.setString(PublicationBean.DBGENERATEDID,TESTARACHBID);
-        mockPublicationResults2.setString(PublicationBean.DBCURATIONSTATUS,"");
-        mockPublicationResults2.setString(PublicationBean.DBCURATIONUPDATE,"");
+		mockPublicationResults2.setInteger(0,PublicationBean.DBID, 2);
+		mockPublicationResults2.setString(0,PublicationBean.DBPUBLICATIONTYPE,JOURNALTYPE);
+		mockPublicationResults2.setString(0,PublicationBean.DBDISPENSATION,"");
+		mockPublicationResults2.setString(0,PublicationBean.DBDOWNLOADED,"");
+		mockPublicationResults2.setString(0,PublicationBean.DBREVIEWED,"");
+		mockPublicationResults2.setString(0,PublicationBean.DBTITLE,"");
+		mockPublicationResults2.setString(0,PublicationBean.DBALTERNATETITLE,"");
+		mockPublicationResults2.setString(0,PublicationBean.DBAUTHORLIST,"");
+		mockPublicationResults2.setString(0,PublicationBean.DBEDITORLIST,"");
+		mockPublicationResults2.setString(0,PublicationBean.DBSOURCEPUBLICATION,"");
+		mockPublicationResults2.setInteger(0,PublicationBean.DBVOLUME,1);
+		mockPublicationResults2.setString(0,PublicationBean.DBISSUE,"");
+		mockPublicationResults2.setString(0,PublicationBean.DBSERIALIDENTIFIER,"");
+		mockPublicationResults2.setString(0,PublicationBean.DBPAGERANGE,"");
+		mockPublicationResults2.setString(0,PublicationBean.DBPUBLICATIONDATE,"");
+		mockPublicationResults2.setString(0,PublicationBean.DBPUBLICATIONYEAR,"");
+		mockPublicationResults2.setString(0,PublicationBean.DBDOI, null);
+		mockPublicationResults2.setString(0,PublicationBean.DBGENERATEDID,TESTARACHBID);
+        mockPublicationResults2.setString(0,PublicationBean.DBCURATIONSTATUS,"");
+        mockPublicationResults2.setString(0,PublicationBean.DBCURATIONUPDATE,"");
 	}
 
 	private final static String doi3 = 
 			"http://dx.doi.org/10.1636/0161-8202(2000)028[0097:HDLHAB]2.0.CO;2";
-	private static MockResults mockPublicationResults3 = new MockResults();
+	private static MockResults mockPublicationResults3 = new MockResults(1);
 	static {
-		mockPublicationResults3.setInteger(PublicationBean.DBID, 3);
-		mockPublicationResults3.setString(PublicationBean.DBPUBLICATIONTYPE,JOURNALTYPE);
-		mockPublicationResults3.setString(PublicationBean.DBDISPENSATION,"");
-		mockPublicationResults3.setString(PublicationBean.DBDOWNLOADED,"");
-		mockPublicationResults3.setString(PublicationBean.DBREVIEWED,"");
-		mockPublicationResults3.setString(PublicationBean.DBTITLE,"");
-		mockPublicationResults3.setString(PublicationBean.DBALTERNATETITLE,"");
-		mockPublicationResults3.setString(PublicationBean.DBAUTHORLIST,"");
-		mockPublicationResults3.setString(PublicationBean.DBEDITORLIST,"");
-		mockPublicationResults3.setString(PublicationBean.DBSOURCEPUBLICATION,"");
-		mockPublicationResults3.setInteger(PublicationBean.DBVOLUME,1);
-		mockPublicationResults3.setString(PublicationBean.DBISSUE,"");
-		mockPublicationResults3.setString(PublicationBean.DBSERIALIDENTIFIER,"");
-		mockPublicationResults3.setString(PublicationBean.DBPAGERANGE,"");
-		mockPublicationResults3.setString(PublicationBean.DBPUBLICATIONDATE,"");
-		mockPublicationResults3.setString(PublicationBean.DBPUBLICATIONYEAR,"");
-		mockPublicationResults3.setString(PublicationBean.DBDOI, doi3);
-		mockPublicationResults3.setString(PublicationBean.DBGENERATEDID, null);
-        mockPublicationResults3.setString(PublicationBean.DBCURATIONSTATUS,"");
-        mockPublicationResults3.setString(PublicationBean.DBCURATIONUPDATE,"");
+		mockPublicationResults3.setInteger(0,PublicationBean.DBID, 3);
+		mockPublicationResults3.setString(0,PublicationBean.DBPUBLICATIONTYPE,JOURNALTYPE);
+		mockPublicationResults3.setString(0,PublicationBean.DBDISPENSATION,"");
+		mockPublicationResults3.setString(0,PublicationBean.DBDOWNLOADED,"");
+		mockPublicationResults3.setString(0,PublicationBean.DBREVIEWED,"");
+		mockPublicationResults3.setString(0,PublicationBean.DBTITLE,"");
+		mockPublicationResults3.setString(0,PublicationBean.DBALTERNATETITLE,"");
+		mockPublicationResults3.setString(0,PublicationBean.DBAUTHORLIST,"");
+		mockPublicationResults3.setString(0,PublicationBean.DBEDITORLIST,"");
+		mockPublicationResults3.setString(0,PublicationBean.DBSOURCEPUBLICATION,"");
+		mockPublicationResults3.setInteger(0,PublicationBean.DBVOLUME,1);
+		mockPublicationResults3.setString(0,PublicationBean.DBISSUE,"");
+		mockPublicationResults3.setString(0,PublicationBean.DBSERIALIDENTIFIER,"");
+		mockPublicationResults3.setString(0,PublicationBean.DBPAGERANGE,"");
+		mockPublicationResults3.setString(0,PublicationBean.DBPUBLICATIONDATE,"");
+		mockPublicationResults3.setString(0,PublicationBean.DBPUBLICATIONYEAR,"");
+		mockPublicationResults3.setString(0,PublicationBean.DBDOI, doi3);
+		mockPublicationResults3.setString(0,PublicationBean.DBGENERATEDID, null);
+        mockPublicationResults3.setString(0,PublicationBean.DBCURATIONSTATUS,"");
+        mockPublicationResults3.setString(0,PublicationBean.DBCURATIONUPDATE,"");
 	}
 
 
-	private static MockResults mockTermResults2 = new MockResults();
+	private static MockResults mockTermResults2 = new MockResults(1);
 	static {
-		mockTermResults2.setInteger(TermBean.DBID,2);
-		mockTermResults2.setString(TermBean.DBSOURCEID,"http://purl.obolibrary.org/obo/SPD_0000001");
-		mockTermResults2.setInteger(TermBean.DBDOMAIN,2);
-		mockTermResults2.setInteger(TermBean.DBAUTHORITY,1);
-		mockTermResults2.setString(TermBean.DBLABEL,"whole organism");
-		mockTermResults2.setString(TermBean.DBGENERATEDID,null);
-		mockTermResults2.setString(TermBean.DBCOMMENT,"");
+		mockTermResults2.setInteger(0,TermBean.DBID,2);
+		mockTermResults2.setString(0,TermBean.DBSOURCEID,"http://purl.obolibrary.org/obo/SPD_0000001");
+		mockTermResults2.setInteger(0,TermBean.DBDOMAIN,2);
+		mockTermResults2.setInteger(0,TermBean.DBAUTHORITY,1);
+		mockTermResults2.setString(0,TermBean.DBLABEL,"whole organism");
+		mockTermResults2.setString(0,TermBean.DBGENERATEDID,null);
+		mockTermResults2.setString(0,TermBean.DBCOMMENT,"");
 	}
 
-	private static MockResults mockTermResults4838 = new MockResults();
+	private static MockResults mockTermResults4838 = new MockResults(1);
 	static {
-		mockTermResults4838.setInteger(TermBean.DBID,4838);
-		mockTermResults4838.setString(TermBean.DBSOURCEID,"http://purl.obolibrary.org/obo/NCBITaxon_336608");
-		mockTermResults4838.setInteger(TermBean.DBDOMAIN,3);
-		mockTermResults4838.setInteger(TermBean.DBAUTHORITY,1);
-		mockTermResults4838.setString(TermBean.DBLABEL,"Tetragnatha straminea");
-		mockTermResults4838.setString(TermBean.DBGENERATEDID,"http://purl.obolibrary.org/obo/NCBITaxon_336608");
-		mockTermResults4838.setString(TermBean.DBCOMMENT,"");
+		mockTermResults4838.setInteger(0,TermBean.DBID,4838);
+		mockTermResults4838.setString(0,TermBean.DBSOURCEID,"http://purl.obolibrary.org/obo/NCBITaxon_336608");
+		mockTermResults4838.setInteger(0,TermBean.DBDOMAIN,3);
+		mockTermResults4838.setInteger(0,TermBean.DBAUTHORITY,1);
+		mockTermResults4838.setString(0,TermBean.DBLABEL,"Tetragnatha straminea");
+		mockTermResults4838.setString(0,TermBean.DBGENERATEDID,"http://purl.obolibrary.org/obo/NCBITaxon_336608");
+		mockTermResults4838.setString(0,TermBean.DBCOMMENT,"");
 	}
 
-	private static MockResults mockTermResults11398 = new MockResults();
+	private static MockResults mockTermResults11398 = new MockResults(1);
 	static {
-		mockTermResults11398.setInteger(TermBean.DBID,11398);
-		mockTermResults11398.setString(TermBean.DBSOURCEID,"http://purl.obolibrary.org/obo/NBO_0000358");
-		mockTermResults11398.setInteger(TermBean.DBDOMAIN,1);
-		mockTermResults11398.setInteger(TermBean.DBAUTHORITY,4);
-		mockTermResults11398.setString(TermBean.DBLABEL,"resting posture");
-		mockTermResults11398.setString(TermBean.DBGENERATEDID,null);
-		mockTermResults11398.setString(TermBean.DBCOMMENT,"");
+		mockTermResults11398.setInteger(0,TermBean.DBID,11398);
+		mockTermResults11398.setString(0,TermBean.DBSOURCEID,"http://purl.obolibrary.org/obo/NBO_0000358");
+		mockTermResults11398.setInteger(0,TermBean.DBDOMAIN,1);
+		mockTermResults11398.setInteger(0,TermBean.DBAUTHORITY,4);
+		mockTermResults11398.setString(0,TermBean.DBLABEL,"resting posture");
+		mockTermResults11398.setString(0,TermBean.DBGENERATEDID,null);
+		mockTermResults11398.setString(0,TermBean.DBCOMMENT,"");
 	}
 	
 
-	private static MockResults mockTermResults10473 = new MockResults();
+	private static MockResults mockTermResults10473 = new MockResults(1);
 	static {
-		mockTermResults10473.setInteger(TermBean.DBID, 10473);
-		mockTermResults10473.setString(TermBean.DBSOURCEID,"http://purl.obolibrary.org/obo/SPD_0000001");
-		mockTermResults10473.setInteger(TermBean.DBDOMAIN,2);
-		mockTermResults10473.setInteger(TermBean.DBAUTHORITY,4);
-		mockTermResults10473.setString(TermBean.DBLABEL,"whole organism");
-		mockTermResults10473.setString(TermBean.DBGENERATEDID,null);
-		mockTermResults10473.setString(TermBean.DBCOMMENT,"");
+		mockTermResults10473.setInteger(0,TermBean.DBID, 10473);
+		mockTermResults10473.setString(0,TermBean.DBSOURCEID,"http://purl.obolibrary.org/obo/SPD_0000001");
+		mockTermResults10473.setInteger(0,TermBean.DBDOMAIN,2);
+		mockTermResults10473.setInteger(0,TermBean.DBAUTHORITY,4);
+		mockTermResults10473.setString(0,TermBean.DBLABEL,"whole organism");
+		mockTermResults10473.setString(0,TermBean.DBGENERATEDID,null);
+		mockTermResults10473.setString(0,TermBean.DBCOMMENT,"");
 		
 	}
 
-
 	
-	private static MockResults mockParticipantResults1 = new MockResults();
+	private static MockResults mockParticipantResults1 = new MockResults(1);
 	static {
-		mockParticipantResults1.setInteger(ParticipantBean.DBID,1);
-		mockParticipantResults1.setString(ParticipantBean.DBQUANTIFICATION,"some");
-		mockParticipantResults1.setString(ParticipantBean.DBLABEL,"");
-		mockParticipantResults1.setString(ParticipantBean.DBGENERATEDID,null);
-		mockParticipantResults1.setInteger(ParticipantBean.DBPROPERTY, 306);  //used
-		mockParticipantResults1.setString(ParticipantBean.DBPUBLICATIONTAXON,TESTPUBTAXON);
-		mockParticipantResults1.setString(ParticipantBean.DBPUBLICATIONANATOMY,"");
-		mockParticipantResults1.setString(ParticipantBean.DBPUBLICATIONSUBSTRATE,"");
-		mockParticipantResults1.setInteger(ParticipantBean.DBHEADELEMENT,1);
+		mockParticipantResults1.setInteger(0,ParticipantBean.DBID,1);
+		mockParticipantResults1.setString(0,ParticipantBean.DBQUANTIFICATION,"some");
+		mockParticipantResults1.setString(0,ParticipantBean.DBLABEL,"");
+		mockParticipantResults1.setString(0,ParticipantBean.DBGENERATEDID,null);
+		mockParticipantResults1.setInteger(0,ParticipantBean.DBPROPERTY, 306);  //used
+		mockParticipantResults1.setString(0,ParticipantBean.DBPUBLICATIONTAXON,TESTPUBTAXON);
+		mockParticipantResults1.setString(0,ParticipantBean.DBPUBLICATIONANATOMY,"");
+		mockParticipantResults1.setString(0,ParticipantBean.DBPUBLICATIONSUBSTRATE,"");
+		mockParticipantResults1.setInteger(0,ParticipantBean.DBHEADELEMENT,1);
 	}
 
-	private static MockResults mockParticipantResults2 = new MockResults();
+	private static MockResults mockParticipantResults2 = new MockResults(1);
 	static {
-		mockParticipantResults2.setInteger(ParticipantBean.DBID,2);
-		mockParticipantResults2.setString(ParticipantBean.DBQUANTIFICATION,"some");
-		mockParticipantResults2.setString(ParticipantBean.DBLABEL,"");
-		mockParticipantResults2.setString(ParticipantBean.DBGENERATEDID,null);
-		mockParticipantResults2.setString(ParticipantBean.DBPUBLICATIONTAXON,TESTPUBTAXON);
-		mockParticipantResults2.setString(ParticipantBean.DBPUBLICATIONANATOMY,"");
-		mockParticipantResults2.setString(ParticipantBean.DBPUBLICATIONSUBSTRATE,"");
-		mockParticipantResults2.setInteger(ParticipantBean.DBHEADELEMENT,51);
+		mockParticipantResults2.setInteger(0,ParticipantBean.DBID,2);
+		mockParticipantResults2.setString(0,ParticipantBean.DBQUANTIFICATION,"some");
+		mockParticipantResults2.setString(0,ParticipantBean.DBLABEL,"");
+		mockParticipantResults2.setString(0,ParticipantBean.DBGENERATEDID,null);
+		mockParticipantResults2.setString(0,ParticipantBean.DBPUBLICATIONTAXON,TESTPUBTAXON);
+		mockParticipantResults2.setString(0,ParticipantBean.DBPUBLICATIONANATOMY,"");
+		mockParticipantResults2.setString(0,ParticipantBean.DBPUBLICATIONSUBSTRATE,"");
+		mockParticipantResults2.setInteger(0,ParticipantBean.DBHEADELEMENT,51);
 	}
 	
-	private static MockResults mockClaimResults = new MockResults();
+	private static MockResults mockClaimResults = new MockResults(1);
 	static{
-		mockClaimResults.setInteger(ClaimBean.DBID, 1);
-		mockClaimResults.setInteger(ClaimBean.DBPUBLICATION,6);
-		mockClaimResults.setInteger(ClaimBean.DBBEHAVIORTERM,9);
-		mockClaimResults.setString(ClaimBean.DBPUBLICATIONBEHAVIOR,"behavior");
-		mockClaimResults.setInteger(ClaimBean.DBEVIDENCE,0);
-		mockClaimResults.setString(ClaimBean.DBGENERATEDID,"");
-		mockClaimResults.setString(ClaimBean.DBPUBDOI, TESTDOI);
-		mockClaimResults.setString(ClaimBean.DBBEHAVIORSOURCEID, TESTBEHAVIOR);
+		mockClaimResults.setInteger(0,ClaimBean.DBID, 1);
+		mockClaimResults.setInteger(0,ClaimBean.DBPUBLICATION,6);
+		mockClaimResults.setInteger(0,ClaimBean.DBBEHAVIORTERM,9);
+		mockClaimResults.setString(0,ClaimBean.DBPUBLICATIONBEHAVIOR,"behavior");
+		mockClaimResults.setInteger(0,ClaimBean.DBEVIDENCE,0);
+		mockClaimResults.setString(0,ClaimBean.DBGENERATEDID,"");
+		mockClaimResults.setString(0,ClaimBean.DBPUBDOI, TESTDOI);
+		mockClaimResults.setString(0,ClaimBean.DBBEHAVIORSOURCEID, TESTBEHAVIOR);
 	}
 	
-	private static MockResults mockTaxonResults = new MockResults();
+	private static MockResults mockTaxonResults = new MockResults(1);
 	static{
-		mockTaxonResults.setInteger(TaxonBean.DBID, 1);
+		mockTaxonResults.setInteger(0,TaxonBean.DBID, 1);
 	}
 	
-	private static MockResults mockTaxonResults2 = new MockResults();
+	private static MockResults mockTaxonResults2 = new MockResults(1);
 	static{
-		mockTaxonResults2.setInteger(TaxonBean.DBID, 12);
+		mockTaxonResults2.setInteger(0,TaxonBean.DBID, 12);
 	}
 	
-	private static MockResults mockIndividualResults94 = new MockResults();
+	private static MockResults mockIndividualResults94 = new MockResults(1);
 	static{
-		mockIndividualResults94.setInteger(IndividualBean.DBID, 94);
-		mockIndividualResults94.setString(IndividualBean.DBLABEL, "female");
-		mockIndividualResults94.setString(IndividualBean.DBSOURCEID, null);
-		mockIndividualResults94.setString(IndividualBean.DBGENERATEDID, null);
-		mockIndividualResults94.setInteger(IndividualBean.DBTERM, 111938);
+		mockIndividualResults94.setInteger(0,IndividualBean.DBID, 94);
+		mockIndividualResults94.setString(0,IndividualBean.DBLABEL, "female");
+		mockIndividualResults94.setString(0,IndividualBean.DBSOURCEID, null);
+		mockIndividualResults94.setString(0,IndividualBean.DBGENERATEDID, null);
+		mockIndividualResults94.setInteger(0,IndividualBean.DBTERM, 111938);
 	}
 
-	private static MockResults mockIndividualResults95 = new MockResults();
+	private static MockResults mockIndividualResults95 = new MockResults(1);
 	static{
-		mockIndividualResults95.setInteger(IndividualBean.DBID, 95);
-		mockIndividualResults95.setString(IndividualBean.DBLABEL, "whole organism of female");
-		mockIndividualResults95.setString(IndividualBean.DBSOURCEID, null);
-		mockIndividualResults95.setString(IndividualBean.DBGENERATEDID, null);
-		mockIndividualResults95.setInteger(IndividualBean.DBTERM, 10473);
+		mockIndividualResults95.setInteger(0,IndividualBean.DBID, 95);
+		mockIndividualResults95.setString(0,IndividualBean.DBLABEL, "whole organism of female");
+		mockIndividualResults95.setString(0,IndividualBean.DBSOURCEID, null);
+		mockIndividualResults95.setString(0,IndividualBean.DBGENERATEDID, null);
+		mockIndividualResults95.setInteger(0,IndividualBean.DBTERM, 10473);
 	}
 
 
-	private static MockResults mockPElementResults = new MockResults();
+	private static MockResults mockPElementResults = new MockResults(1);
 	static{
-		mockPElementResults.setInteger(PElementBean.DBID, 1);
-		mockPElementResults.setInteger(PElementBean.DBTYPE, 1);
-		mockPElementResults.setInteger(PElementBean.DBPARTICIPANT, 1);		
+		mockPElementResults.setInteger(0,PElementBean.DBID, 1);
+		mockPElementResults.setInteger(0,PElementBean.DBTYPE, 1);
+		mockPElementResults.setInteger(0,PElementBean.DBPARTICIPANT, 1);		
 	}
 
-	private static MockResults mockPElementResults2 = new MockResults();
+	private static MockResults mockPElementResults2 = new MockResults(1);
 	static{
-		mockPElementResults2.setInteger(PElementBean.DBID, 2);
-		mockPElementResults2.setInteger(PElementBean.DBTYPE, 1);
-		mockPElementResults2.setInteger(PElementBean.DBPARTICIPANT, 1);
+		mockPElementResults2.setInteger(0,PElementBean.DBID, 2);
+		mockPElementResults2.setInteger(0,PElementBean.DBTYPE, 1);
+		mockPElementResults2.setInteger(0,PElementBean.DBPARTICIPANT, 1);
 	}
 	
-	private static MockResults mockPElementResults61 = new MockResults();
+	private static MockResults mockPElementResults61 = new MockResults(1);
 	static{
-		mockPElementResults61.setInteger(PElementBean.DBID, 61);
-		mockPElementResults61.setInteger(PElementBean.DBTYPE, 3);
-		mockPElementResults61.setInteger(PElementBean.DBPARTICIPANT, 29);
+		mockPElementResults61.setInteger(0,PElementBean.DBID, 61);
+		mockPElementResults61.setInteger(0,PElementBean.DBTYPE, 3);
+		mockPElementResults61.setInteger(0,PElementBean.DBPARTICIPANT, 29);
 		
 	}
 	
 	
-	private static MockResults mockPEParentResults = new MockResults();
+	private static MockResults mockPEParentResults = new MockResults(1);
 	static {
-		mockPEParentResults.setInteger(PElementBean.DBPARENTID, 1);
-		mockPEParentResults.setInteger(PElementBean.DBPARENTPROPERTY, 1);
+		mockPEParentResults.setInteger(0,PElementBean.DBPARENTID, 1);
+		mockPEParentResults.setInteger(0,PElementBean.DBPARENTPROPERTY, 1);
 	}
 	
 	
-	private static MockResults mockPEChildResults = new MockResults();
+	private static MockResults mockPEChildResults = new MockResults(1);
 	static {
-		mockPEChildResults.setInteger(PElementBean.DBCHILDID, 1);
-		mockPEChildResults.setInteger(PElementBean.DBCHILDPROPERTY, 1);		
+		mockPEChildResults.setInteger(0,PElementBean.DBCHILDID, 1);
+		mockPEChildResults.setInteger(0,PElementBean.DBCHILDPROPERTY, 1);		
 	}
 	
 	
@@ -250,45 +249,45 @@ public class MockConnection implements AbstractConnection {
 	final static String ACTIVELYPARTICIPATESINLABEL = "actively participates in";
 	
 
-	private static MockResults mockPropertyResults1 = new MockResults();
+	private static MockResults mockPropertyResults1 = new MockResults(1);
 	static {
-		mockPropertyResults1.setInteger(PropertyBean.DBID, 306);
-		mockPropertyResults1.setString(PropertyBean.DBSOURCEID, ACTIVELYPARTICIPATESINURL);
-		mockPropertyResults1.setInteger(PropertyBean.DBAUTHORITY,0);
-		mockPropertyResults1.setString(PropertyBean.DBLABEL,ACTIVELYPARTICIPATESINLABEL);
-		mockPropertyResults1.setString(PropertyBean.DBGENERATEDID,null);
-		mockPropertyResults1.setString(PropertyBean.DBCOMMENT,null);		
+		mockPropertyResults1.setInteger(0,PropertyBean.DBID, 306);
+		mockPropertyResults1.setString(0,PropertyBean.DBSOURCEID, ACTIVELYPARTICIPATESINURL);
+		mockPropertyResults1.setInteger(0,PropertyBean.DBAUTHORITY,0);
+		mockPropertyResults1.setString(0,PropertyBean.DBLABEL,ACTIVELYPARTICIPATESINLABEL);
+		mockPropertyResults1.setString(0,PropertyBean.DBGENERATEDID,null);
+		mockPropertyResults1.setString(0,PropertyBean.DBCOMMENT,null);		
 	}
 	
-	private static MockResults termFillResultsNull = new MockResults();
+	private static MockResults termFillResultsNull = new MockResults(1);
 	static {
-		termFillResultsNull.setInteger(PElementBean.DBTERM, (Integer) null);
+		termFillResultsNull.setInteger(0,PElementBean.DBTERM, (Integer) null);
 	}
 	
-	private static MockResults termFillResults4838 = new MockResults();
+	private static MockResults termFillResults4838 = new MockResults(1);
 	static {
-		termFillResults4838.setInteger(PElementBean.DBTERM, 4838);
+		termFillResults4838.setInteger(0,PElementBean.DBTERM, 4838);
 	}
 
 	
-	private static MockResults termFillResults10473 = new MockResults();
+	private static MockResults termFillResults10473 = new MockResults(1);
 	static {
-		termFillResults10473.setInteger(PElementBean.DBTERM, 10473);
+		termFillResults10473.setInteger(0,PElementBean.DBTERM, 10473);
 	}
 
-	private static MockResults termFillResults11398 = new MockResults();
+	private static MockResults termFillResults11398 = new MockResults(1);
 	static {
-		termFillResults11398.setInteger(PElementBean.DBTERM, 11398);
+		termFillResults11398.setInteger(0,PElementBean.DBTERM, 11398);
 	}
 
-	private static MockResults individualFillResultsNull = new MockResults();
+	private static MockResults individualFillResultsNull = new MockResults(1);
 	static {
-		individualFillResultsNull.setInteger(PElementBean.DBINDIVIDUAL, (Integer) null);
+		individualFillResultsNull.setInteger(0,PElementBean.DBINDIVIDUAL, (Integer) null);
 	}
 
-	private static MockResults individualFillResults94 = new MockResults();
+	private static MockResults individualFillResults94 = new MockResults(1);
 	static {
-		individualFillResults94.setInteger(PElementBean.DBINDIVIDUAL, 94);
+		individualFillResults94.setInteger(0,PElementBean.DBINDIVIDUAL, 94);
 	}
 	
 	private static Map<String,String> mockImportSourceMap = new HashMap<String,String>();
@@ -484,7 +483,7 @@ public class MockConnection implements AbstractConnection {
 	public void updateClaim(ClaimBean cl){
 		switch (cl.getId()){
 		case 1:
-			mockClaimResults.setString(ClaimBean.DBGENERATEDID, cl.getGeneratedId());
+			mockClaimResults.setString(0,ClaimBean.DBGENERATEDID, cl.getGeneratedId());
 			break;
 		default:
 			break;
@@ -500,10 +499,10 @@ public class MockConnection implements AbstractConnection {
 	public void updatePublication(PublicationBean p){
 		switch (p.getId()){
 		case 2:
-			mockPublicationResults2.setString(PublicationBean.DBGENERATEDID, p.getGeneratedId());
+			mockPublicationResults2.setString(0,PublicationBean.DBGENERATEDID, p.getGeneratedId());
 			break;
 		case 3:
-			mockPublicationResults3.setString(PublicationBean.DBGENERATEDID, p.getGeneratedId());
+			mockPublicationResults3.setString(0,PublicationBean.DBGENERATEDID, p.getGeneratedId());
 			break;
 		default:
 			break;
@@ -559,10 +558,10 @@ public class MockConnection implements AbstractConnection {
 	public void updateIndividual(IndividualBean ib){
 		switch (ib.getId()){
 		case 94:
-			mockIndividualResults94.setString(IndividualBean.DBGENERATEDID, ib.getGeneratedId());
+			mockIndividualResults94.setString(0,IndividualBean.DBGENERATEDID, ib.getGeneratedId());
 			break;
 		case 95:
-			mockIndividualResults95.setString(IndividualBean.DBGENERATEDID, ib.getGeneratedId());
+			mockIndividualResults95.setString(0,IndividualBean.DBGENERATEDID, ib.getGeneratedId());
 			break;
 		default:
 			throw new IllegalStateException("mock Individual Bean has unknown id");

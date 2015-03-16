@@ -9,19 +9,24 @@ import java.util.Set;
 
 public class MockResults implements AbstractResults {
 
-	private final Map<Integer,Integer> intResults = new HashMap<Integer,Integer>();
-	private final Map<Integer,String> stringResults = new HashMap<Integer,String>();
-	private final Map<Integer,Boolean> booleanResults = new HashMap<Integer,Boolean>();
-	private final Set<Integer> nullFields = new HashSet<Integer>();
 	private int count = 0;
-	private int size = 0;
+	final private int size;
+	final private RowResult[] rows;
+	
+	public MockResults(int rowCount){
+		size = rowCount;
+		rows = new RowResult[size];
+		for (int i=0;i< size;i++){
+			rows[i] = new RowResult();
+		}
+	}
 	
 	@Override
 	public int getInt(int field) throws SQLException {
-		if (intResults.containsKey(field)){
-			return intResults.get(field);
+		if (rows[count].intResults.containsKey(field)){
+			return rows[count].intResults.get(field);
 		}
-		else if (nullFields.contains(field)){
+		else if (rows[count].nullFields.contains(field)){
 			return 0;
 		}
 		else {
@@ -31,8 +36,8 @@ public class MockResults implements AbstractResults {
 
 	@Override
 	public String getString(int field) throws SQLException {
-		if (stringResults.containsKey(field)){
-			return stringResults.get(field);
+		if (rows[count].stringResults.containsKey(field)){
+			return rows[count].stringResults.get(field);
 		}
 		else {
 			throw new SQLException("Bad string field in MockResults: " + field);
@@ -41,8 +46,8 @@ public class MockResults implements AbstractResults {
 	
 	@Override
 	public boolean getBoolean(int field) throws SQLException {
-		if (booleanResults.containsKey(field)){
-			return booleanResults.get(field);
+		if (rows[count].booleanResults.containsKey(field)){
+			return rows[count].booleanResults.get(field);
 		}
 		else {
 			throw new SQLException("Bad boolean field in MockResults: " + field);
@@ -60,21 +65,26 @@ public class MockResults implements AbstractResults {
 	}
 	
 	
-	public void setInteger(int f,Integer i){
+	public void setInteger(int row,int f,Integer i){
 		if (i != null){
-			intResults.put(f, i);
+			rows[row].intResults.put(f, i);
 		}
 		else {
-			nullFields.add(f);
+			rows[row].nullFields.add(f);
 		}
 	}
 	
-	public void setString(int f, String s){
-		stringResults.put(f, s);
+	public void setString(int row, int f, String s){
+		rows[row].stringResults.put(f, s);
 	}
 
-	public void setSize(int s){
-		size = s;
-	}
 	
+	
+	private static class RowResult{
+		private final Map<Integer,Integer> intResults = new HashMap<Integer,Integer>();
+		private final Map<Integer,String> stringResults = new HashMap<Integer,String>();
+		private final Map<Integer,Boolean> booleanResults = new HashMap<Integer,Boolean>();
+		private final Set<Integer> nullFields = new HashSet<Integer>();
+
+	}
 }
