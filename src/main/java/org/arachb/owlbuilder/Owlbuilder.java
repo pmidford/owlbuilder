@@ -30,6 +30,7 @@ import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassAxiom;
 import org.semanticweb.owlapi.model.OWLDataFactory;
+import org.semanticweb.owlapi.model.OWLIndividual;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLObjectPropertyAxiom;
 import org.semanticweb.owlapi.model.OWLObjectPropertyExpression;
@@ -104,6 +105,12 @@ public class Owlbuilder{
 		format.asPrefixOWLOntologyFormat().setPrefix("doi", "http://dx.doi.org/");
 	}
 
+	void setUpForTesting() throws Exception{
+		mergedSources = testWrapper.getSourceOntology();
+		preReasoner = rfactory.createReasoner(mergedSources);
+	}
+	
+	
 	void process() throws Exception{	
 		target = testWrapper.getSourceOntology();
 		log.info("Loading ontologies");
@@ -257,7 +264,7 @@ public class Owlbuilder{
 			for (OWLAnnotationAssertionAxiom a : taxonAnnotations){
 				if (a.getAnnotation().getProperty().isLabel()){
 					manager.addAxiom(target, a);
-					log.info("Taxon label is: " + a.getAnnotation().getValue().toString());
+					log.debug("Taxon label is: " + a.getAnnotation().getValue().toString());
 				}
 			}
 		}
@@ -293,6 +300,7 @@ public class Owlbuilder{
 	}
 	
 	public void initializeMiscTermAndParents(OWLClass term){
+		assert term != null;
 		initializeMiscTerm(term);
 		final NodeSet<OWLClass> termParents = preReasoner.getSuperClasses(term, false);
 		for (OWLClass c : termParents.getFlattened()){
@@ -303,7 +311,8 @@ public class Owlbuilder{
 	
 	public void initializeMiscTerm(OWLClass term){
 		final OWLOntologyManager manager = testWrapper.getManager();
-		Set<OWLClassAxiom> taxonAxioms =  mergedSources.getAxioms(term);
+		assert mergedSources != null;
+		Set<OWLClassAxiom> taxonAxioms = mergedSources.getAxioms(term);
 		if (taxonAxioms.isEmpty()){
 			log.error("No Axioms for term " + term);
 		}
@@ -352,6 +361,16 @@ public class Owlbuilder{
 			}
 		}
 	}
+	
+	/**
+	 * This should assert misc properties for individuals (e.g., a rdf:label)
+	 * @param ind
+	 */
+	public void initializeMiscIndividual(OWLIndividual ind){
+		//TODO implement
+		final OWLOntologyManager manager = testWrapper.getManager();
+	}
+	
 	
 	private void saveOntology() throws OWLOntologyStorageException{
 		log.info("Saving ontology");			

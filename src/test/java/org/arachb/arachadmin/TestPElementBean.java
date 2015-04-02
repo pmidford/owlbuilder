@@ -19,7 +19,6 @@ public class TestPElementBean {
 
     private AbstractConnection testConnection;
 
-    private int TESTCLAIMID = 1;
     private final static int TESTPUBTAXONDBID = 4838;
     private final static int TESTPUBANATOMYID = 10473;
     private ClaimBean testClaim1;
@@ -151,13 +150,13 @@ public class TestPElementBean {
 	@Test
 	public void testResolveChildren() throws Exception{
 		testConnection.fillPElementChildren(testElement1);
-		testElement1.resolveParents(testParticipant1,testConnection);
+		testElement1.resolveChildren(testParticipant1,testConnection);
 		testConnection.fillPElementChildren(testElement2);
-		testElement2.resolveParents(testParticipant1,testConnection);
+		testElement2.resolveChildren(testParticipant1,testConnection);
 		testConnection.fillPElementChildren(testElement61);
-		testElement61.resolveParents(testParticipant29,testConnection);
+		testElement61.resolveChildren(testParticipant29,testConnection);
 		testConnection.fillPElementChildren(testElement62);
-		testElement62.resolveParents(testParticipant29,testConnection);
+		testElement62.resolveChildren(testParticipant29,testConnection);
 	}
 
 

@@ -90,10 +90,13 @@ public class TermBean extends CachingBean implements UpdateableBean{
 
 	@Override
 	public String checkIRIString(IRIManager manager) throws SQLException{
-		if (getGeneratedId() == null){
-			manager.generateIRI(this);
+		if (getSourceId() == null){
+			if (getGeneratedId() == null){
+				manager.generateIRI(this);
+			}
+			return getGeneratedId();
 		}
-		return getGeneratedId();
+		return getSourceId();
 	}
 
 

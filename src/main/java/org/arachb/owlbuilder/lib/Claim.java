@@ -105,7 +105,7 @@ public class Claim implements GeneratingEntity {
 		final OWLDataFactory factory = builder.getDataFactory();
 		final OWLClass textualEntityClass = factory.getOWLClass(Vocabulary.textualEntity);
 		final OWLObjectProperty denotesProp = factory.getOWLObjectProperty(Vocabulary.denotesProperty);
-		OWLObjectProperty hasParticipant = factory.getOWLObjectProperty(Vocabulary.hasParticipantProperty);
+		final OWLObjectProperty hasParticipant = factory.getOWLObjectProperty(Vocabulary.hasParticipantProperty);
 		if (owl_part instanceof OWLClassExpression){
         	Set<OWLClassExpression> supersets = new HashSet<OWLClassExpression>(); 
         	supersets.add(textualEntityClass);
