@@ -52,7 +52,12 @@
     <dependency> 
       <groupId>org.semanticweb.elk</groupId> 
       <artifactId>elk-owlapi</artifactId> 
-      <version>0.4.1</version> 
+      <version>0.4.2</version> 
+    </dependency>
+    <dependency>
+      <groupId>com.hermit-reasoner</groupId> 
+  	  <artifactId>org.semanticweb.hermit</artifactId> 
+      <version>1.3.8.1</version> 
     </dependency> 
     <dependency>
       <groupId>mysql</groupId>
@@ -83,6 +88,21 @@
           <target>1.6</target>
         </configuration>
       </plugin>
+          <plugin>
+      <!-- Build an executable JAR -->
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-jar-plugin</artifactId>
+      <version>2.4</version>
+      <configuration>
+        <archive>
+          <manifest>
+            <addClasspath>true</addClasspath>
+            <mainClass>org.arachb.owlbuilder.Owlbuilder</mainClass>
+          </manifest>
+        </archive>
+      </configuration>
+    </plugin>
+ 
     </plugins>
   </build>
   <properties>
