@@ -68,22 +68,24 @@ public class Participant implements GeneratingEntity{
 		return result;
 	}
 	
-	@Override	
+	@Override
 	public OWLObject generateOWL(Owlbuilder builder) throws SQLException{
 		final Map<String, OWLObject> owlElements = new HashMap<String, OWLObject>();
-		final OWLDataFactory factory = builder.getDataFactory();
 		PElementBean headBean = bean.getElementBean(bean.getHeadElement());
 		PropertyBean propBean= bean.getParticipationBean();
 		OWLObject headObject = generateElementOWL(headBean,builder, owlElements);
 		Set <Integer>children = headBean.getChildren();
-		log.info("children size: " + children.size());
-		OWLObject childObject = null;
-		if (children.size() > 0){
+		switch (children.size()){
+		case 0:
+			return generateNoDependentOWL(builder, propBean, headObject);
+		case 1:
 			Integer childIndex = children.iterator().next();
 			PElementBean childBean = bean.getElementBean(childIndex);
-			childObject = generateRestrictionClass(builder, owlElements, childBean);
-		}	
-		return generateDependentOWL(builder, propBean, headObject, childObject);
+			OWLObject childObject = generateRestrictionClass(builder, owlElements, childBean);
+			return generateDependentOWL(builder, propBean, headObject, childObject);
+		default:
+			throw new RuntimeException("Didn't expect " + children.size() + " children");
+		}
 	}
 
 	/**
@@ -119,10 +121,39 @@ public class Participant implements GeneratingEntity{
 			}
 			else{
 				OWLClassExpression propertyRestriction = 
-						factory.getOWLObjectSomeValuesFrom(elementProperty,headClass); 
+						factory.getOWLObjectSomeValuesFrom(elementProperty,headClass);
 				log.info("Generated Property restriction: " + propertyRestriction);
 				return propertyRestriction;
 			}
+		}
+		else if (headObject instanceof OWLIndividual){
+			log.info("Generated Individual reference: " + headObject);
+			return headObject; //TODO finish implementing individual case
+		}
+		else {
+			throw new RuntimeException("Bad head object in participant: " + headObject);
+		}
+	}
+
+	
+	/**
+	 * @param factory
+	 * @param propBean
+	 * @param headObject
+	 * @param childObject
+	 * @return
+	 */
+	private OWLObject generateNoDependentOWL(Owlbuilder builder,
+			PropertyBean propBean, OWLObject headObject) {
+		final OWLDataFactory factory = builder.getDataFactory();
+		IRI propertyIRI = IRI.create(propBean.getSourceId());
+		OWLObjectProperty elementProperty = factory.getOWLObjectProperty(propertyIRI);
+		if (headObject instanceof OWLClassExpression){
+			final OWLClassExpression headClass = (OWLClassExpression)headObject;
+			OWLClassExpression propertyRestriction = 
+					factory.getOWLObjectSomeValuesFrom(elementProperty,headClass); 
+			log.info("Generated Property restriction: " + propertyRestriction);
+			return propertyRestriction;
 		}
 		else if (headObject instanceof OWLIndividual){
 			log.info("Generated Individual reference: " + headObject);
@@ -133,6 +164,7 @@ public class Participant implements GeneratingEntity{
 		}
 	}
 
+	
 	/**
 	 * @param builder
 	 * @param owlElements
@@ -141,15 +173,18 @@ public class Participant implements GeneratingEntity{
 	 * @return
 	 */
 	private OWLObject generateRestrictionClass(Owlbuilder builder,
-			final Map<String, OWLObject> owlElements,
-			PElementBean childBean) {
+											   final Map<String, OWLObject> owlElements,
+											   PElementBean peb) {
 		final OWLDataFactory factory = builder.getDataFactory();
-		Set <Integer>parentSet = childBean.getParents();
-		Integer parentIndex = parentSet.iterator().next();
-		PropertyBean childProp = childBean.getParentProperty(parentIndex);
+		Integer parentIndex = peb.getSingletonParent();
+		PropertyBean childProp = peb.getParentProperty(parentIndex);
 		IRI childPropIRI = IRI.create(childProp.getSourceId());
 		OWLObjectProperty childProperty = factory.getOWLObjectProperty(childPropIRI);
-		OWLObject childElement = generateElementOWL(childBean,builder, owlElements);
+		OWLObject childElement = generateElementOWL(peb,builder, owlElements);
+		Set <Integer>children = peb.getChildren();
+		if (children.size() >0){
+			log.info("children size: " + children.size());
+		}
 		if (childElement instanceof OWLClassExpression){
 			final OWLClassExpression childClass = (OWLClassExpression)childElement;
 			OWLClassExpression childPropertyRestriction = 
@@ -165,153 +200,6 @@ public class Participant implements GeneratingEntity{
 		}
 	}
 	
-	
-	private OWLObject traverseElements(Owlbuilder builder, 
-			                           Map<String, OWLObject> owlElements, 
-			                           PElementBean childElement,
-			                           PropertyBean childProperty){
-		final Set<Integer>grandChildren = childElement.getChildren();
-		final OWLDataFactory factory = builder.getDataFactory();
-		switch (grandChildren.size()){
-		case 0:
-			return generateElementOWL(childElement, builder, owlElements);
-		case 1:
-			Integer grandChild = grandChildren.iterator().next();
-			OWLClassExpression intersectExpr =
-					factory.getOWLObjectIntersectionOf(childClass,propertyExpr);
-			OWLObject grandChildOWL =
-					generateLinearElementExpressionOWL(childElement, 
-													   childProperty,
-													   grandChild,
-													   builder,
-													   owlElements);
-		default:
-			return generateBranchedElementExpressionOWL(childElement,
-					childProperty,
-					grandChildren,
-					builder,
-					owlElements);
-		}			
-	}
-
-	
-	OWLObject generateLinearElementExpressionOWL(PElementBean pe, 
-										         PropertyBean pb, 
-										         Integer childIndex, 
-										         Owlbuilder builder, 
-										         Map<String, OWLObject> elements){
-		final OWLDataFactory factory = builder.getDataFactory();
-		final OWLOntologyManager manager = builder.getOntologyManager();
-		final OWLOntology target = builder.getTarget();
-		IRI propertyIRI = IRI.create(pb.getSourceId());
-		PElementBean grandChild = pe.getChildElement(childIndex);
-		PropertyBean grandChildBean = pe.getChildProperty(childIndex);
-		OWLObject grandChildOWL = traverseElements(builder, elements, grandChild,  grandChildBean);
-		OWLObjectProperty elementProperty = factory.getOWLObjectProperty(propertyIRI);
-		if (grandChildOWL instanceof OWLClassExpression){
-			final OWLClassExpression grandChildClass = (OWLClassExpression) grandChildOWL;
-			OWLClassExpression propertyExpr = 
-					factory.getOWLObjectSomeValuesFrom(elementProperty,grandChildClass); 
-			return intersectExpr;
-			
-		}
-		else if (grandChildOWL instanceof OWLIndividual){
-			
-		}
-		else if (child == null){
-			return termClass;
-		}
-		else {
-			throw new RuntimeException(GENERATEOWLBADCHILD + child);
-		}
-		if (pe.getTerm() != null){
-			OWLClassExpression termClass = generateTermOWL(pe.getTerm(), builder, elements);
-			if (child instanceof OWLClassExpression){
-				final OWLClassExpression childClass = (OWLClassExpression) child;
-				OWLClassExpression propertyExpr = 
-						factory.getOWLObjectSomeValuesFrom(elementProperty,termClass); 
-				OWLClassExpression intersectExpr =
-						factory.getOWLObjectIntersectionOf(childClass,propertyExpr);
-				return intersectExpr;
-			}
-			else if (child instanceof OWLIndividual){  //should be very rare
-				final OWLIndividual childIndividual = (OWLIndividual) child;
-				return childIndividual;
-			}
-		}
-		else if (pe.getIndividual() != null){
-			OWLIndividual individualExpression = generateIndividualOWL(pe.getIndividual(), builder, elements);
-			if (child instanceof OWLClassExpression){
-				return individualExpression;
-			}
-			else if (child instanceof OWLIndividual){
-				return individualExpression;
-			}
-			else if (child == null){
-				return individualExpression;
-			}
-			else {
-				throw new RuntimeException(GENERATEOWLBADCHILD + child);
-			}
-		}
-		else {
-			throw new IllegalStateException("Element " + pe.getId() + " is neither term nor individual");
-		}
-	}
-
-
-	OWLObject generateBranchedElementExpressionOWL(PElementBean pe, 
-			                                       PropertyBean pb, 
-			                                       Set<Integer> children, 
-			                                       Owlbuilder builder, 
-			                                       Map<String, OWLObject> elements){
-		final OWLDataFactory factory = builder.getDataFactory();
-		final OWLOntologyManager manager = builder.getOntologyManager();
-		final OWLOntology target = builder.getTarget();
-		IRI propertyIRI = IRI.create(pb.getSourceId());
-		OWLObjectProperty elementProperty = factory.getOWLObjectProperty(propertyIRI);
-		if (pe.getTerm() != null){
-			OWLClassExpression termClass = generateTermOWL(pe.getTerm(), builder, elements);
-			if (child instanceof OWLClassExpression){
-				final OWLClassExpression childClass = (OWLClassExpression) child;
-				OWLClassExpression propertyExpr = 
-						factory.getOWLObjectSomeValuesFrom(elementProperty,termClass); 
-				OWLClassExpression intersectExpr =
-						factory.getOWLObjectIntersectionOf(childClass,propertyExpr);
-				return intersectExpr;
-			}
-			else if (child instanceof OWLIndividual){  //should be very rare
-				final OWLIndividual childIndividual = (OWLIndividual) child;
-				return childIndividual;
-			}
-			else if (child == null){
-				return termClass;
-			}
-			else {
-				throw new RuntimeException(GENERATEOWLBADCHILD + child);
-			}
-		}
-		else if (pe.getIndividual() != null){
-			OWLIndividual individualExpression = generateIndividualOWL(pe.getIndividual(), builder, elements);
-			if (child instanceof OWLClassExpression){
-				return individualExpression;
-			}
-			else if (child instanceof OWLIndividual){
-				return individualExpression;
-			}
-			else if (child == null){
-				return individualExpression;
-			}
-			else {
-				throw new RuntimeException(GENERATEOWLBADCHILD + child);
-			}
-		}
-		else {
-			throw new IllegalStateException("Element " + pe.getId() + " is neither term nor individual");
-		}
-	}
-
-
 	
 	final static String GENERATEOWLBADCHILD = 
 			"Child passed to generateElementOWL is neither ClassExpression or Individual";
@@ -339,6 +227,7 @@ public class Participant implements GeneratingEntity{
 			}
 			else{
 				termIRI = IRI.create(termString);
+				log.info("Creating OWL class: " + termIRI);
 				OWLClass termClass = factory.getOWLClass(termIRI);
 				builder.initializeMiscTermAndParents(termClass);
 				elements.put(termString, termClass);
