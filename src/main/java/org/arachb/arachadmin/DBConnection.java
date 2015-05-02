@@ -1,6 +1,5 @@
 package org.arachb.arachadmin;
 
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -203,6 +202,13 @@ public class DBConnection implements AbstractConnection{
 		}
 		catch (Exception e){
 			log.error("DBConnection setup failed, encountered:",e);
+			if (c != null){
+				try {
+					c.close();
+				} catch (SQLException e1) {
+					return false;
+				}
+			}
 			return false;
 		}
 		finally{
@@ -234,16 +240,25 @@ public class DBConnection implements AbstractConnection{
 	
 	private final String DOMAINSQUERY = "SELECT id,name FROM domain";
 	
+	@SuppressWarnings("resource")
 	private void initDomains(Connection c) throws SQLException{
 		Statement domainStatement = c.createStatement();
-		ResultSet domainSet = domainStatement.executeQuery(DOMAINSQUERY);
-		while (domainSet.next()){
-			int id = domainSet.getInt("id");
-			String label = domainSet.getString("name");
-			id2domain.put(id, label);
-			domain2id.put(label, id);
+		ResultSet domainResult = null;
+		try{
+			domainResult = domainStatement.executeQuery(DOMAINSQUERY); 
+			if (domainResult.next()){
+				int id = domainResult.getInt("id");
+				String label = domainResult.getString("name");
+				id2domain.put(id, label);
+				domain2id.put(label, id);
+			}
 		}
-		domainStatement.close();
+		finally{
+			if (domainResult != null){
+				domainResult.close();
+			}
+			domainStatement.close();
+		}
 	}
 	
 	/**
@@ -281,22 +296,22 @@ public class DBConnection implements AbstractConnection{
 	
 	public PublicationBean getPublication(int id) throws SQLException{
 		PreparedStatement publicationStatement = c.prepareStatement(PUBLICATIONROWQUERY);
+		ResultSet rawResults = null;
+		PublicationBean result = null;
 		try{
 			publicationStatement.setInt(1, id);
-			ResultSet rawResults = publicationStatement.executeQuery();
+			rawResults = publicationStatement.executeQuery();
 			AbstractResults publicationResults = new DBResults(rawResults);
 			if (publicationResults.next()){
-				PublicationBean result = new PublicationBean();
+				result = new PublicationBean();
 				result.fill(publicationResults);
-				return result;
-			}
-			else {
-				return null;
 			}
 		}
 		finally{
+			rawResults.close();
 			publicationStatement.close();
 		}
+		return result;
 	}
 	
 	public Set<PublicationBean> getPublications() throws SQLException{
