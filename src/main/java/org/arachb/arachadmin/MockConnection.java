@@ -194,7 +194,7 @@ public class MockConnection implements AbstractConnection {
 		mockParticipantResults29.setString(0,ParticipantBean.DBPUBLICATIONTAXON,"Leucauge mariana");
 		mockParticipantResults29.setString(0,ParticipantBean.DBPUBLICATIONANATOMY,"female");
 		mockParticipantResults29.setString(0,ParticipantBean.DBPUBLICATIONSUBSTRATE,"");
-		mockParticipantResults29.setInteger(0,ParticipantBean.DBHEADELEMENT,61);
+		mockParticipantResults29.setInteger(0,ParticipantBean.DBHEADELEMENT,62);
 	}
 
 	
@@ -578,8 +578,6 @@ public class MockConnection implements AbstractConnection {
 		ClaimBean result = new ClaimBean();
 		switch (i){
 		case 1:
-			fillOrThrow(result,mockClaimResults1);
-			break;
 		case 2:
 			fillOrThrow(result,mockClaimResults1);
 			break;
@@ -872,22 +870,17 @@ public class MockConnection implements AbstractConnection {
 	@Override
 	public void fillPElementTerm(PElementBean pb) throws Exception {
 		switch (pb.getId()){
-		case 1:{
+		case 1:
 			pb.fillTerm(termFillResults4838, this);
 			break;
-		}
-		case 2: {
+		case 2: 
 			pb.fillTerm(termFillResults10473, this);
 			break;
-		}
-		case 61: {
+		case 61: 
+		case 62: 
 			pb.fillTerm(termFillResultsNull, this);
 			break;
-		}
-		case 62: {
-			pb.fillTerm(termFillResultsNull, this);
-			break;
-		}
+		
 		default:
 			throw new RuntimeException("Bad pelementbean id: " + pb.getId());
 		}
