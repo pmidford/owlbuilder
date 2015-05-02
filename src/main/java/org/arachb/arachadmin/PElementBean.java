@@ -66,7 +66,6 @@ public class PElementBean implements BeanBase {
 	@Override
 	public void fill(AbstractResults record) throws SQLException {
 		id = record.getInt(DBID);
-		log.info("Filling Element: " + this.toString() + " with id: " + id);
 		eletype = record.getInt(DBTYPE);
 		participant = record.getInt(DBPARTICIPANT);
 	}
@@ -104,7 +103,6 @@ public class PElementBean implements BeanBase {
 	
 
 	public void resolveParents(ParticipantBean pb, AbstractConnection c) throws Exception{
-		System.out.println("id = " + pb.getId() + " elements = " + pb.elements);
 		resolveDependents(pb, parentLinks, c);
 	}
 	
@@ -125,9 +123,16 @@ public class PElementBean implements BeanBase {
 		return parentLinks.keySet();
 	}
 	
+	public Integer getSingletonParent(){
+		if (parentLinks.size() != 1){
+			throw new RuntimeException("PElementBean " + toString() + " has number of parents other than 1");
+		}
+		else{
+			return parentLinks.keySet().iterator().next();
+		}
+	}
+	
 	public PElementBean getParentElement(Integer index){
-		log.info("index = " + index);
-		log.info("link = " + parentLinks.get(index).toString());
 		return parentLinks.get(index).getElement();
 	}
 
@@ -139,6 +144,16 @@ public class PElementBean implements BeanBase {
 	public Set<Integer> getChildren(){
 		return childLinks.keySet();
 	}
+	
+	public Integer getSingletonChild(){
+		if (childLinks.size() != 1){
+			throw new RuntimeException("PElementBean " + toString() + " has number of children other than 1");
+		}
+		else{
+			return childLinks.keySet().iterator().next();
+		}
+	}
+
 	
 	public PElementBean getChildElement(Integer index){
 		return childLinks.get(index).getElement();
