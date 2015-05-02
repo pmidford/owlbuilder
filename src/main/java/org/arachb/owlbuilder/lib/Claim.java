@@ -48,10 +48,10 @@ public class Claim implements GeneratingEntity {
 
 
 	@Override
-	public OWLObject generateOWL(Owlbuilder builder) throws Exception{		
+	public OWLObject generateOWL(Owlbuilder builder) throws Exception{
 		final AbstractConnection c = builder.getConnection();
-		OWLOntology target = builder.getTarget();
-		OWLOntologyManager manager = builder.getOntologyManager();
+		final OWLOntology target = builder.getTarget();
+		final OWLOntologyManager manager = builder.getOntologyManager();
 		final OWLDataFactory factory = builder.getDataFactory();
 		final OWLObjectProperty partofProperty = factory.getOWLObjectProperty(Vocabulary.partOfProperty);
 		final OWLIndividual claim_ind = factory.getOWLNamedIndividual(IRI.create(bean.getIRIString()));
@@ -73,9 +73,11 @@ public class Claim implements GeneratingEntity {
 			assert op != null;
 			owlParticipants.add(op);
 		}
+		log.info("After processing claim participants: " + bean.getId() +" database, target class count = " + target.getClassesInSignature().size());
 		for (OWLObject o : owlParticipants){
 			connectParticipant(builder, o, claim_ind, behaviorClass);
 		}
+		log.info("After connecting claim participants: " + bean.getId() +" database, target class count = " + target.getClassesInSignature().size());
 
 		Publication pub = new Publication(c.getPublication(bean.getPublication()));
 
@@ -133,6 +135,9 @@ public class Claim implements GeneratingEntity {
 		
 	}
 
+	public int getId(){
+		return bean.getId();
+	}
 	
 
 }
