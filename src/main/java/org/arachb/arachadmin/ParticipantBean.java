@@ -161,17 +161,17 @@ public class ParticipantBean implements UpdateableBean{
 		}
 		Set<PElementBean> elementset = c.getPElements(this);
 		for (PElementBean e : elementset){
-			log.info("    loading element" + e);
-			log.info("     id is" + e.getId());
-			log.info("     term is " + e.getTerm());
-			log.info("     individual is " + e.getIndividual());
+			log.debug("    loading element" + e);
+			log.debug("     id is" + e.getId());
+			log.debug("     term is " + e.getTerm());
+			log.debug("     individual is " + e.getIndividual());
 			elements.put(e.getId(), e);
 		}
 	}
 
 	public void resolveElements(AbstractConnection c) throws Exception{
 		assert elements.size() > 0 : "Participant: " + this.id + " has no elements";
-		log.info("      pb: " + this.getId() + " element count: " + elements.size());
+		log.debug("      pb: " + this.getId() + " element count: " + elements.size());
 		assert elements.containsKey(getHeadElement()) : "Participant: " + this.id + " has unregistered head element: " + getHeadElement();
 		headBean = c.getPElement(getHeadElement());
 		propertyBean = c.getProperty(getProperty());
@@ -188,7 +188,7 @@ public class ParticipantBean implements UpdateableBean{
 		final OWLOntology merged = builder.getMergedSources();
 		final OWLOntology extracted = builder.getTarget();
 		if (true){  //add appropriate when figured out
-			log.info("Need to add taxon: " + taxon.getIRI());
+			//log.info("Need to add taxon: " + taxon.getIRI());
 			//log.info("Defining Axioms");
 			manager.addAxioms(extracted, merged.getAxioms(taxon));
 			//log.info("Annotations");
@@ -196,7 +196,7 @@ public class ParticipantBean implements UpdateableBean{
 			for (OWLAnnotationAssertionAxiom a : taxonAnnotations){
 				//log.info("   Annotation Axiom: " + a.toString());
 				if (a.getAnnotation().getProperty().isLabel()){
-					log.info("Label is " + a.getAnnotation().getValue().toString());
+					log.debug("Label is " + a.getAnnotation().getValue().toString());
 					manager.addAxiom(extracted, a);
 				}
 			}
