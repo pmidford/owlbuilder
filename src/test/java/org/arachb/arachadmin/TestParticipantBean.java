@@ -60,7 +60,7 @@ public class TestParticipantBean {
 			assertEquals("Leucauge mariana", pb.getPublicationTaxon());
 			assertEquals("female", pb.getPublicationAnatomy());
 			assertEquals(0, pb.getSubstrate());
-			assertEquals(61, pb.getHeadElement());
+			assertEquals(62, pb.getHeadElement());
 		}
 	}
 
