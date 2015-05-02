@@ -9,6 +9,7 @@ import java.io.File;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -23,8 +24,10 @@ import org.arachb.owlbuilder.lib.Claim;
 import org.arachb.owlbuilder.lib.Config;
 import org.arachb.owlbuilder.lib.Taxon;
 import org.arachb.owlbuilder.lib.Vocabulary;
+import org.semanticweb.HermiT.Reasoner;
 import org.semanticweb.elk.owlapi.ElkReasonerFactory;
 import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLAnnotation;
 import org.semanticweb.owlapi.model.OWLAnnotationAssertionAxiom;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
@@ -39,9 +42,11 @@ import org.semanticweb.owlapi.model.OWLOntologyFormat;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 import org.semanticweb.owlapi.reasoner.InferenceType;
+import org.semanticweb.owlapi.reasoner.Node;
 import org.semanticweb.owlapi.reasoner.NodeSet;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
+import org.semanticweb.owlapi.reasoner.structural.StructuralReasonerFactory;
 import org.semanticweb.owlapi.util.InferredAxiomGenerator;
 import org.semanticweb.owlapi.util.InferredClassAssertionAxiomGenerator;
 import org.semanticweb.owlapi.util.InferredEquivalentClassAxiomGenerator;
@@ -60,6 +65,7 @@ public class Owlbuilder{
 	private final IRIManager iriManager;
 	private final AbstractConnection connection;
 	private final OWLReasonerFactory rfactory;
+	private final OWLReasonerFactory elkFactory;
 	private OWLOntology target;
 	private OWLReasoner preReasoner;
 	private OWLReasoner postReasoner;
@@ -99,7 +105,8 @@ public class Owlbuilder{
 			connection = DBConnection.getMockConnection();
 		}
 		testWrapper = new OWLGraphWrapper(targetIRI);
-		rfactory = new ElkReasonerFactory();
+		rfactory = new Reasoner.ReasonerFactory();
+		elkFactory = new ElkReasonerFactory();
 		iriManager = new IRIManager(connection);
 		final OWLOntologyFormat format = testWrapper.getManager().getOntologyFormat(testWrapper.getSourceOntology());
 		format.asPrefixOWLOntologyFormat().setPrefix("doi", "http://dx.doi.org/");
@@ -107,7 +114,7 @@ public class Owlbuilder{
 
 	void setUpForTesting() throws Exception{
 		mergedSources = testWrapper.getSourceOntology();
-		preReasoner = rfactory.createReasoner(mergedSources);
+		preReasoner = elkFactory.createReasoner(mergedSources);
 	}
 	
 	
@@ -117,37 +124,64 @@ public class Owlbuilder{
 		loadImportedOntologies();
 		mergedSources = mergeImportedOntologies();
 		loadCuratorAddedTerms(mergedSources);
+		//log.info("Saving ontology");			
+		//File f = new File("merged.owl");
+		//testWrapper.getManager().saveOntology(mergedSources, IRI.create(f.toURI()));		
+		
 		log.info("Initializing reasoner");
-		preReasoner = rfactory.createReasoner(mergedSources);
+
+        OWLReasonerFactory rf = new StructuralReasonerFactory();
+        preReasoner = rf.createReasoner(mergedSources);
+		//preReasoner = elkFactory.createReasoner(mergedSources);
 		log.info("Finished reasoner initialization");
         // Classify the ontology.
 		try{
 			preReasoner.precomputeInferences(InferenceType.CLASS_HIERARCHY);
 			log.info("Finished precomputing class hierarchy");
 			//target = manager.createOntology(IRI.create(targetIRI));
+			log.info("Before copying taxonomy, target class count = " +target.getClassesInSignature().size());
 			log.info("copying relevant taxonony to target ontology");
-			initializeTaxonomy();
+			initializeTaxonomy(target);
+			log.info("After copying taxonomy, target class count = " +target.getClassesInSignature().size());
 			log.info("copying misc support terms to target ontology");
+			log.info("Before adding misc classes, target class count = " +target.getClassesInSignature().size());
 			initializeMisc();
+			log.info("After adding misc classes, target class count = " +target.getClassesInSignature().size());
+			log.info("Before processing database, target class count = " +target.getClassesInSignature().size());
 			processDatabase();
-			preReasoner.flush();
-			postReasoner = rfactory.createReasoner(target);
-			postReasoner.precomputeInferences(InferenceType.CLASS_HIERARCHY);
+			log.info("After processing database, target class count = " +target.getClassesInSignature().size());
+			
+			//log.info("Saving ontology");			
+			//File f = new File("checkpoint.owl");
+			//testWrapper.getManager().saveOntology(target, IRI.create(f.toURI()));
+			if (true){
+				//preReasoner.flush();
+				log.info("disposing preReasoner");
+				preReasoner.dispose();
+				mergedSources = null;  // hopefully GC will notice this
+				log.info("starting post reasoning on target");
+				log.info("Creating postReasoner");
+				postReasoner = elkFactory.createReasoner(target);
+				log.info("Precomputing hierarchy");
+				postReasoner.precomputeInferences(InferenceType.CLASS_HIERARCHY);
 
-	        // To generate an inferred ontology we use implementations of
-	        // inferred axiom generators
-	        List<InferredAxiomGenerator<? extends OWLAxiom>> gens = new ArrayList<InferredAxiomGenerator<? extends OWLAxiom>>();
-	        gens.add(new InferredSubClassAxiomGenerator());
-	        gens.add(new InferredEquivalentClassAxiomGenerator());
-	        gens.add(new InferredClassAssertionAxiomGenerator());
+				// To generate an inferred ontology we use implementations of
+				// inferred axiom generators
+				List<InferredAxiomGenerator<? extends OWLAxiom>> gens = new ArrayList<InferredAxiomGenerator<? extends OWLAxiom>>();
+				gens.add(new InferredSubClassAxiomGenerator());
+				gens.add(new InferredEquivalentClassAxiomGenerator());
+				gens.add(new InferredClassAssertionAxiomGenerator());
 
-	        InferredOntologyGenerator iog = new InferredOntologyGenerator(postReasoner,
-	                        gens);
-	        iog.fillOntology(testWrapper.getManager(),target);
-	        
-	        saveOntology();
-			generateHTML();
-			log.info("Shutting down reasoner");
+				InferredOntologyGenerator iog = new InferredOntologyGenerator(postReasoner,
+						gens);
+				iog.fillOntology(testWrapper.getManager(),target);
+				log.info("flushing reasoner");
+				postReasoner.flush();
+
+				saveOntology();
+				generateHTML();
+				log.info("Shutting down reasoner");
+			}
 		}
 		catch(Exception e){
 			log.error(e);
@@ -172,6 +206,7 @@ public class Owlbuilder{
 	void processDatabase() throws Exception{
 		log.info("Processing Claims");
 		processClaims();
+		connection.close();
 	}
 	
 	/**
@@ -219,16 +254,16 @@ public class Owlbuilder{
  		}		
 	}
 	
-	private void initializeTaxonomy(){
+	private void initializeTaxonomy(OWLOntology targetontology){
 		OWLClass arachnidaClass = testWrapper.getDataFactory().getOWLClass(Vocabulary.arachnidaTaxon);
 		final NodeSet<OWLClass> arachnidaParents = preReasoner.getSuperClasses(arachnidaClass, false);
 		final NodeSet<OWLClass> arachnidaChildren = preReasoner.getSubClasses(arachnidaClass, false);
-		initializeTaxon(arachnidaClass);
+		initializeTaxon(arachnidaClass,targetontology);
 		for (OWLClass c : arachnidaParents.getFlattened()){
-			initializeTaxon(c);
+			initializeTaxon(c,targetontology);
 		}
 		for (OWLClass c : arachnidaChildren.getFlattened()){
-			initializeTaxon(c);
+			initializeTaxon(c,targetontology);
 		}
 	}
 	
@@ -243,7 +278,7 @@ public class Owlbuilder{
 		filterLabels.add("DNA10");
 	}
 	
-	private void initializeTaxon(OWLClass taxon){
+	private void initializeTaxon(OWLClass taxon, OWLOntology targetontology){
 		final OWLOntologyManager manager = testWrapper.getManager();
 		final Set<OWLAnnotationAssertionAxiom> taxonAnnotations = 
 				mergedSources.getAnnotationAssertionAxioms(taxon.getIRI());
@@ -260,10 +295,10 @@ public class Owlbuilder{
 		}
 		if (!skipTaxon){
 			Set<OWLClassAxiom> taxonAxioms =  mergedSources.getAxioms(taxon);
-			manager.addAxioms(target, taxonAxioms);
+			manager.addAxioms(targetontology, taxonAxioms);
 			for (OWLAnnotationAssertionAxiom a : taxonAnnotations){
 				if (a.getAnnotation().getProperty().isLabel()){
-					manager.addAxiom(target, a);
+					manager.addAxiom(targetontology, a);
 					log.debug("Taxon label is: " + a.getAnnotation().getValue().toString());
 				}
 			}
@@ -301,10 +336,34 @@ public class Owlbuilder{
 	
 	public void initializeMiscTermAndParents(OWLClass term){
 		assert term != null;
-		initializeMiscTerm(term);
-		final NodeSet<OWLClass> termParents = preReasoner.getSuperClasses(term, false);
-		for (OWLClass c : termParents.getFlattened()){
-			initializeMiscTerm(c);
+		if (term.getIRI().equals(IRI.create("http://purl.obolibrary.org/obo/NBO_0000356"))){
+			log.info("Found target Term; targetsize = " + this.getTarget().getClassesInSignature().size());
+			initializeMiscTerm(term);
+			log.info("Found target Term; targetsize = " + this.getTarget().getClassesInSignature().size());
+			final NodeSet<OWLClass> termParents = preReasoner.getSuperClasses(term, true);
+			log.info("Found target Term; parent set size = " + termParents.getFlattened().size());
+			log.info("Node set size = " + termParents.getNodes().size());
+			for (Node<OWLClass> n : termParents.getNodes()){
+				log.info("Node: " + n + "; size = " + n.getSize());
+				OWLClass c = n.getRepresentativeElement();
+				NodeSet<OWLClass> foo = preReasoner.getSubClasses(c, true);
+				if (foo.containsEntity(term)){
+					log.info("Subclass backcheck is true");
+				}
+				else {
+					log.info("Subclass backcheck is false");
+				}
+			}
+			for (OWLClass c : termParents.getFlattened()){
+				initializeMiscTerm(c);
+			}
+		}
+		else{
+			initializeMiscTerm(term);
+			final NodeSet<OWLClass> termParents = preReasoner.getSuperClasses(term, false);
+			for (OWLClass c : termParents.getFlattened()){
+				initializeMiscTerm(c);
+			}
 		}
 
 	}
@@ -313,8 +372,8 @@ public class Owlbuilder{
 		final OWLOntologyManager manager = testWrapper.getManager();
 		assert mergedSources != null;
 		Set<OWLClassAxiom> taxonAxioms = mergedSources.getAxioms(term);
-		if (taxonAxioms.isEmpty()){
-			log.error("No Axioms for term " + term);
+		if (taxonAxioms.isEmpty()){   //TODO add subclass relation to owl:Thing?
+			//log.error("No Axioms for term " + term);
 		}
 		else{
 			manager.addAxioms(target, taxonAxioms);
@@ -423,16 +482,34 @@ public class Owlbuilder{
 
 	public void loadCuratorAddedTerms(OWLOntology mergedSources) throws SQLException{
 		final Set<TaxonBean> taxa = connection.getTaxa();
+		final Set<OWLAxiom> taxonAxioms = new HashSet<OWLAxiom>();
+		final OWLDataFactory factory = getDataFactory();
 		for (TaxonBean tb : taxa){
 			Taxon t = new Taxon(tb);
 			String usable = tb.checkIRIString(getIRIManager());
 			if (usable == null){
-				
+				throw new RuntimeException("No usable IRI for curator added taxon: " + tb.getId());
 			}
-			final IRI iri = IRI.create(usable);
-			nonNCBITaxa.put(iri, t);
+			final IRI taxonIRI = IRI.create(usable);
+			OWLClass taxonClass = getDataFactory().getOWLClass(taxonIRI);
+			String parentString = tb.getParentSourceId();
+			if (parentString == null){
+				log.error("No parent specified for curator added taxon: " + tb.getId());
+			}
+			else{
+				final IRI parentIRI = IRI.create(parentString);
+				OWLClass parentClass = factory.getOWLClass(parentIRI);
+				taxonAxioms.add(factory.getOWLSubClassOfAxiom(taxonClass, parentClass));
+				nonNCBITaxa.put(taxonIRI, t);
+				if (tb.getName() != null){
+					OWLAnnotation labelAnno = 
+							factory.getOWLAnnotation(factory.getRDFSLabel(),
+									                 factory.getOWLLiteral(t.getName()));
+					taxonAxioms.add(factory.getOWLAnnotationAssertionAxiom(taxonIRI, labelAnno));
+				}
+			}
 		}
-
+		this.getOntologyManager().addAxioms(mergedSources, taxonAxioms);
 	}
 
 	public Map<IRI, Taxon> getNonNCBITaxa() {
