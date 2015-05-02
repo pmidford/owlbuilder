@@ -3,7 +3,6 @@ package org.arachb.arachadmin;
 import java.sql.SQLException;
 
 import org.apache.log4j.Logger;
-import org.arachb.owlbuilder.lib.Publication;
 
 public class ClaimBean implements UpdateableBean{  //do all claims need IRI's?
 	
@@ -133,6 +132,11 @@ public class ClaimBean implements UpdateableBean{  //do all claims need IRI's?
 		publicationIRI = s;
 	}
 
+	
+	public String getPublicationIri(){
+		return publicationIRI;
+	}
+	
 	public void setBehaviorIri(String s){
 		behaviorIRI = s;
 	}
@@ -141,6 +145,9 @@ public class ClaimBean implements UpdateableBean{  //do all claims need IRI's?
 		evidenceIRI = s;
 	}
 
+	public String getEvidenceIri(){
+		return evidenceIRI;
+	}
 	
 	public void setGeneratedId(String id){
 		generated_id = id;
