@@ -101,16 +101,16 @@ public class TestParticipant {
 	
 	
 
-	@Test
-	public void testGenerateTermOWL(){
-		fail("Not implemented");
-	}
-	
-
-	@Test
-	public void testGenerateIndividualOWL(){
-		fail("Not implemented");
-	}
+//	@Test
+//	public void testGenerateTermOWL(){
+//		fail("Not implemented");
+//	}
+//	
+//
+//	@Test
+//	public void testGenerateIndividualOWL(){
+//		fail("Not implemented");
+//	}
 
 	
 	
