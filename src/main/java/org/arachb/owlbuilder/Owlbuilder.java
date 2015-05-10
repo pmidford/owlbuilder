@@ -227,7 +227,7 @@ public class Owlbuilder{
             manager.getIRIMappers().add(new SimpleIRIMapper(iri, IRI.create(cachePath)));
 			log.info("Added IRIMapper");
 			OWLOntology ont = manager.loadOntology(iri);
-			log.info("Loaded ontology: " + ont);
+			log.info("Loaded " + ont.getAxiomCount() + " axioms from " + cachePath);
             supportOntologies.put(source, ont);
 		}
 	}
