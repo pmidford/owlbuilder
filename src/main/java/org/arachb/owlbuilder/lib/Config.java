@@ -7,6 +7,9 @@ public class Config {
 	private String mireotDir;
 	private String cacheDir;
 	
+	/**
+	 * @param configFile will specify a path to the configuration file 
+	 */
 	public Config(String configFile){
 		//will eventually process a configuration file
 		ontologyDir = "//Users/pmidford/Projects/arachtools/website/arachb";

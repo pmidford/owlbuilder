@@ -8,7 +8,6 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.arachb.arachadmin.AbstractConnection;
-import org.arachb.arachadmin.IRIManager;
 import org.arachb.arachadmin.IndividualBean;
 import org.arachb.arachadmin.PElementBean;
 import org.arachb.arachadmin.ParticipantBean;
@@ -16,22 +15,12 @@ import org.arachb.arachadmin.PropertyBean;
 import org.arachb.arachadmin.TermBean;
 import org.arachb.owlbuilder.Owlbuilder;
 import org.semanticweb.owlapi.model.IRI;
-import org.semanticweb.owlapi.model.OWLAnnotation;
-import org.semanticweb.owlapi.model.OWLAnnotationAssertionAxiom;
-import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
-import org.semanticweb.owlapi.model.OWLClassAssertionAxiom;
-import org.semanticweb.owlapi.model.OWLClassAxiom;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLIndividual;
 import org.semanticweb.owlapi.model.OWLObject;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
-import org.semanticweb.owlapi.model.OWLObjectPropertyAssertionAxiom;
-import org.semanticweb.owlapi.model.OWLOntology;
-import org.semanticweb.owlapi.model.OWLOntologyManager;
-import org.semanticweb.owlapi.reasoner.NodeSet;
-import org.semanticweb.owlapi.reasoner.OWLReasoner;
 
 public class Participant implements GeneratingEntity{
 
@@ -46,8 +35,6 @@ public class Participant implements GeneratingEntity{
 
 
 
-	private final static String INDIVIDUALQUANTIFIER = "INDIVIDUAL";
-	private final static String SOMEQUANTIFIER = "SOME";
 
 	private static Logger log = Logger.getLogger(Participant.class);
 	private final ParticipantBean bean;
@@ -112,19 +99,15 @@ public class Participant implements GeneratingEntity{
 					log.info("Generated Property restriction(2): " + propertyRestriction);					
 					return propertyRestriction;
 				}
-				else {
-					OWLClassExpression propertyRestriction = 
-							factory.getOWLObjectSomeValuesFrom(elementProperty,headClass); 
-					log.info("Generated Property restriction (3): " + propertyRestriction);
-					return propertyRestriction;					
-				}
-			}
-			else{
 				OWLClassExpression propertyRestriction = 
-						factory.getOWLObjectSomeValuesFrom(elementProperty,headClass);
-				log.info("Generated Property restriction: " + propertyRestriction);
-				return propertyRestriction;
+						factory.getOWLObjectSomeValuesFrom(elementProperty,headClass); 
+				log.info("Generated Property restriction (3): " + propertyRestriction);
+				return propertyRestriction;					
 			}
+			OWLClassExpression propertyRestriction = 
+					factory.getOWLObjectSomeValuesFrom(elementProperty,headClass);
+			log.info("Generated Property restriction: " + propertyRestriction);
+			return propertyRestriction;
 		}
 		else if (headObject instanceof OWLIndividual){
 			log.info("Generated Individual reference: " + headObject);
@@ -225,14 +208,12 @@ public class Participant implements GeneratingEntity{
 			if (elements.containsKey(termString)){
 				return (OWLClassExpression)elements.get(termString);
 			}
-			else{
-				termIRI = IRI.create(termString);
-				log.info("Creating OWL class: " + termIRI);
-				OWLClass termClass = factory.getOWLClass(termIRI);
-				builder.initializeMiscTermAndParents(termClass);
-				elements.put(termString, termClass);
-				return termClass;
-			}
+			termIRI = IRI.create(termString);
+			log.info("Creating OWL class: " + termIRI);
+			OWLClass termClass = factory.getOWLClass(termIRI);
+			builder.initializeMiscTermAndParents(termClass);
+			elements.put(termString, termClass);
+			return termClass;
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -249,13 +230,11 @@ public class Participant implements GeneratingEntity{
 			if (elements.containsKey(indString)){
 				return (OWLIndividual)elements.get(indString);
 			}
-			else{
-				individualIRI = IRI.create(indString);
-				OWLIndividual namedIndividual = factory.getOWLNamedIndividual(individualIRI);
-				builder.initializeMiscIndividual(namedIndividual);
-				elements.put(indString, namedIndividual);
-				return namedIndividual;
-			}
+			individualIRI = IRI.create(indString);
+			OWLIndividual namedIndividual = factory.getOWLNamedIndividual(individualIRI);
+			builder.initializeMiscIndividual(namedIndividual);
+			elements.put(indString, namedIndividual);
+			return namedIndividual;
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -263,12 +242,6 @@ public class Participant implements GeneratingEntity{
 		}
 	}
 	
-	
-
-	private Integer getSingletonInteger(Set<Integer> s){
-		assert s.size() == 1;
-		return s.iterator().next();
-	}
 	
 //	/**
 //	 * 

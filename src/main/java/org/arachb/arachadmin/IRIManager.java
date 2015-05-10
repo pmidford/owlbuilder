@@ -5,8 +5,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.sql.SQLException;
-import java.util.HashSet;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.semanticweb.owlapi.model.IRI;

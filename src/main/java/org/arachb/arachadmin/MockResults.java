@@ -6,7 +6,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
 
 
 public class MockResults implements AbstractResults, ResetableResults{
@@ -15,7 +14,6 @@ public class MockResults implements AbstractResults, ResetableResults{
 	final private int size;
 	final private RowResult[] rows;
 	
-    private static Logger log = Logger.getLogger(MockResults.class);
 
 	public MockResults(int rowCount){
 		size = rowCount;
@@ -45,9 +43,7 @@ public class MockResults implements AbstractResults, ResetableResults{
 		if (rows[count].stringResults.containsKey(field)){
 			return rows[count].stringResults.get(field);
 		}
-		else {
-			throw new SQLException("Bad string field in MockResults: " + field);
-		}
+		throw new SQLException("Bad string field in MockResults: " + field);
 	}
 	
 	@Override
@@ -55,9 +51,7 @@ public class MockResults implements AbstractResults, ResetableResults{
 		if (rows[count].booleanResults.containsKey(field)){
 			return rows[count].booleanResults.get(field);
 		}
-		else {
-			throw new SQLException("Bad boolean field in MockResults: " + field);
-		}
+		throw new SQLException("Bad boolean field in MockResults: " + field);
 	}
 	
 

@@ -1,16 +1,11 @@
 package org.arachb.owlbuilder.lib;
 
-import java.sql.SQLException;
-
-import org.apache.log4j.Logger;
-import org.arachb.arachadmin.AbstractConnection;
 import org.arachb.arachadmin.TaxonBean;
 import org.arachb.owlbuilder.Owlbuilder;
 import org.semanticweb.owlapi.model.OWLObject;
 
 public class Taxon implements GeneratingEntity{
 
-	private static Logger log = Logger.getLogger(Taxon.class);
 	private final TaxonBean bean;
 
 	public Taxon(TaxonBean b){

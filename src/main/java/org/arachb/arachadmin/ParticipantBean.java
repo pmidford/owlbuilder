@@ -190,7 +190,7 @@ public class ParticipantBean implements UpdateableBean{
 		if (true){  //add appropriate when figured out
 			//log.info("Need to add taxon: " + taxon.getIRI());
 			//log.info("Defining Axioms");
-			manager.addAxioms(extracted, merged.getAxioms(taxon));
+			manager.addAxioms(extracted, merged.getAxioms(taxon,org.semanticweb.owlapi.model.parameters.Imports.INCLUDED));
 			//log.info("Annotations");
 			Set<OWLAnnotationAssertionAxiom> taxonAnnotations = merged.getAnnotationAssertionAxioms(taxon.getIRI());
 			for (OWLAnnotationAssertionAxiom a : taxonAnnotations){
@@ -209,7 +209,7 @@ public class ParticipantBean implements UpdateableBean{
 		final OWLOntology extracted = builder.getTarget();
 		if (true){
 			log.info("Need to add anatomy: " + anatomyClass.getIRI());
-			Set<OWLClassAxiom> anatAxioms = merged.getAxioms(anatomyClass);
+			Set<OWLClassAxiom> anatAxioms = merged.getAxioms(anatomyClass,org.semanticweb.owlapi.model.parameters.Imports.INCLUDED);
 			manager.addAxioms(extracted, anatAxioms);
 			Set<OWLAnnotationAssertionAxiom> anatAnnotations = 
 					merged.getAnnotationAssertionAxioms(anatomyClass.getIRI());

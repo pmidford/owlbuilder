@@ -2,11 +2,9 @@ package org.arachb.arachadmin;
 
 import java.sql.SQLException;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
 
 
 public class PElementBean implements BeanBase {
@@ -31,11 +29,9 @@ public class PElementBean implements BeanBase {
 	final private Map<Integer,Plink> parentLinks = new HashMap<Integer,Plink>();
 	final private Map<Integer,Plink> childLinks = new HashMap<Integer,Plink>();
 	
-	private ParticipantBean part = null;
 	private IndividualBean individual = null;
 	private TermBean term;
 	
-	private static Logger log = Logger.getLogger(PElementBean.class);
 	
 	@Override
 	public int getId() {
@@ -82,7 +78,7 @@ public class PElementBean implements BeanBase {
 	}
 
 	
-	public void fillParents(AbstractResults parentResults, AbstractConnection c) throws Exception{		
+	public void fillParents(AbstractResults parentResults) throws Exception{		
 		while (parentResults.next()){
 			Plink pl = new Plink();
 			pl.element_id = parentResults.getInt(DBPARENTID);
@@ -92,7 +88,7 @@ public class PElementBean implements BeanBase {
 	}
 
 
-	public void fillChildren(AbstractResults childrenResults, AbstractConnection c) throws Exception{
+	public void fillChildren(AbstractResults childrenResults) throws Exception{
 		while (childrenResults.next()){
 			Plink pl = new Plink();
 			pl.element_id = childrenResults.getInt(DBCHILDID);
@@ -127,9 +123,7 @@ public class PElementBean implements BeanBase {
 		if (parentLinks.size() != 1){
 			throw new RuntimeException("PElementBean " + toString() + " has number of parents other than 1");
 		}
-		else{
-			return parentLinks.keySet().iterator().next();
-		}
+		return parentLinks.keySet().iterator().next();
 	}
 	
 	public PElementBean getParentElement(Integer index){
@@ -145,13 +139,16 @@ public class PElementBean implements BeanBase {
 		return childLinks.keySet();
 	}
 	
+	/**
+	 * Convenience method for checking and returning the link to the pelement's child
+	 * @return id of plink linking this pelement and its child
+	 * @throws RuntimeException - if PElement has more than one child
+	 */
 	public Integer getSingletonChild(){
 		if (childLinks.size() != 1){
 			throw new RuntimeException("PElementBean " + toString() + " has number of children other than 1");
 		}
-		else{
-			return childLinks.keySet().iterator().next();
-		}
+		return childLinks.keySet().iterator().next();
 	}
 
 	

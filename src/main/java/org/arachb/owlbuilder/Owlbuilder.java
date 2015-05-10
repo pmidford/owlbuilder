@@ -33,12 +33,12 @@ import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassAxiom;
 import org.semanticweb.owlapi.model.OWLDataFactory;
+import org.semanticweb.owlapi.model.OWLDocumentFormat;
 import org.semanticweb.owlapi.model.OWLIndividual;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLObjectPropertyAxiom;
 import org.semanticweb.owlapi.model.OWLObjectPropertyExpression;
 import org.semanticweb.owlapi.model.OWLOntology;
-import org.semanticweb.owlapi.model.OWLOntologyFormat;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 import org.semanticweb.owlapi.reasoner.InferenceType;
@@ -64,6 +64,7 @@ public class Owlbuilder{
 	//private OWLDataFactory factory;
 	private final IRIManager iriManager;
 	private final AbstractConnection connection;
+	@SuppressWarnings("unused")
 	private final OWLReasonerFactory rfactory;
 	private final OWLReasonerFactory elkFactory;
 	private OWLOntology target;
@@ -81,7 +82,6 @@ public class Owlbuilder{
 	public static final String taxonomyTarget = "http://arachb.org/imports/NCBI_import.owl";
 
 	private static String temporaryOutput = "test.owl";
-	private static String temporaryTaxonomyReport = "taxonomy.html";
 	
 	private final Config config;
 	private static Logger log = Logger.getLogger(Owlbuilder.class);
@@ -108,7 +108,7 @@ public class Owlbuilder{
 		rfactory = new Reasoner.ReasonerFactory();
 		elkFactory = new ElkReasonerFactory();
 		iriManager = new IRIManager(connection);
-		final OWLOntologyFormat format = testWrapper.getManager().getOntologyFormat(testWrapper.getSourceOntology());
+		final OWLDocumentFormat format = testWrapper.getManager().getOntologyFormat(testWrapper.getSourceOntology());
 		format.asPrefixOWLOntologyFormat().setPrefix("doi", "http://dx.doi.org/");
 	}
 
@@ -174,7 +174,7 @@ public class Owlbuilder{
 
 				InferredOntologyGenerator iog = new InferredOntologyGenerator(postReasoner,
 						gens);
-				iog.fillOntology(testWrapper.getManager(),target);
+				iog.fillOntology(testWrapper.getDataFactory(),target);
 				log.info("flushing reasoner");
 				postReasoner.flush();
 
@@ -224,7 +224,7 @@ public class Owlbuilder{
 			String [] pathParts = sourcePath.split("/");
 			String cachePath = "file:/" + config.getCacheDir() + "/" + pathParts[pathParts.length-1];
             log.info("Cachepath is " + cachePath);
-			manager.addIRIMapper(new SimpleIRIMapper(iri, IRI.create(cachePath)));
+            manager.getIRIMappers().add(new SimpleIRIMapper(iri, IRI.create(cachePath)));
 			log.info("Added IRIMapper");
 			OWLOntology ont = manager.loadOntology(iri);
 			log.info("Loaded ontology: " + ont);
@@ -294,7 +294,8 @@ public class Owlbuilder{
 			}
 		}
 		if (!skipTaxon){
-			Set<OWLClassAxiom> taxonAxioms =  mergedSources.getAxioms(taxon);
+			Set<OWLClassAxiom> taxonAxioms =  mergedSources.getAxioms(taxon,
+																	  org.semanticweb.owlapi.model.parameters.Imports.INCLUDED);
 			manager.addAxioms(targetontology, taxonAxioms);
 			for (OWLAnnotationAssertionAxiom a : taxonAnnotations){
 				if (a.getAnnotation().getProperty().isLabel()){
@@ -371,7 +372,8 @@ public class Owlbuilder{
 	public void initializeMiscTerm(OWLClass term){
 		final OWLOntologyManager manager = testWrapper.getManager();
 		assert mergedSources != null;
-		Set<OWLClassAxiom> taxonAxioms = mergedSources.getAxioms(term);
+		Set<OWLClassAxiom> taxonAxioms = mergedSources.getAxioms(term,
+																 org.semanticweb.owlapi.model.parameters.Imports.INCLUDED);
 		if (taxonAxioms.isEmpty()){   //TODO add subclass relation to owl:Thing?
 			//log.error("No Axioms for term " + term);
 		}
@@ -399,7 +401,7 @@ public class Owlbuilder{
 	
 	public void initializeMiscObjProperty(OWLObjectPropertyExpression prope){
 		final OWLOntologyManager manager = testWrapper.getManager();
-		Set<OWLObjectPropertyAxiom> propertyAxioms =  mergedSources.getAxioms(prope);
+		Set<OWLObjectPropertyAxiom> propertyAxioms =  mergedSources.getAxioms(prope,org.semanticweb.owlapi.model.parameters.Imports.INCLUDED);
 		if (propertyAxioms.isEmpty()){
 			log.error("No Axioms for object property " + prope);
 		}
@@ -427,7 +429,6 @@ public class Owlbuilder{
 	 */
 	public void initializeMiscIndividual(OWLIndividual ind){
 		//TODO implement
-		final OWLOntologyManager manager = testWrapper.getManager();
 	}
 	
 	

@@ -2,7 +2,6 @@ package org.arachb.arachadmin;
 
 import java.sql.SQLException;
 
-import org.apache.log4j.Logger;
 
 
 /**
@@ -26,8 +25,6 @@ public class IndividualBean extends CachingBean implements UpdateableBean{
 	private int term;  //the individual's class
 	
 	
-	private static Logger log = Logger.getLogger(IndividualBean.class);
-
 
 	@Override
 	public void fill(AbstractResults record) throws SQLException {
@@ -76,9 +73,7 @@ public class IndividualBean extends CachingBean implements UpdateableBean{
 			}
 			return getGeneratedId();
 		}
-		else {
-			return getSourceId();
-		}
+		return getSourceId();
 	}
 
 	@Override

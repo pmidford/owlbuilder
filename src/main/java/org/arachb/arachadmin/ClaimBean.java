@@ -2,7 +2,6 @@ package org.arachb.arachadmin;
 
 import java.sql.SQLException;
 
-import org.apache.log4j.Logger;
 
 public class ClaimBean implements UpdateableBean{  //do all claims need IRI's?
 	
@@ -27,8 +26,6 @@ public class ClaimBean implements UpdateableBean{  //do all claims need IRI's?
 			"Term without IRI referenced as evidence type supporting claim; claim id = %s; evidence id = %s";
 
 	
-	private final static Logger log = Logger.getLogger(ClaimBean.class);
-
 	private int id;
 	private int publication;
 	private int behavior;

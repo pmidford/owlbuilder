@@ -180,14 +180,12 @@ public class PublicationBean implements UpdateableBean{
 			}
 			return getGeneratedId();
 		}
-		else {
-			try {
-				return IRIManager.cleanupDoi(getDoi());
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				return "";
-			}
+		try {
+			return IRIManager.cleanupDoi(getDoi());
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return "";
 		}
 	}
 
@@ -197,15 +195,12 @@ public class PublicationBean implements UpdateableBean{
 			manager.generateIRI(this);
 			return getGeneratedId();
 		}
-		else {
-			try {
-				return IRIManager.cleanupDoi(getDoi());
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				return "";
-			}
-
+		try {
+			return IRIManager.cleanupDoi(getDoi());
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return "";
 		}
 	}
 

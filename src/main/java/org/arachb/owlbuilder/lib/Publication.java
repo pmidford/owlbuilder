@@ -1,11 +1,7 @@
 package org.arachb.owlbuilder.lib;
 
-import java.net.URL;
-import java.net.URLEncoder;
 import java.sql.SQLException;
 
-import org.apache.log4j.Logger;
-import org.arachb.arachadmin.AbstractConnection;
 import org.arachb.arachadmin.PublicationBean;
 import org.arachb.owlbuilder.Owlbuilder;
 import org.semanticweb.owlapi.model.IRI;
@@ -24,9 +20,6 @@ public class Publication implements GeneratingEntity {
 	private final PublicationBean bean;
 
 	private String generatedLabel;
-	
-	private static Logger log = Logger.getLogger(Publication.class);
-	
 	
 
 

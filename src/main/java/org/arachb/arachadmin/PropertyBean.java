@@ -2,7 +2,6 @@ package org.arachb.arachadmin;
 
 import java.sql.SQLException;
 
-import org.apache.log4j.Logger;
 
 
 public class PropertyBean extends CachingBean {
@@ -25,7 +24,6 @@ public class PropertyBean extends CachingBean {
 	public final static String INDIVIDUALQUANTIFIER = "INDIVIDUAL";
 	public final static String SOMEQUANTIFIER = "SOME";
 	
-	private static Logger log = Logger.getLogger(PropertyBean.class);
 
 
 	
