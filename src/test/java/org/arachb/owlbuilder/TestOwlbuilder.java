@@ -2,7 +2,6 @@ package org.arachb.owlbuilder;
 
 import static org.junit.Assert.assertNotNull;
 
-import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.junit.Before;
 import org.junit.Test;
@@ -10,10 +9,8 @@ import org.junit.Test;
 /**
  * Unit tests for owlbuilder tool
  */
-public class TestOwlbuilder 
-{
+public class TestOwlbuilder {
 
-    private static Logger log = Logger.getLogger(TestOwlbuilder.class);
 
     /**
      * currently just initializes the logging system for tests 

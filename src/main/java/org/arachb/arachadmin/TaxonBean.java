@@ -139,9 +139,7 @@ public class TaxonBean extends CachingBean implements UpdateableBean{
 			}
 			return getGeneratedId();
 		}
-		else {
-			return getSourceId();
-		}
+		return getSourceId();
 	}
 	
 	@Override
@@ -152,9 +150,7 @@ public class TaxonBean extends CachingBean implements UpdateableBean{
 			}
 			return getGeneratedId();
 		}
-		else {
-			return getSourceId();
-		}
+		return getSourceId();
 	}
 
 

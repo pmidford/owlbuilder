@@ -499,32 +499,30 @@ public class MockConnection implements AbstractConnection {
 		if (termBeanCache.containsKey(i)){
 			return termBeanCache.get(i);
 		}
-		else{
 		TermBean tb = new TermBean();
-			switch (i){
-			case 4838:
-				fillOrThrow(tb,mockTermResults4838);
-				break;
-			case 2:
-				fillOrThrow(tb,mockTermResults11052);
-				break;
-			case 10473:
-				fillOrThrow(tb,mockTermResults10473);
-				break;
-			case 11398:
-				fillOrThrow(tb,mockTermResults11398);
-				break;
-			case 0:
-				tb = null;
-				break;
-			default:
-				throw new RuntimeException("Bad value to getTerm: " + i);
-			}
-			termBeanCache.put(i, tb);
-			return tb;
+		switch (i){
+		case 4838:
+			fillOrThrow(tb,mockTermResults4838);
+			break;
+		case 2:
+			fillOrThrow(tb,mockTermResults11052);
+			break;
+		case 10473:
+			fillOrThrow(tb,mockTermResults10473);
+			break;
+		case 11398:
+			fillOrThrow(tb,mockTermResults11398);
+			break;
+		case 0:
+			tb = null;
+			break;
+		default:
+			throw new RuntimeException("Bad value to getTerm: " + i);
 		}
+		termBeanCache.put(i, tb);
+		return tb;
 	}
-	
+
 
 	@Override
 	public Set<TermBean> getTerms() throws SQLException {
@@ -696,25 +694,23 @@ public class MockConnection implements AbstractConnection {
 		if (individualBeanCache.containsKey(id)){
 			return individualBeanCache.get(id);
 		}
-		else{
-			IndividualBean ib = new IndividualBean();
-			switch (id){
-			case 94:
-				fillOrThrow(ib,mockIndividualResults94);
-				break;
+		IndividualBean ib = new IndividualBean();
+		switch (id){
+		case 94:
+			fillOrThrow(ib,mockIndividualResults94);
+			break;
 
-			case 95: 
-				fillOrThrow(ib,mockIndividualResults95);
-				break;
-			case 0:
-				ib = null;
-				break;
-			default:
-				throw new IllegalStateException("mock Individual Bean has unknown id: " + id);
-			}
-			individualBeanCache.put(id, ib);
-			return ib;
+		case 95: 
+			fillOrThrow(ib,mockIndividualResults95);
+			break;
+		case 0:
+			ib = null;
+			break;
+		default:
+			throw new IllegalStateException("mock Individual Bean has unknown id: " + id);
 		}
+		individualBeanCache.put(id, ib);
+		return ib;
 	}	
 
 	@Override
@@ -825,13 +821,13 @@ public class MockConnection implements AbstractConnection {
 		switch (result.getId()){
 		case 1:
 			mockPEParent1Results.reset();
-			result.fillParents(mockPEParent1Results, this);
+			result.fillParents(mockPEParent1Results);
 			break;
 		case 61:
 			mockPEParent61Results.reset();
-			result.fillParents(mockPEParent61Results,this);
+			result.fillParents(mockPEParent61Results);
 		default:
-			result.fillParents(MockResults.NullResults, this);
+			result.fillParents(MockResults.NullResults);
 		}
 	}
 
@@ -839,14 +835,14 @@ public class MockConnection implements AbstractConnection {
 		switch (result.getId()){
 		case 2:
 			mockPEChild2Results.reset();
-			result.fillChildren(mockPEChild2Results, this);
+			result.fillChildren(mockPEChild2Results);
 			break;
 		case 62:
 			mockPEChild62Results.reset();
-			result.fillChildren(mockPEChild62Results, this);
+			result.fillChildren(mockPEChild62Results);
 			break;
 		default:
-			result.fillChildren(MockResults.NullResults, this);
+			result.fillChildren(MockResults.NullResults);
 		}
 		
 	}
