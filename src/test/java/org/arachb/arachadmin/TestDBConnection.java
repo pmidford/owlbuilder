@@ -18,12 +18,17 @@ public class TestDBConnection {
     private AbstractConnection testConnection;
     private final static String testID = "http://arachb.org/arachb/ARACHB_0000001";
     private final static String testGenID = "http://arachb.org/arachb/ARACHB_0000099";
-    private final static String testTaxon = "http://purl.obolibrary.org/obo/NCBITaxon_336608";
+
+    //TODO use this
+    //private final static String testTaxon = "http://purl.obolibrary.org/obo/NCBITaxon_336608";
     private final static int TESTPUBTAXONDBID = 4838;
     private final static String testPubTaxon = "Tetragnatha straminea";
-    private final static String testAnatomy = "http://purl.obolibrary.org/obo/SPD_0000001";
+
+    //TODO use this
+    //private final static String testAnatomy = "http://purl.obolibrary.org/obo/SPD_0000001";
     
-    private final static int TESTPUBANATOMYID = 10473;
+    //TODO use or better substitute with URI
+    //private final static int TESTPUBANATOMYID = 10473;
 
     
 	@Before
@@ -134,9 +139,7 @@ public class TestDBConnection {
 	
 	@Test
 	public void testupdateParticipant() throws Exception{
-		ClaimBean testClaim = testConnection.getClaim(1);
-		Set<ParticipantBean> testSet = testConnection.getParticipants(testClaim);
-		//TODO make this test something?
+		//TODO implement
 	}
 
 	
