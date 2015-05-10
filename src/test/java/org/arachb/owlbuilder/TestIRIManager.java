@@ -6,7 +6,6 @@ import static org.junit.Assert.assertNotNull;
 import org.arachb.arachadmin.AbstractConnection;
 import org.arachb.arachadmin.IRIManager;
 import org.arachb.arachadmin.MockConnection;
-import org.arachb.arachadmin.TermBean;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;

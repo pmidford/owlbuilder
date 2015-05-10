@@ -2,9 +2,7 @@ package org.arachb.owlbuilder;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -14,18 +12,12 @@ import org.apache.log4j.Logger;
 import org.arachb.arachadmin.AbstractConnection;
 import org.arachb.arachadmin.ClaimBean;
 import org.arachb.arachadmin.DBConnection;
-import org.arachb.arachadmin.IndividualBean;
 import org.arachb.arachadmin.PElementBean;
 import org.arachb.arachadmin.ParticipantBean;
-import org.arachb.arachadmin.PropertyBean;
-import org.arachb.arachadmin.TermBean;
 import org.arachb.owlbuilder.lib.Participant;
 import org.junit.Before;
 import org.junit.Test;
-import org.semanticweb.owlapi.model.IRI;
-import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
-import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLIndividual;
 import org.semanticweb.owlapi.model.OWLObject;
 
@@ -89,12 +81,12 @@ public class TestParticipant {
 		}
 	}
 	
+	
 	private OWLObject setUpGenerateElement(ParticipantBean pb) throws Exception{
 		pb.loadElements(testConnection);
 		pb.resolveElements(testConnection);
 		Participant p = new Participant(pb);
 		PElementBean headBean = pb.getElementBean(pb.getHeadElement());
-		PropertyBean propBean= pb.getParticipationBean();
 		Map<String, OWLObject> elements = new HashMap<String, OWLObject>(); 
 		return p.generateElementOWL(headBean, builder, elements);		
 	}
