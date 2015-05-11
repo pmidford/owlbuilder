@@ -64,7 +64,6 @@ public class Claim implements GeneratingEntity {
 		for (Participant p : participants){
 			p.resolveElements(c);
 		}
-		// should be loading and resolving elements here
 		final Set<OWLObject> owlParticipants = new HashSet<OWLObject>();
 		for (Participant p : participants){
 			OWLObject op = p.generateOWL(builder);

@@ -14,13 +14,17 @@ import org.arachb.arachadmin.ParticipantBean;
 import org.arachb.arachadmin.PropertyBean;
 import org.arachb.arachadmin.TermBean;
 import org.arachb.owlbuilder.Owlbuilder;
+import org.semanticweb.owlapi.model.AddAxiom;
 import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLAnnotation;
+import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLIndividual;
 import org.semanticweb.owlapi.model.OWLObject;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
+import org.semanticweb.owlapi.model.OWLObjectPropertyAssertionAxiom;
 
 public class Participant implements GeneratingEntity{
 
@@ -99,10 +103,12 @@ public class Participant implements GeneratingEntity{
 					log.info("Generated Property restriction(2): " + propertyRestriction);					
 					return propertyRestriction;
 				}
-				OWLClassExpression propertyRestriction = 
-						factory.getOWLObjectSomeValuesFrom(elementProperty,headClass); 
-				log.info("Generated Property restriction (3): " + propertyRestriction);
-				return propertyRestriction;					
+				else if (childObject instanceof OWLIndividual){
+					log.info("Individual child of class");
+				}
+				else {
+					throw new RuntimeException("child is neither a class expression or individual: " + childObject);
+				}
 			}
 			OWLClassExpression propertyRestriction = 
 					factory.getOWLObjectSomeValuesFrom(elementProperty,headClass);
@@ -111,6 +117,21 @@ public class Participant implements GeneratingEntity{
 		}
 		else if (headObject instanceof OWLIndividual){
 			log.info("Generated Individual reference: " + headObject);
+			final OWLIndividual headIndividual = (OWLIndividual)headObject;
+			if (childObject != null){
+				if (childObject instanceof OWLIndividual){
+					OWLIndividual childIndividual = (OWLIndividual)childObject;
+			        OWLObjectPropertyAssertionAxiom assertion = 
+			        		factory.getOWLObjectPropertyAssertionAxiom(elementProperty, headIndividual, childIndividual);
+			        // Finally, add the axiom to our ontology and save
+			        AddAxiom addAxiomChange = new AddAxiom(builder.getTarget(), assertion);
+			        builder.getOntologyManager().applyChange(addAxiomChange);
+				}
+				else {  //child is class expression?
+					log.info("class child of individual");
+				}
+				
+			}
 			return headObject; //TODO finish implementing individual case
 		}
 		else {
@@ -232,6 +253,15 @@ public class Participant implements GeneratingEntity{
 			}
 			individualIRI = IRI.create(indString);
 			OWLIndividual namedIndividual = factory.getOWLNamedIndividual(individualIRI);
+			int termId = ib.getTerm();
+			final String label = ib.getLabel();
+			if (label != null){
+				OWLAnnotation labelAnno = factory.getOWLAnnotation(factory.getRDFSLabel(),
+																   factory.getOWLLiteral(label));
+				OWLAxiom ax = factory.getOWLAnnotationAssertionAxiom(individualIRI, labelAnno);
+				// Add the axiom to the ontology
+				builder.getOntologyManager().addAxiom(builder.getTarget(),ax);
+			}
 			builder.initializeMiscIndividual(namedIndividual);
 			elements.put(indString, namedIndividual);
 			return namedIndividual;
