@@ -265,7 +265,7 @@ public class DBConnection implements AbstractConnection{
 	
 	/**
 	 * 
-	 * @return
+	 * @return connection to default database identified in properties file
 	 * @throws Exception
 	 */
 	public static DBConnection getDBConnection() throws Exception{
@@ -275,7 +275,7 @@ public class DBConnection implements AbstractConnection{
 	
 	/**
 	 * 
-	 * @return
+	 * @return connection to a database of test data
 	 * @throws Exception
 	 */
 	public static DBConnection getTestConnection() throws Exception{

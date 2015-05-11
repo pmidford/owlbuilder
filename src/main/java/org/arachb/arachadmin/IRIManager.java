@@ -53,7 +53,6 @@ public class IRIManager {
 	 * This cleans up doi's (which tend to have lots of URI unfriendly characters) and returns a properly prefixed doi
 	 * @param doi
 	 * @return IRI using using doi prefix
-	 * @throws Exception either MalformedURL or Encoding exceptions can be thrown
 	 */
 	public static String cleanupDoi(String doi){
 		if (doi == null || doi.length() == 0){

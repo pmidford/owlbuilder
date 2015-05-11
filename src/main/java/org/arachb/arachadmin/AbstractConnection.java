@@ -58,8 +58,8 @@ public interface AbstractConnection {
 
 	/**
 	 * 
-	 * @param a
-	 * @return
+	 * @param a claim with associated participants
+	 * @return participant beans associated with claim
 	 * @throws SQLException
 	 */
 	Set<ParticipantBean> getParticipants(ClaimBean a) throws Exception;
@@ -89,7 +89,7 @@ public interface AbstractConnection {
 	/**
 	 * 
 	 * @param id
-	 * @return
+	 * @return bean reflecting record indexed by id
 	 * @throws Exception
 	 */
 	PElementBean getPElement(int id) throws Exception;
@@ -134,11 +134,12 @@ public interface AbstractConnection {
 
 	/**
 	 * 
-	 * @return
+	 * @return set of all term records in database
 	 * @throws SQLException
 	 */
 	Set<TermBean> getTerms() throws SQLException;
-
+	//TODO why?
+	
 	/**
 	 * 
 	 * @param termBean
@@ -178,10 +179,8 @@ public interface AbstractConnection {
 	void updateIndividual(IndividualBean t) throws SQLException;
 
 	/**
-	 * returns bean representation of an OWL property from connection or
-	 * property class's cache
-	 * @param pId
-	 * @return
+	 * @param pId index of property record
+	 * @return bean containing record of owl property indexed by id
 	 * @throws Exception 
 	 */
 	PropertyBean getProperty(int pId) throws Exception;

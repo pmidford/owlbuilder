@@ -14,7 +14,7 @@ public interface BeanBase {
 	/**
 	 * Method for filling the fields of a new instance of an AE subtype; 
 	 * @param record key value pairs to fill instance from - typically wraps an SQL ResultSet
-	 * @throws Exception
+	 * @throws SQLException
 	 */
 	void fill(AbstractResults record) throws SQLException;
 
