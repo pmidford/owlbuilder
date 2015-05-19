@@ -141,10 +141,9 @@ public class Participant implements GeneratingEntity{
 
 	
 	/**
-	 * @param factory
+	 * @param builder
 	 * @param propBean
 	 * @param headObject
-	 * @param childObject
 	 * @return
 	 */
 	private OWLObject generateNoDependentOWL(Owlbuilder builder,
