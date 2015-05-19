@@ -41,10 +41,10 @@ public class Claim implements GeneratingEntity {
 	}
 
 
-	
-
-
-
+	/**
+	 * @param builder
+	 * @return 
+	 */
 	@Override
 	public OWLObject generateOWL(Owlbuilder builder) throws Exception{
 		final AbstractConnection c = builder.getConnection();
