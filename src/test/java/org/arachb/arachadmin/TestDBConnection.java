@@ -93,6 +93,21 @@ public class TestDBConnection {
 	}
 	
 	@Test
+	public void testgetNarrative() throws SQLException{
+		NarrativeBean testNarrative1 = testConnection.getNarrative(1);
+		assertNotNull(testNarrative1);
+		assertEquals(1,testNarrative1.getId());
+		assertEquals(123,testNarrative1.getPublicationId());
+		assertEquals("courtship sequence",testNarrative1.getLabel());
+		assertEquals("",testNarrative1.getDescription());
+		NarrativeBean testNarrative2 = testConnection.getNarrative(2);
+		assertNotNull(testNarrative2);
+		assertEquals(2,testNarrative2.getId());
+		assertEquals(123,testNarrative2.getPublicationId());
+		assertEquals("",testNarrative2.getDescription());
+	}
+	
+	@Test
 	public void testgetTerms() throws SQLException{
 		Set<TermBean> testSet = testConnection.getTerms();
 		assertNotNull(testSet);
