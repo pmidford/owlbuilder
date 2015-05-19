@@ -115,6 +115,7 @@ public class Owlbuilder{
 	void setUpForTesting() throws Exception{
 		mergedSources = testWrapper.getSourceOntology();
 		preReasoner = elkFactory.createReasoner(mergedSources);
+		target = testWrapper.getSourceOntology();
 	}
 	
 	
@@ -337,7 +338,7 @@ public class Owlbuilder{
 	
 	public void initializeMiscTermAndParents(OWLClass term){
 		assert term != null;
-		if (term.getIRI().equals(IRI.create("http://purl.obolibrary.org/obo/NBO_0000356"))){
+		if (term.getIRI().equals(IRI.create("http://purl.obolibrary.org/obo/CHEBI_33290"))){
 			log.info("Found target Term; targetsize = " + this.getTarget().getClassesInSignature().size());
 			initializeMiscTerm(term);
 			log.info("Found target Term; targetsize = " + this.getTarget().getClassesInSignature().size());

@@ -276,6 +276,21 @@ public class MockConnection implements AbstractConnection {
 		mockIndividualResults95.setInteger(0,IndividualBean.DBTERM, 10473);
 	}
 
+	private static MockResults mockNarrativeResults1 = new StaticMockResults();
+	static{
+		mockNarrativeResults1.setInteger(0, NarrativeBean.DBID, 1);
+		mockNarrativeResults1.setInteger(0, NarrativeBean.DBPUBLICATION, 123);
+		mockNarrativeResults1.setString(0, NarrativeBean.DBLABEL, "courtship sequence");
+		mockNarrativeResults1.setString(0, NarrativeBean.DBDESCRIPTION, "");
+	}
+	
+	private static MockResults mockNarrativeResults2 = new StaticMockResults();
+	static{
+		mockNarrativeResults2.setInteger(0, NarrativeBean.DBID, 2);		
+		mockNarrativeResults2.setInteger(0, NarrativeBean.DBPUBLICATION, 123);
+		mockNarrativeResults2.setString(0, NarrativeBean.DBLABEL, "sperm induction");
+		mockNarrativeResults2.setString(0, NarrativeBean.DBDESCRIPTION, "");
+	}
 
 	private static MockResults mockPElementResults = new StaticMockResults();
 	static{
@@ -727,6 +742,25 @@ public class MockConnection implements AbstractConnection {
 		}
 	}		
 
+	
+	@Override
+	public NarrativeBean getNarrative(int nId) throws SQLException{
+		NarrativeBean nb = new NarrativeBean();
+		switch (nId){
+		case 1:
+			fillOrThrow(nb,mockIndividualResults94);
+			break;
+		case 2: 
+			fillOrThrow(nb,mockIndividualResults95);
+			break;
+		case 0:
+			nb = null;
+			break;
+		default:
+			throw new IllegalStateException("mock Narrative Bean has unknown id: " + nId);
+		}
+		return nb;
+	}
 
 	@Override
 	public int scanPrivateIDs(){

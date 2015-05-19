@@ -177,6 +177,16 @@ public interface AbstractConnection {
 	 * @throws SQLException
 	 */
 	void updateIndividual(IndividualBean t) throws SQLException;
+	
+	
+	/**
+	 * 
+	 * @param nId
+	 * @return bean for narrative record indexed by id
+	 * @throws SQLException
+	 */
+	NarrativeBean getNarrative(int nId) throws SQLException;
+	
 
 	/**
 	 * @param pId index of property record
@@ -219,7 +229,6 @@ public interface AbstractConnection {
 	 * @throws Exception
 	 */
 	void fillPElementChildren(PElementBean result) throws Exception;
-
 
 
 }

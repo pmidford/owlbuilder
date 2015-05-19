@@ -164,6 +164,10 @@ public class DBConnection implements AbstractConnection{
 	static final String INDIVIDUALUPDATESTATEMENT =
 			"UPDATE individual SET generated_id = ? WHERE id = ?";
 	
+	static final String NARRATIVEROWQUERY =
+			"SELECT n.id, n.publication, n.label, n.description " +
+			"FROM narrative AS n WHERE n.id = ?";
+	
 	static final String PROPERTYROWQUERY = 
 			"SELECT p.id, p.source_id, p.authority, p.label, p.generated_id, p.comment " +
 			"FROM property AS p WHERE p.id = ?";
@@ -625,7 +629,29 @@ public class DBConnection implements AbstractConnection{
 		}
 	}
 
-	
+	@Override
+	public NarrativeBean getNarrative(int nId) throws SQLException{
+		final PreparedStatement narrativeStatement = c.prepareStatement(NARRATIVEROWQUERY);
+		try{
+			narrativeStatement.setInt(1, nId);
+			final ResultSet narrativeSet = narrativeStatement.executeQuery();
+			NarrativeBean result;
+			if (narrativeSet.next()){
+				result = new NarrativeBean();
+				final AbstractResults narrativeResults = new DBResults(narrativeSet);
+				result.fill(narrativeResults);
+			}
+			else{
+				result = null;
+			}
+			narrativeSet.close();
+			return result;
+		}
+		finally{
+			narrativeStatement.close();
+		}
+	}
+
 	
 	public PropertyBean getProperty(int id) throws Exception{
 		if (PropertyBean.isCached(id)){
