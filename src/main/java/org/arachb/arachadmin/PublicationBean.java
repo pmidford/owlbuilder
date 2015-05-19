@@ -5,7 +5,7 @@ import java.sql.SQLException;
 
 
 
-public class PublicationBean implements UpdateableBean{
+public class PublicationBean extends CachingBean implements UpdateableBean {
 
 
 	static final int DBID = 1;
