@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.arachb.owlbuilder.lib.Individual;
+
 
 
 public class PElementBean implements BeanBase {
@@ -30,7 +32,7 @@ public class PElementBean implements BeanBase {
 	final private Map<Integer,Plink> childLinks = new HashMap<Integer,Plink>();
 	
 	private IndividualBean individual = null;
-	private TermBean term;
+	private TermBean term = null;
 	
 	
 	@Override
@@ -77,6 +79,25 @@ public class PElementBean implements BeanBase {
 		individual = c.getIndividual(individualId);
 	}
 
+	
+	/**
+	 * Current only tests for a term - no need for owlgenerating Term class at present,
+	 * so just test and return true if no term (so resolve Individual gets called)
+	 * @param c connection that might be used to load beans for a term (if needed)
+	 * @return true if no term present
+	 */
+	public boolean resolveTerm(AbstractConnection c){
+		return term == null;
+	}
+	
+	public boolean resolveIndividual(AbstractConnection c){
+		if (individual != null){
+			generatingIndividual = new Individual(individual);
+			return false;
+		}
+		throw new RuntimeException(
+				String.format("Participant Element %s seems to have neither a term or an individual",this));
+	}
 	
 	public void fillParents(AbstractResults parentResults) throws Exception{		
 		while (parentResults.next()){
