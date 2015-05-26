@@ -17,14 +17,18 @@ import org.arachb.owlbuilder.Owlbuilder;
 import org.semanticweb.owlapi.model.AddAxiom;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAnnotation;
+import org.semanticweb.owlapi.model.OWLAnnotationAssertionAxiom;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
+import org.semanticweb.owlapi.model.OWLClassAxiom;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLIndividual;
 import org.semanticweb.owlapi.model.OWLObject;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLObjectPropertyAssertionAxiom;
+import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyManager;
 
 public class Participant implements GeneratingEntity{
 
@@ -42,6 +46,9 @@ public class Participant implements GeneratingEntity{
 
 	private static Logger log = Logger.getLogger(Participant.class);
 	private final ParticipantBean bean;
+	
+	final Map<Integer, ParticipantElement> elements = new HashMap<Integer, ParticipantElement>();
+
 
 	public Participant(ParticipantBean b){
 		bean = b;
@@ -270,6 +277,92 @@ public class Participant implements GeneratingEntity{
 			return null;
 		}
 	}
+	
+	
+	//TODO should these be merged?
+	
+		public void loadElements(AbstractConnection c) throws Exception{
+			// special handling for head participation property
+			if (property > 0){
+				propertyBean = c.getProperty(property);
+			}
+			else {
+				throw new IllegalStateException("No participantProperty specified");
+			}
+			Set<PElementBean> elementset = c.getPElements(this);
+			for (PElementBean e : elementset){
+				log.debug("    loading element" + e);
+				log.debug("     id is" + e.getId());
+				log.debug("     term is " + e.getTerm());
+				log.debug("     individual is " + e.getIndividual());
+				elements.put(e.getId(), e);
+			}
+		}
+
+		public void resolveElements(AbstractConnection c) throws Exception{
+			assert elements.size() > 0 : "Participant: " + bean.getId() + " has no elements";
+			log.debug("      pb: " + this.getId() + " element count: " + elements.size());
+			assert elements.containsKey(getHeadElement()) : "Participant: " + this.id + " has unregistered head element: " + getHeadElement();
+			headBean = c.getPElement(getHeadElement());
+			propertyBean = c.getProperty(getProperty());
+			assert headBean != null;
+			assert propertyBean != null;
+			for (PElementBean element : elements.values()){
+				if (element.resolveTerm(this,c)){  // inverted logic - if term, return false
+					element.resolveIndividual(this,c);
+				}
+				element.resolveParents(this,c);
+				element.resolveChildren(this,c);
+			}
+		}
+		
+		void processTaxon(Owlbuilder builder,OWLClass taxon){
+			final OWLOntologyManager manager = builder.getOntologyManager();
+			final OWLOntology merged = builder.getMergedSources();
+			final OWLOntology extracted = builder.getTarget();
+			if (true){  //add appropriate when figured out
+				//log.info("Need to add taxon: " + taxon.getIRI());
+				//log.info("Defining Axioms");
+				manager.addAxioms(extracted, merged.getAxioms(taxon,org.semanticweb.owlapi.model.parameters.Imports.INCLUDED));
+				//log.info("Annotations");
+				Set<OWLAnnotationAssertionAxiom> taxonAnnotations = merged.getAnnotationAssertionAxioms(taxon.getIRI());
+				for (OWLAnnotationAssertionAxiom a : taxonAnnotations){
+					//log.info("   Annotation Axiom: " + a.toString());
+					if (a.getAnnotation().getProperty().isLabel()){
+						log.debug("Label is " + a.getAnnotation().getValue().toString());
+						manager.addAxiom(extracted, a);
+					}
+				}
+			}
+		}
+
+		public void processAnatomy(Owlbuilder builder, OWLClass anatomyClass) {
+			final OWLOntologyManager manager = builder.getOntologyManager();
+			final OWLOntology merged = builder.getMergedSources();
+			final OWLOntology extracted = builder.getTarget();
+			if (true){
+				log.info("Need to add anatomy: " + anatomyClass.getIRI());
+				Set<OWLClassAxiom> anatAxioms = merged.getAxioms(anatomyClass,org.semanticweb.owlapi.model.parameters.Imports.INCLUDED);
+				manager.addAxioms(extracted, anatAxioms);
+				Set<OWLAnnotationAssertionAxiom> anatAnnotations = 
+						merged.getAnnotationAssertionAxioms(anatomyClass.getIRI());
+				for (OWLAnnotationAssertionAxiom a : anatAnnotations){
+					//log.info("   Annotation Axiom: " + a.toString());
+					if (a.getAnnotation().getProperty().isLabel()){
+						log.info("Label is " + a.getAnnotation().getValue().toString());
+						manager.addAxiom(extracted, a);
+					}
+				}
+			}
+	    	builder.initializeMiscTermAndParents(anatomyClass);
+			
+		}
+
+		public void processSubstrate(Owlbuilder builder, OWLClass substrateClass) {
+			builder.initializeMiscTermAndParents(substrateClass);
+			
+		}
+
 	
 	
 //	/**
@@ -750,14 +843,8 @@ public class Participant implements GeneratingEntity{
 	}
 
 	
-	public void loadElements(AbstractConnection c) throws Exception{
-		bean.loadElements(c);
-	}
 	
 	
-	public void resolveElements(AbstractConnection c) throws Exception{
-		bean.resolveElements(c);
-	}
 
 
 }
