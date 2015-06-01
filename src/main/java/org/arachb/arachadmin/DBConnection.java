@@ -28,6 +28,7 @@ public class DBConnection implements AbstractConnection{
 	
 	//Query strings
 	
+	/* may never need to load singleton publications, but in case */
 	static final String PUBLICATIONROWQUERY = 
 			"SELECT id, publication_type,dispensation," +
 					"downloaded,reviewed,title,alternate_title,author_list,editor_list," +
@@ -35,26 +36,29 @@ public class DBConnection implements AbstractConnection{
 					"publication_year,doi,generated_id,curation_status,curation_update " +
 					"FROM publication where publication.id = ?";
 
+	static final String PUBLICATIONSETQUERY = "SELECT id FROM publication";
+
+	/* keep this, because it may be faster to process the whole publication table */
 	static final String PUBLICATIONTABLEQUERY = 
 			"SELECT id, publication_type,dispensation," +
 					"downloaded,reviewed,title,alternate_title,author_list,editor_list," +
 					"source_publication,volume,issue,serial_identifier,page_range,publication_date," +
 					"publication_year,doi,generated_id,curation_status, curation_update " +
 					"FROM publication";
-	
+
 	static final String PUBLICATIONUPDATESTATEMENT = 
 			"UPDATE publication SET generated_id = ? WHERE id = ?";
 				
 
+	/* arachadmin has the union of all support ontologies - DO NOT want to load the whole
+	 * term table, stay with singletons and caching.
+	 */
 	static final String TERMROWQUERY = 
 			"SELECT id,source_id,domain," +
 					"authority,label,generated_id,comment " +
 					"FROM term where term.id = ?";
 		
-	static final String TERMTABLEQUERY = 
-			"SELECT id,source_id,domain," +
-					"authority,label,generated_id,comment " +
-					"FROM term";
+	static final String TERMSETQUERY = "SELECT id FROM term";
 			
 	static final String TERMUPDATESTATEMENT = 
 			"UPDATE term SET generated_id = ? WHERE id = ?";
@@ -62,6 +66,7 @@ public class DBConnection implements AbstractConnection{
 	static final String TERMIRIQUERY = 
 			"SELECT id,source_id,generated_id FROM term where term.id = ?";
 		
+	//TODO needs review
 	static final String PRIMARYPARTICIPANTQUERY =
 			"SELECT part.id, part.taxon, part.substrate, part.anatomy, " +
 					"part.quantification, part.generated_id, part.publication_taxon, " +
@@ -76,26 +81,69 @@ public class DBConnection implements AbstractConnection{
 					"LEFT JOIN term AS anatomy ON (part.anatomy = anatomy.id) " +
 					"WHERE p2c.claim = ? AND p2c.participant_index = 1";
 	
-	static final String PARTICIPANTSQUERY = 
+	
+	// Cache all the participants for a particular claim
+	static final String PARTICIPANTSINCLAIMSETQUERY = 
+			"SELECT part.id " +
+					"FROM participant2claim as p2c " + 
+					"JOIN participant AS part ON (p2c.participant = part.id) " +
+					"WHERE p2c.claim = ?";
+	
+	static final String PARTICIPANTSINCLAIMTABLEQUERY =
 			"SELECT part.id, part.quantification, part.label, part.generated_id, " +
 					"p2c.property, part.publication_taxon, part.publication_anatomy, " +
 					"part.publication_substrate, part.head_element " +
 					"FROM participant2claim as p2c " + 
 					"JOIN participant AS part ON (p2c.participant = part.id) " +
 					"WHERE p2c.claim = ?";
+
+	// should we just cache all the participants at once?
+	static final String PARTICIPANTTABLEQUERY = 
+			"SELECT part.id, part.quantification, part.label, part.generated_id, " +
+					"p2c.property, part.publication_taxon, part.publication_anatomy, " +
+					"part.publication_substrate, part.head_element " +
+					"FROM participant2claim as p2c " + 
+					"JOIN participant AS part ON (p2c.participant = part.id) ";
+				
+	// id's of participants in claim
+	static final String PARTICIPANTCLAIMSETQUERY = 
+			"SELECT part.id" +
+					"FROM participant2claim as p2c " + 
+					"JOIN participant AS part ON (p2c.participant = part.id) " +
+					"WHERE p2c.claim = ?";
+
+	// singleton participant
+	static final String PARTICIPANTROWQUERY = 
+			"SELECT part.id, part.quantification, part.label, part.generated_id, " +
+					"p2c.property, part.publication_taxon, part.publication_anatomy, " +
+					"part.publication_substrate, part.head_element " +
+					"FROM participant AS part " +
+					"JOIN participant2claim AS p2c ON (part.id = p2c.participant) " +
+					"WHERE part.id = ?";
+	
 	
 	static final String PARTICIPANTUPDATESTATEMENT = "";
 	
-	static final String PELEMENTSFROMPARTICIPANTQUERY =
-			"SELECT id,type,participant FROM participant_element WHERE participant = ?";
+	static final String PELEMENTSETFROMPARTICIPANTQUERY =
+			"SELECT id FROM participant_element WHERE participant = ?";
 
-	static final String PELEMENTQUERY =
+	static final String PELEMENTROWQUERY =
 			"SELECT ele.id, ele.type, ele.participant, p2t.term, p2i.individual " +
 			        "FROM participant_element as ele " +
 				    "LEFT JOIN pelement2term as p2t ON (p2t.element = ele.id) " +
 					"LEFT JOIN pelement2individual as p2i ON (p2i.element = ele.id) " +
 				    "WHERE ele.id = ?";
 	
+	// set of all pelement ids
+	static final String PELEMENTSETQUERY = "SELECT ele.id FROM participant_element AS ele";
+	
+	
+	// table of all pelements
+	static final String PELEMENTTABLEQUERY =
+			"SELECT ele.id, ele.type, ele.participant, p2t.term, p2i.individual " +
+			        "FROM participant_element as ele " +
+				    "LEFT JOIN pelement2term as p2t ON (p2t.element = ele.id) " +
+					"LEFT JOIN pelement2individual as p2i ON (p2i.element = ele.id) ";
 	
 	static final String PELEMENTTERMQUERY =
 			"SELECT p2t.term FROM pelement2term as p2t WHERE element = ?";
@@ -105,13 +153,12 @@ public class DBConnection implements AbstractConnection{
 			"SELECT p2i.individual FROM pelement2individual as p2i WHERE element = ?";
 
 	static final String PELEMENTPARENTSQUERY =
-			"SELECT link.parent,link.property FROM participant_link as link " +
+			"SELECT link.child,link.parent,link.property FROM participant_link as link " +
 			        "WHERE link.child = ?";
 
 	static final String PELEMENTCHILDRENQUERY =
-			"SELECT link.child,link.property FROM participant_link as link " +
+			"SELECT link.child,link.parent,link.property FROM participant_link as link " +
 			        "WHERE link.parent = ?";
-	
 	
 	static final String CLAIMROWQUERY =
 			"SELECT c.id, c.publication, c.publication_behavior, c.behavior_term, " +
@@ -161,8 +208,13 @@ public class DBConnection implements AbstractConnection{
 			"SELECT i.id, i.source_id, i.generated_id, i.label, i.term " +
 			"FROM individual AS i";
 	
+	static final String INDIVIDUALNARRATIVESQUERY =
+			"SELECT i2n.narrative FROM individual2narrative as i2n " +
+			        "WHERE i2n.individual = ?";
+
+	
 	static final String INDIVIDUALUPDATESTATEMENT =
-			"UPDATE individual SET generated_id = ? WHERE id = ?";
+			"UPDATE individual SET generated_id = ? WHERE id = ?";	
 	
 	static final String NARRATIVEROWQUERY =
 			"SELECT n.id, n.publication, n.label, n.description " +
@@ -176,6 +228,8 @@ public class DBConnection implements AbstractConnection{
 	static final Logger logger = Logger.getLogger(DBConnection.class.getName());
 
 	private Connection c;
+	
+	private IRIManager irimanager;
 	
 	private final HashMap<Integer,String>id2domain = new HashMap<Integer,String>();
 	
@@ -241,6 +295,7 @@ public class DBConnection implements AbstractConnection{
 		final String password = properties.getProperty("password");
 		c = DriverManager.getConnection(String.format("jdbc:mysql://%s/%s",host,db),user,password);
         initDomains(c);
+        irimanager = new IRIManager(this);
 	}
 	
 	
@@ -301,29 +356,51 @@ public class DBConnection implements AbstractConnection{
 	}
 	
 	public PublicationBean getPublication(int id) throws SQLException{
+		if (PublicationBean.isCached(id)){
+			return PublicationBean.getCached(id);
+		}
 		final PreparedStatement publicationStatement = c.prepareStatement(PUBLICATIONROWQUERY);
-		ResultSet rawResults = null;
-		PublicationBean result = null;
 		try{
 			publicationStatement.setInt(1, id);
-			rawResults = publicationStatement.executeQuery();
-			AbstractResults publicationResults = new DBResults(rawResults);
+			final AbstractResults publicationResults = executeAndAbstract(publicationStatement);
+			PublicationBean results;
 			if (publicationResults.next()){
-				result = new PublicationBean();
-				result.fill(publicationResults);
+				results = new PublicationBean();
+				results.fill(publicationResults);
+				results.cache();
 			}
+			else {
+				results = null;
+			}
+			publicationResults.close();
+			return results;
 		}
 		finally{
 			publicationStatement.close();
-			if (rawResults != null){
-				rawResults.close();
-				return result;
-			}
 		}
-		return null;
 	}
 	
-	public Set<PublicationBean> getPublications() throws SQLException{
+	private AbstractResults executeAndAbstract(PreparedStatement p) throws SQLException{
+		return new DBResults(p.executeQuery());
+	}
+
+	public Set<Integer> getPublicationSet() throws SQLException{
+		final Set<Integer> result = new HashSet<Integer>();
+		Statement allpubStatement = c.createStatement();
+		try{
+			ResultSet rawResults = allpubStatement.executeQuery(PUBLICATIONSETQUERY);
+			while (rawResults.next()){
+				result.add(rawResults.getInt(1));
+			}
+			rawResults.close();
+			return result;
+		}
+		finally{
+			allpubStatement.close();
+		}
+	}
+
+	public Set<PublicationBean> getPublicationTable() throws SQLException{
 		final Set<PublicationBean> result = new HashSet<PublicationBean>();
 		Statement allpubStatement = c.createStatement();
 		try{
@@ -332,6 +409,7 @@ public class DBConnection implements AbstractConnection{
 			while (publicationResults.next()){
 				PublicationBean pub = new PublicationBean();
 				pub.fill(publicationResults);
+				pub.cache();
 				result.add(pub);
 			}
 			rawResults.close();
@@ -342,7 +420,11 @@ public class DBConnection implements AbstractConnection{
 		}
 	}
 
-	final static private String UPDATEPUBLICATIONFAIL = "publication (%s) update failed; row count = %d";
+	
+	final static private String UPDATEPUBLICATIONFAIL = 
+			"publication (%s) update failed; row count = %d";
+	
+	
 	public void updatePublication(PublicationBean p) throws SQLException{
 		final PreparedStatement updateStatement = 
 				c.prepareStatement(PUBLICATIONUPDATESTATEMENT);
@@ -353,6 +435,9 @@ public class DBConnection implements AbstractConnection{
 			if (count != 1){
 				logger.error(String.format(UPDATEPUBLICATIONFAIL,p,count));
 			}
+			else {
+				p.updatecache();
+			}
 		}
 		finally{
 			updateStatement.close();
@@ -362,7 +447,7 @@ public class DBConnection implements AbstractConnection{
 	
 	public TermBean getTerm(int id) throws SQLException{
 		if (TermBean.isCached(id)){
-			return (TermBean)TermBean.getCached(id);
+			return TermBean.getCached(id);
 		}
 		final PreparedStatement termStatement = c.prepareStatement(TERMROWQUERY);
 		try{
@@ -373,7 +458,8 @@ public class DBConnection implements AbstractConnection{
 				result = new TermBean();
 				final AbstractResults termResults = new DBResults(termSet);
 				result.fill(termResults);
-				TermBean.cache(result);
+				result.checkIRIString(irimanager);
+				result.cache();
 			}
 			else{
 				result = null;
@@ -387,26 +473,6 @@ public class DBConnection implements AbstractConnection{
 	}
 
 
-	
-	public Set<TermBean> getTerms() throws SQLException{
-		final Set<TermBean> result = new HashSet<TermBean>();
-		final Statement allTermStatement = c.createStatement();
-		try{
-			final ResultSet termSet = allTermStatement.executeQuery(TERMTABLEQUERY);
-			final AbstractResults termResults = new DBResults(termSet);
-			while (termSet.next()){
-				TermBean t = new TermBean();
-				t.fill(termResults);
-				result.add(t);
-			}
-			termSet.close();
-			return result;
-		}
-		finally{
-			allTermStatement.close();
-		}
-	}
-
 	public void updateTerm(TermBean t) throws SQLException{
 		final PreparedStatement updateStatement = 
 				c.prepareStatement(TERMUPDATESTATEMENT);
@@ -417,6 +483,9 @@ public class DBConnection implements AbstractConnection{
 			if (count != 1){
 				logger.error("term update failed; row count = " + count);
 			}
+			else{
+				t.updatecache();
+			}
 		}
 		finally{
 			updateStatement.close();
@@ -426,6 +495,9 @@ public class DBConnection implements AbstractConnection{
 
 
 	public ClaimBean getClaim(int id) throws Exception{
+		if (ClaimBean.isCached(id)){
+			return ClaimBean.getCached(id);
+		}
 		final PreparedStatement claimStatement = c.prepareStatement(CLAIMROWQUERY);
 		try{
 			claimStatement.setInt(1, id);
@@ -435,6 +507,7 @@ public class DBConnection implements AbstractConnection{
 			if (claimSet.next()){
 				result = new ClaimBean();
 				result.fill(claimSet);
+				result.cache();
 			}
 			else{
 				result = null;
@@ -447,7 +520,8 @@ public class DBConnection implements AbstractConnection{
 		}
 	}
 	
-	public Set<ClaimBean> getClaims() throws Exception {
+	
+	public Set<ClaimBean> getClaimTable() throws Exception {
 		final Statement allClaimStatement = c.createStatement();
 		try{
 			final Set<ClaimBean> result = new HashSet<ClaimBean>();
@@ -457,6 +531,9 @@ public class DBConnection implements AbstractConnection{
 				ClaimBean cb = new ClaimBean();
 				cb.fill(claimSet);
 				result.add(cb);
+				if (!ClaimBean.isCached(cb.getId())){
+					cb.cache();
+				}
 			}
 			r.close();
 			return result;
@@ -476,6 +553,9 @@ public class DBConnection implements AbstractConnection{
 			if (count != 1){
 				logger.error("entity update failed; row count = " + count);
 			}
+			else{
+				cl.updatecache();
+			}
 		}
 		finally{
 			updateStatement.close();
@@ -483,19 +563,16 @@ public class DBConnection implements AbstractConnection{
 	}
 
 	
-	public Set<ParticipantBean> getParticipants(ClaimBean a) throws Exception {
-		final Set<ParticipantBean> result = new HashSet<ParticipantBean>();
-		final int assertion_id = a.getId();
+	public Set<Integer> getParticipantSet(int claimId) throws Exception {
+		final Set<Integer> result = new HashSet<Integer>();
 		final PreparedStatement participantsStatement =
-				c.prepareStatement(PARTICIPANTSQUERY);
+				c.prepareStatement(PARTICIPANTSINCLAIMSETQUERY);
 		try{
-			participantsStatement.setInt(1, assertion_id);
+			participantsStatement.setInt(1, claimId);
 			final ResultSet r = participantsStatement.executeQuery();
 			final AbstractResults participantSet = new DBResults(r);
-			while (participantSet.next()){                   //TODO too much going on here, hard to test
-				ParticipantBean p = new ParticipantBean();
-				p.fill(participantSet);
-				result.add(p);
+			while (participantSet.next()){
+				result.add(participantSet.getInt(1));
 			}
 			r.close();
 			return result;
@@ -504,11 +581,106 @@ public class DBConnection implements AbstractConnection{
 			participantsStatement.close();
 		}
 	}
+	
+	
+	@Override
+	public ParticipantBean getParticipant(int id) throws Exception {
+		if (ParticipantBean.isCached(id)){
+			return ParticipantBean.getCached(id);
+		}
+		final PreparedStatement participantStatement = c.prepareStatement(PARTICIPANTROWQUERY);
+		ParticipantBean result;
+		try{
+			participantStatement.setInt(1, id);
+			final AbstractResults participantSet = executeAndAbstract(participantStatement);
+			if (participantSet.next()){
+				result = new ParticipantBean();
+				result.fill(participantSet);
+				result.cache();
+			}
+			else{
+				result = null;
+			}
+			participantSet.close();
+		}
+		finally{
+			participantStatement.close();
+		}
+		if (result != null) {
+			final Set<Integer> elements = new HashSet<Integer>();
+			final PreparedStatement participantsStatement =
+					c.prepareStatement(PELEMENTSETFROMPARTICIPANTQUERY);
+			try{
+				participantsStatement.setInt(1, result.getId());
+				final ResultSet r = participantsStatement.executeQuery();
+				while (r.next()){
+					elements.add(r.getInt(1));
+				}
+				r.close();
+				result.setElements(elements);
+				log.info("Participant " + result.getId() + " loaded " + elements.size() + " element ids");
+				return result;
+			}
+			finally{
+				participantsStatement.close();
+			}
+		}
+		return result;
+	}
 
+
+	@Override
+	public Set<ParticipantBean> getParticipantTable(int claimId) throws Exception{
+		final Set<ParticipantBean> result = new HashSet<ParticipantBean>();
+		final PreparedStatement participantsStatement =
+				c.prepareStatement(PARTICIPANTSINCLAIMTABLEQUERY);
+		try{
+			participantsStatement.setInt(1, claimId);
+			final ResultSet r = participantsStatement.executeQuery();
+			final AbstractResults participantSet = new DBResults(r);
+			while (participantSet.next()){
+				ParticipantBean pb = new ParticipantBean();
+				pb.fill(participantSet);
+				result.add(pb);
+			}
+			r.close();
+		}
+		finally{
+			participantsStatement.close();
+		}
+		if (!result.isEmpty()) {
+			log.info("adding elements to " + result.size() + " participants");
+			final PreparedStatement elementsStatement =
+					c.prepareStatement(PELEMENTSETFROMPARTICIPANTQUERY);
+			try{
+				for (ParticipantBean pb : result){
+					log.info("About to load elements for participant " + pb.getId());
+					final Set<Integer> elements = new HashSet<Integer>();
+					elementsStatement.setInt(1, pb.getId());
+					final ResultSet r = elementsStatement.executeQuery();
+					while (r.next()){
+						elements.add(r.getInt(1));
+					}
+					r.close();
+					pb.setElements(elements);
+					log.info("Participant " + pb.getId() + " loaded " + elements.size() + " element ids");
+				}
+				return result;
+			}
+			finally{
+				elementsStatement.close();
+			}
+
+		}
+		return result;
+	}
+
+	
 	@Override
 	public void updateNamedEntity(UpdateableBean b) throws SQLException{
 		b.updateDB(this);
 	}
+	
 	
 	public void updateParticipant(ParticipantBean b) throws SQLException{
 		final PreparedStatement updateStatement = 
@@ -520,28 +692,158 @@ public class DBConnection implements AbstractConnection{
 			if (count != 1){
 				logger.error("entity update failed; row count = " + count);
 			}
+			else{
+				b.updatecache();
+			}
 		}
 		finally{
 			updateStatement.close();
 		}
 	}
 
+	@Override
+	public Set<PElementBean> getPElementTable(ParticipantBean p) throws Exception {
+		final PreparedStatement pElementStatement = c.prepareStatement(PELEMENTTABLEQUERY);
+		final Set<PElementBean> result = new HashSet<PElementBean>();
+		try{
+			pElementStatement.setInt(1,p.getId());
+			final ResultSet rawResults = pElementStatement.executeQuery();
+			AbstractResults pElementsResults = new DBResults(rawResults);
+			while (pElementsResults.next()){
+				PElementBean bean = new PElementBean();
+				bean.fill(pElementsResults);
+				if (!PElementBean.isCached(bean.getId())){
+					bean.cache();
+				}
+				if (bean.getTermId() != null){
+					if (!TermBean.isCached(bean.getTermId())){
+						getTerm(bean.getTermId()).cache();
+					}
+				}
+				result.add(bean);
+			}
+			rawResults.close();
+		}
+		finally{
+			pElementStatement.close();
+		}
+		return result;
+	}
 	
-	public TaxonBean getTaxon(int id) throws SQLException{
+	@Override
+	public Set<Integer> getPElementSet(ParticipantBean p) throws Exception {
+		final Set<Integer> result = new HashSet<Integer>();
+		final PreparedStatement participantsStatement =
+				c.prepareStatement(PELEMENTSETQUERY);
+		try{
+			participantsStatement.setInt(1, p.getId());
+			final ResultSet r = participantsStatement.executeQuery();
+			while (r.next()){
+				result.add(r.getInt(1));
+			}
+			r.close();
+			return result;
+		}
+		finally{
+			participantsStatement.close();
+		}
+	}
+	
+	@Override
+	public PElementBean getPElement(int id) throws Exception{
+		final PreparedStatement pElementStatement = c.prepareStatement(PELEMENTROWQUERY);
+		PElementBean pb;
+		try{
+			pElementStatement.setInt(1, id);
+			final ResultSet rawResults = pElementStatement.executeQuery();
+			AbstractResults pElementResults = new DBResults(rawResults);
+			if (pElementResults.next()){
+				pb = new PElementBean();
+				pb.fill(pElementResults);
+				if (!PElementBean.isCached(pb.getId())){
+					pb.cache();
+				}
+				if (pb.getTermId() > 0){
+					if (!TermBean.isCached(pb.getTermId())){
+						getTerm(pb.getTermId()).cache();
+					}
+				}
+				else if (pb.getIndividualId() > 0){
+					if (!IndividualBean.isCached(pb.getIndividualId())){
+						getIndividual(pb.getIndividualId()).cache();
+					}
+				}
+				else {
+					rawResults.close();
+					throw new RuntimeException("PElement bean with id " + id + " has neither term or individual");
+				}
+				rawResults.close();
+			}
+			else{
+				pb = null;
+			}
+			rawResults.close();
+		}
+		finally{
+			pElementStatement.close();
+		}
+		if (pb != null){
+			final PreparedStatement pElementParentsStatement = c.prepareStatement(PELEMENTPARENTSQUERY);
+			try{
+				pElementParentsStatement.setInt(1, pb.getId());
+				ResultSet parentResults = pElementParentsStatement.executeQuery();
+				while (parentResults.next()){
+					int parent = parentResults.getInt(2);  //Constant for this?
+					int property = parentResults.getInt(3);  //Constant for this?
+					pb.addParent(parent,property);
+				}
+				parentResults.close();
+			}
+			finally{
+				pElementParentsStatement.close();
+			}
+			final PreparedStatement pElementChildStatement = c.prepareStatement(PELEMENTPARENTSQUERY);
+			try{
+				pElementChildStatement.setInt(1, pb.getId());
+				ResultSet childResults = pElementChildStatement.executeQuery();
+				while (childResults.next()){
+					int child = childResults.getInt(2);  //Constant for this?
+					int property = childResults.getInt(3);  //Constant for this?
+					pb.addChild(child,property);
+				}
+				childResults.close();
+			}
+			finally{
+				pElementChildStatement.close();
+			}
+		}			
+		return pb;
+	}
+
+
+
+	public TaxonBean getTaxonRow(int id) throws SQLException{
+		if (TaxonBean.isCached(id)){
+			return TaxonBean.getCached(id);
+		}
 		final PreparedStatement taxonStatement = c.prepareStatement(TAXONROWQUERY);
 		try{
 			taxonStatement.setInt(1, id);
-			ResultSet rawResults = taxonStatement.executeQuery();
-			AbstractResults taxonResults = new DBResults(rawResults);
+			AbstractResults taxonResults = executeAndAbstract(taxonStatement);
 			TaxonBean result;
 			if (taxonResults.next()){
 				result = new TaxonBean();
 				result.fill(taxonResults);
+				String usable = result.checkIRIString(irimanager);
+				if (usable == null){
+					throw new RuntimeException("No usable IRI for curator added taxon: " + result.getId());
+				}
+				result.cache();
 			}
 			else{
 				result = null;
 			}
-			rawResults.close();
+			taxonResults.close();
 			return result;
 		}
 		finally{
@@ -549,25 +851,30 @@ public class DBConnection implements AbstractConnection{
 		}
 	}
 	
-
-	public Set<TaxonBean> getTaxa() throws SQLException{
+	
+	@Override
+	public Set<TaxonBean> getTaxonTable() throws SQLException {
 		final Set<TaxonBean> result = new HashSet<TaxonBean>();
-		final Statement allTaxaStatement = c.createStatement();
+		final Statement taxonStatement = c.createStatement();
 		try{
-			ResultSet rawResults = allTaxaStatement.executeQuery(TAXONTABLEQUERY);
-			AbstractResults taxaResults = new DBResults(rawResults);
-			while (taxaResults.next()){
-				TaxonBean tax = new TaxonBean();
-				tax.fill(taxaResults);
-				result.add(tax);
+			final ResultSet r = taxonStatement.executeQuery(TAXONTABLEQUERY);
+			final AbstractResults TaxonSet = new DBResults(r);
+			while (TaxonSet.next()){
+				TaxonBean tb = new TaxonBean();
+				tb.fill(TaxonSet);
+				if (!TaxonBean.isCached(tb.getId())){
+					tb.cache();
+				}
+				result.add(tb);
 			}
-			rawResults.close();
+			r.close();
 			return result;
 		}
 		finally{
-			allTaxaStatement.close();
+			taxonStatement.close();
 		}
 	}
+
 
 	
 	public void updateTaxon(TaxonBean t) throws SQLException{
@@ -580,6 +887,9 @@ public class DBConnection implements AbstractConnection{
 			if (count != 1){
 				logger.error("entity update failed; row count = " + count);
 			}
+			else{
+				t.updatecache();
+			}
 		}
 		finally{
 			updateStatement.close();
@@ -589,28 +899,49 @@ public class DBConnection implements AbstractConnection{
 	
 	public IndividualBean getIndividual(int id) throws SQLException{
 		if (IndividualBean.isCached(id)){
-			return (IndividualBean)IndividualBean.getCached(id);
+			return IndividualBean.getCached(id);
 		}
+		IndividualBean ib;
 		final PreparedStatement individualStatement = c.prepareStatement(INDIVIDUALROWQUERY);
 		try{
 			individualStatement.setInt(1, id);
 			final ResultSet individualSet = individualStatement.executeQuery();
-			IndividualBean result;
 			if (individualSet.next()){
-				result = new IndividualBean();
-				final AbstractResults individualResults = new DBResults(individualSet);
-				result.fill(individualResults);
-				IndividualBean.cache(result);
+				ib = new IndividualBean();
+				ib.fill(new DBResults(individualSet));
+				ib.checkIRIString(irimanager);
+				if (!TermBean.isCached(ib.getTerm())){
+					getTerm(ib.getTerm()).cache();
+				}
+				ib.cache();
 			}
 			else{
-				result = null;
+				ib = null;
 			}
 			individualSet.close();
-			return result;
 		}
 		finally{
 			individualStatement.close();
 		}
+		if (ib != null){
+			final PreparedStatement individualNarrativesStatement = c.prepareStatement(INDIVIDUALNARRATIVESQUERY);
+			try{
+				individualNarrativesStatement.setInt(1, ib.getId());
+				ResultSet narratives = individualNarrativesStatement.executeQuery();
+				while (narratives.next()){
+					int n = narratives.getInt(1);
+					ib.addNarrative(n);
+					if (!NarrativeBean.isCached(n)){
+						getNarrative(n).cache();
+					}
+				}
+				narratives.close();
+			}
+			finally{
+				individualNarrativesStatement.close();
+			}
+		}			
+		return ib;
 	}
 	
 	public void updateIndividual(IndividualBean ib) throws SQLException{
@@ -655,7 +986,7 @@ public class DBConnection implements AbstractConnection{
 	
 	public PropertyBean getProperty(int id) throws Exception{
 		if (PropertyBean.isCached(id)){
-			return (PropertyBean)PropertyBean.getCached(id);
+			return PropertyBean.getCached(id);
 		}
 		final PreparedStatement propertyStatement = c.prepareStatement(PROPERTYROWQUERY);
 		try{
@@ -666,7 +997,7 @@ public class DBConnection implements AbstractConnection{
 			if (propertyResults.next()){
 				result = new PropertyBean();
 				result.fill(propertyResults);
-				PropertyBean.cache(result);
+				result.cache();
 			}
 			else{
 				result = null;
@@ -810,128 +1141,8 @@ public class DBConnection implements AbstractConnection{
 		c.close();
 	}
 
-	@Override
-	public Set<ParticipantBean> getParticipantsWithProperty(ClaimBean a,
-			Object p) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
-	@Override
-	public Set<PElementBean> getPElements(ParticipantBean p) throws Exception {
-		final PreparedStatement pElementStatement = c.prepareStatement(PELEMENTSFROMPARTICIPANTQUERY);
-		final Set<PElementBean> result = new HashSet<PElementBean>();
-		try{
-			pElementStatement.setInt(1,p.getId());
-			final ResultSet rawResults = pElementStatement.executeQuery();
-			AbstractResults pElementsResults = new DBResults(rawResults);
-			while (pElementsResults.next()){
-				PElementBean bean = new PElementBean();
-				bean.fill(pElementsResults);
-				fillPElementTerm(bean);
-				fillPElementIndividual(bean);
-				fillPElementParents(bean);
-				fillPElementChildren(bean);
-				result.add(bean);
-			}
-			rawResults.close();
-		}
-		finally{
-			pElementStatement.close();
-		}
-		return result;
-	}
-	
-	
-	@Override
-	public PElementBean getPElement(int id) throws Exception{
-		final PreparedStatement pElementStatement = c.prepareStatement(PELEMENTQUERY);
-		try{
-			pElementStatement.setInt(1, id);
-			final ResultSet rawResults = pElementStatement.executeQuery();
-			AbstractResults pElementResults = new DBResults(rawResults);
-			PElementBean pb;
-			if (pElementResults.next()){
-				pb = new PElementBean();
-				pb.fill(pElementResults);
-				fillPElementParents(pb);
-				fillPElementChildren(pb);
-				rawResults.close();
-			}
-			else{
-				pb = null;
-			}
-			rawResults.close();
-			return pb;
-		}
-		finally{
-			pElementStatement.close();
-		}
-	}
-	
-	@Override
-	public void fillPElementTerm(PElementBean pb) throws Exception{
-		final PreparedStatement pElementTermStatement = c.prepareStatement(PELEMENTTERMQUERY);
-		try{
-			pElementTermStatement.setInt(1, pb.getId());
-			final ResultSet results = pElementTermStatement.executeQuery();
-			if (results.next()){
-				AbstractResults tresults = new DBResults(results);
-				pb.fillTerm(tresults, this);
-			}
-			results.close();
-		}
-		finally{
-			pElementTermStatement.close();
-		}
-	}
-	
-	@Override
-	public void fillPElementIndividual(PElementBean pb) throws Exception{
-		final PreparedStatement pElementIndividualStatement = c.prepareStatement(PELEMENTINDIVIDUALQUERY);
-		try{
-			pElementIndividualStatement.setInt(1, pb.getId());
-			final ResultSet results = pElementIndividualStatement.executeQuery();
-			if (results.next()){
-				AbstractResults iresults = new DBResults(results);
-				pb.fillIndividual(iresults, this);
-			}
-			results.close();
-		}
-		finally{
-			pElementIndividualStatement.close();
-		}
-	}
-	
-	@Override
-	public void fillPElementParents(PElementBean result) throws Exception{
-		final PreparedStatement pElementParentsStatement = c.prepareStatement(PELEMENTPARENTSQUERY);
-		try{
-			pElementParentsStatement.setInt(1, result.getId());
-			ResultSet rawResults = pElementParentsStatement.executeQuery();
-			AbstractResults parentResults = new DBResults(rawResults);
-			result.fillParents(parentResults);
-			rawResults.close();
-		}
-		finally{
-			pElementParentsStatement.close();
-		}
-	}
-	
-	@Override
-	public void fillPElementChildren(PElementBean result) throws Exception{
-		final PreparedStatement pElementChildrenStatement = c.prepareStatement(PELEMENTCHILDRENQUERY);
-		try{
-			pElementChildrenStatement.setInt(1, result.getId());
-			ResultSet rawResults = pElementChildrenStatement.executeQuery();
-			AbstractResults childrenResults = new DBResults(rawResults);
-			result.fillChildren(childrenResults);
-			rawResults.close();
-		}
-		finally{
-			pElementChildrenStatement.close();
-		}
-	}
+
 
 }
 
