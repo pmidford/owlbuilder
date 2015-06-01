@@ -1,9 +1,13 @@
 package org.arachb.arachadmin;
 
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.log4j.Logger;
 
 
-public class ClaimBean implements UpdateableBean{  //do all claims need IRI's?
+public class ClaimBean implements BeanBase,UpdateableBean,CachingBean{  //do all claims need IRI's?
 	
 	final static int DBID = 1;
 	final static int DBPUBLICATION = 2;
@@ -25,6 +29,10 @@ public class ClaimBean implements UpdateableBean{  //do all claims need IRI's?
 	final static String BADEVIDENCEIRI =
 			"Term without IRI referenced as evidence type supporting claim; claim id = %s; evidence id = %s";
 
+	private static final Map<Integer, ClaimBean> cache = new HashMap<>();
+	private static Logger log = Logger.getLogger(ClaimBean.class);
+
+
 	
 	private int id;
 	private int publication;
@@ -37,8 +45,7 @@ public class ClaimBean implements UpdateableBean{  //do all claims need IRI's?
 	private String evidenceIRI;
 	
 	static final ClaimBean dummy = new ClaimBean(); 
-	
-	
+
 	//maybe make this a constructor
 	@Override
 	public void fill(AbstractResults record) throws SQLException{
@@ -101,6 +108,7 @@ public class ClaimBean implements UpdateableBean{  //do all claims need IRI's?
 	}
 	
 
+	/* access methods */
 
 	@Override
 	public int getId(){
@@ -125,29 +133,12 @@ public class ClaimBean implements UpdateableBean{  //do all claims need IRI's?
 	}
 	
 
-	public void setPublicationIri(String s){
-		publicationIRI = s;
-	}
-
-	
 	public String getPublicationIri(){
 		return publicationIRI;
 	}
 	
-	public void setBehaviorIri(String s){
-		behaviorIRI = s;
-	}
-
-	public void setEvidenceIri(String s){
-		evidenceIRI = s;
-	}
-
 	public String getEvidenceIri(){
 		return evidenceIRI;
-	}
-	
-	public void setGeneratedId(String id){
-		generated_id = id;
 	}
 	
 	public String getGeneratedId(){
@@ -159,6 +150,27 @@ public class ClaimBean implements UpdateableBean{  //do all claims need IRI's?
 		return behaviorIRI;
 	}
 	
+
+	public void setPublicationIri(String s){
+		publicationIRI = s;
+	}
+
+	/**
+	 * 
+	 * @param s representation of IRI for behavior class
+	 */
+	public void setBehaviorIri(String s){
+		behaviorIRI = s;
+	}
+
+	public void setEvidenceIri(String s){
+		evidenceIRI = s;
+	}
+
+	public void setGeneratedId(String id){
+		generated_id = id;
+	}
+
 	
 	final static String NOCLAIMGENID = "Claim has no generated id; db id = %s";
 
@@ -184,6 +196,43 @@ public class ClaimBean implements UpdateableBean{  //do all claims need IRI's?
 	public void updateDB(AbstractConnection c) throws SQLException{
 		c.updateClaim(this);
 	}
-	
-	
+
+	/**
+	 * may not be needed, but if we ever need to reopen a database
+	 */
+	static void flushCache(){
+		cache.clear();
+	}
+
+	public static boolean isCached(int id){
+		return cache.containsKey(id);
+	}
+
+	public static ClaimBean getCached(int id){
+		assert cache.containsKey(id) : String.format("no cache entry for %d",id);
+		return cache.get(id);
+	}
+
+	@Override
+	public void cache(){
+		if (isCached(id)){
+			log.warn(String.format("Tried multiple caching of %s with id %d",
+					               getClass().getSimpleName(),
+					               getId()));
+		}
+		cache.put(id, this);
+	}
+
+
+	@Override
+	public void updatecache(){
+		ClaimBean existing = cache.get(getId());
+		if (!this.equals(existing)){
+			log.warn(String.format("Forcing update of cached bean %s with id %d",
+					               getClass().getSimpleName(),
+					               getId()));
+			cache.put(getId(), this);
+		}
+	}
+
 }
