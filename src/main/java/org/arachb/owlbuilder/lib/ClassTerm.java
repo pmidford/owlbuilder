@@ -1,5 +1,6 @@
 package org.arachb.owlbuilder.lib;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.arachb.arachadmin.TermBean;
@@ -23,19 +24,26 @@ public class ClassTerm implements NamedGeneratingEntity,TaxonomicEntity {
 	public boolean isTaxon(){
 		return isTaxon;
 	}
-	
-	@Override
-	public OWLObject generateOWL(Owlbuilder b) throws Exception {
-		OWLDataFactory factory = b.getDataFactory();
-		IRI classIRI = IRI.create(bean.getIRIString());
-		return factory.getOWLClass(classIRI);
-	}
+
 
 	@Override
 	public OWLObject generateOWL(Owlbuilder b, Map<String, OWLObject> elements) throws Exception {
-		OWLObject newClass = generateOWL(b);
+		OWLDataFactory factory = b.getDataFactory();
+		IRI classIRI = IRI.create(bean.getIRIString());
+		OWLClass newClass = factory.getOWLClass(classIRI);
 		elements.put(bean.getIRIString(), newClass);
 		return newClass;
 	}
 
+
+	final private static Map<String,OWLObject> defaultElementMap = new HashMap<String,OWLObject>();
+
+	@Override
+	public OWLObject generateOWL(Owlbuilder builder) throws Exception {
+		OWLObject result = generateOWL(builder, defaultElementMap);
+		defaultElementMap.clear();
+		return result;
+	}
+
+	
 }
