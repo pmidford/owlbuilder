@@ -36,7 +36,7 @@ public class TestParticipantBean {
 
 	@Test
 	public void testFill() throws Exception {
-		Set<ParticipantBean> pbs1 = testConnection.getParticipants(testClaim1);
+		Set<ParticipantBean> pbs1 = testConnection.getParticipantTable(1);
 		assertEquals(1, pbs1.size());
 		for (ParticipantBean pb : pbs1){
 			assertEquals(1, pb.getId());
@@ -49,7 +49,7 @@ public class TestParticipantBean {
 			assertEquals(0, pb.getSubstrate());
 			assertEquals(1, pb.getHeadElement());
 		}
-		Set<ParticipantBean> pbs29 = testConnection.getParticipants(testClaim26);
+		Set<ParticipantBean> pbs29 = testConnection.getParticipantTable(26);
 		assertEquals(1, pbs29.size());
 		for (ParticipantBean pb : pbs29){
 			assertEquals(29, pb.getId());
@@ -65,23 +65,6 @@ public class TestParticipantBean {
 	}
 
 
-	@Test
-	public void testLoadElements() throws Exception {
-		final Set<ParticipantBean> pbs1 = testConnection.getParticipants(testClaim1);
-		assertEquals(1, pbs1.size());
-		for (ParticipantBean pb : pbs1){
-			assertNull(pb.getElementBean(1));
-			pb.loadElements(testConnection);
-			assertNotNull(pb.getElementBean(1));
-		}
-		Set<ParticipantBean> pbs29 = testConnection.getParticipants(testClaim26);
-		assertEquals(1, pbs29.size());
-		for (ParticipantBean pb : pbs29){
-			assertNull(pb.getElementBean(1));
-			pb.loadElements(testConnection);
-			assertNotNull(pb.getElementBean(61));
-		}
-	}
 
 
 }
