@@ -1,6 +1,8 @@
 package org.arachb.owlbuilder.lib;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -46,7 +48,7 @@ public class Claim implements GeneratingEntity {
 	 * @return 
 	 */
 	@Override
-	public OWLObject generateOWL(Owlbuilder builder) throws Exception{
+	public OWLObject generateOWL(Owlbuilder builder, Map<String, OWLObject> elements) throws Exception{
 		final AbstractConnection c = builder.getConnection();
 		final OWLOntology target = builder.getTarget();
 		final OWLOntologyManager manager = builder.getOntologyManager();
@@ -56,13 +58,13 @@ public class Claim implements GeneratingEntity {
 		OWLClass behaviorClass = factory.getOWLClass(IRI.create(bean.getBehaviorIri()));
 		builder.initializeMiscTermAndParents(behaviorClass);
 		final Set<Participant> participants =  
-				Participant.wrapSet(c.getParticipants(bean));
+				Participant.wrapSet(c.getParticipantTable(bean.getId()));
 		// load participant elements
 		for (Participant p : participants){
 			p.loadElements(c);
 		}
 		for (Participant p : participants){
-			p.resolveElements(c);
+			p.resolveElements();
 		}
 		final Set<OWLObject> owlParticipants = new HashSet<OWLObject>();
 		for (Participant p : participants){
@@ -87,6 +89,22 @@ public class Claim implements GeneratingEntity {
 		}
 		return claim_ind;
 	}
+
+	final Map<String,OWLObject> defaultElementTable = new HashMap<String,OWLObject>();
+
+	@Override
+	public OWLObject generateOWL(Owlbuilder b) throws Exception{
+		defaultElementTable.clear();
+		OWLObject result = null;
+		try{
+			result = generateOWL(b,defaultElementTable);
+		}
+		finally{
+			defaultElementTable.clear();
+		}
+		return result;
+	}
+
 
 	/**
 	 * 
