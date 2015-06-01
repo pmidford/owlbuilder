@@ -5,8 +5,25 @@ import java.util.Map;
 import java.util.Set;
 
 
-
 public interface AbstractConnection {
+
+	/**
+	 * Methods for connecting to an arachadmin database or mock of the same.
+	 * Many methods return a single row from a table, as specified by an id,
+	 * and represented by a bean appropriate to the table being queried
+	 * or a set of ids (frequently filtered by an SQL where clause) or a table
+	 * consisting of a set of beans.  Update methods operate on a single row and
+	 * usually just update the generated_id column for that row, since that is the
+	 * only field that can be filled at generation time.
+	 * Not every table has methods for every type of access.
+	 * Note that the implementation of beans is limited to strings, integers, and
+	 * sets of integers (doubles aren't used but wouldn't break the design).  One to
+	 * many and many to many are each captured as sets of indices (currently limited
+	 * to integers, though that's a design pattern (imposed by web2py) that will be 
+	 * tossed when web2py is replaced in the curation tool.
+	 * @author pmidford
+	 */
+	
 
 	/**
 	 * performs query and returns a mapping from uri's of support ontologies used
@@ -22,12 +39,18 @@ public interface AbstractConnection {
 	 */
 	void close() throws Exception;
 
+
 	/**
 	 * 
 	 * @return all the claims in the supplying resource
 	 * @throws Exception
 	 */
-	Set<ClaimBean> getClaims() throws Exception;
+	Set<ClaimBean> getClaimTable() throws Exception;
+
+	/**
+	 * 
+	 */
+	void updateClaim(ClaimBean c) throws SQLException;
 
 	/**
 	 * returns a single publication
@@ -39,16 +62,19 @@ public interface AbstractConnection {
 
 	/**
 	 * 
-	 * @return all the publications in the supplying resource
+	 * @return integer id's of publications in table
 	 * @throws SQLException
+	 *
 	 */
-	Set<PublicationBean> getPublications() throws SQLException;
+	//Set<Integer> getPublicationSet() throws SQLException;
 	
 	/**
 	 * 
+	 * @return all the publications in the supplying resource
+	 * @throws SQLException
 	 */
-	void updateClaim(ClaimBean c) throws SQLException;
-
+	Set<PublicationBean> getPublicationTable() throws SQLException;
+	
 	/**
 	 * 
 	 * @param p
@@ -58,19 +84,26 @@ public interface AbstractConnection {
 
 	/**
 	 * 
-	 * @param a claim with associated participants
-	 * @return participant beans associated with claim
+	 * @param claimId id of claim with associated participants
+	 * @return id's of participant beans associated with claim
 	 * @throws SQLException
 	 */
-	Set<ParticipantBean> getParticipants(ClaimBean a) throws Exception;
+	public Set<Integer> getParticipantSet(int claimId) throws Exception;
 	
 	/**
 	 * 
-	 * @param a holds the claim
-	 * @param p specifies the property (e.g., activelyparticipatesin)
+	 * @param claimId id of claim with associated participants
+	 * @return id's of participant beans associated with claim
 	 * @throws SQLException
 	 */
-	Set<ParticipantBean> getParticipantsWithProperty(ClaimBean a, Object p);
+	public Set<ParticipantBean> getParticipantTable(int claimId) throws Exception;
+	
+	
+	/**
+	 * 
+	 * @return bean associated with id
+	 */
+	public ParticipantBean getParticipant(int id) throws Exception;
 	
 	/**
 	 * 
@@ -83,8 +116,16 @@ public interface AbstractConnection {
 	 * @param p specifies the participant that packages these elements
 	 * @throws SQLException
 	 */
-	Set<PElementBean> getPElements(ParticipantBean p) throws Exception;
-	
+	Set<Integer> getPElementSet(ParticipantBean p) throws Exception;
+		
+	/**
+	 * 
+	 * @param p
+	 * @return set of PElementBeans associated with p's participant
+	 * @throws Exception
+	 */
+	Set<PElementBean> getPElementTable(ParticipantBean p) throws Exception;
+
 	
 	/**
 	 * 
@@ -95,19 +136,20 @@ public interface AbstractConnection {
 	PElementBean getPElement(int id) throws Exception;
 
 	/**
+	 * 
+	 * @return
+	 * @throws SQLException
+	 */
+	Set<TaxonBean>getTaxonTable() throws SQLException;
+	
+	/**
 	 * returns a single (curator added) taxon 
 	 * @param id integer id of the (curator added) taxon to return
 	 * @return object filled with the fields from the taxon requested
 	 * @throws SQLException
 	 */
-	TaxonBean getTaxon(int id) throws SQLException;
+	TaxonBean getTaxonRow(int id) throws SQLException;
 
-	/**
-	 * 
-	 * @return all the taxa in the supplying resource
-	 * @throws SQLException
-	 */
-	Set<TaxonBean> getTaxa() throws SQLException;
 
 	/**
 	 * 
@@ -132,13 +174,6 @@ public interface AbstractConnection {
 	 */
 	TermBean getTerm(int termId) throws SQLException;
 
-	/**
-	 * 
-	 * @return set of all term records in database
-	 * @throws SQLException
-	 */
-	Set<TermBean> getTerms() throws SQLException;
-	//TODO why?
 	
 	/**
 	 * 
@@ -207,28 +242,14 @@ public interface AbstractConnection {
 	 * @param pb
 	 * @throws Exception
 	 */
-	void fillPElementTerm(PElementBean pb) throws Exception;
+	//void fillPElementTerm(PElementBean pb) throws Exception;
 
 	/**
 	 * 
 	 * @param pb
 	 * @throws Exception
 	 */
-	void fillPElementIndividual(PElementBean pb) throws Exception;
-
-	/**
-	 * 
-	 * @param result
-	 * @throws Exception
-	 */
-	void fillPElementParents(PElementBean result) throws Exception;
-
-	/**
-	 * 
-	 * @param result
-	 * @throws Exception
-	 */
-	void fillPElementChildren(PElementBean result) throws Exception;
+	//void fillPElementIndividual(PElementBean pb) throws Exception;
 
 
 }
