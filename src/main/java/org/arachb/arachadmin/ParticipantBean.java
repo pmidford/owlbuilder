@@ -2,20 +2,14 @@ package org.arachb.arachadmin;
 
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.arachb.owlbuilder.Owlbuilder;
-import org.semanticweb.owlapi.model.OWLAnnotationAssertionAxiom;
-import org.semanticweb.owlapi.model.OWLClass;
-import org.semanticweb.owlapi.model.OWLClassAxiom;
-import org.semanticweb.owlapi.model.OWLOntology;
-import org.semanticweb.owlapi.model.OWLOntologyManager;
 
-public class ParticipantBean implements UpdateableBean{
+public class ParticipantBean implements CachingBean,UpdateableBean{
 
-	
 
 		
 	final static int DBID = 1;
@@ -35,7 +29,7 @@ public class ParticipantBean implements UpdateableBean{
 	final static String BADSUBSTRATEIRI =
 			"Term without IRI referenced as participant substrate; participant id = %s; substrate id = %s";
 	
-    
+	private static final Map<Integer, ParticipantBean> cache = new HashMap<>();
 	private int id;
 	private int taxon;
 	private int substrate;
@@ -50,12 +44,10 @@ public class ParticipantBean implements UpdateableBean{
 	private String taxonIRI = null;
 	private String substrateIRI = null;
 	private String anatomyIRI = null;
-	private PropertyBean propertyBean;
 	private int headElement;
-	private PElementBean headBean;
 
 	
-	final Map<Integer, PElementBean> elements = new HashMap<Integer, PElementBean>();
+	final private Set<Integer> elements = new HashSet<Integer>();
 	
 	public final static String INDIVIDUALQUANTIFIER = "INDIVIDUAL";
 	public final static String SOMEQUANTIFIER = "SOME";
@@ -140,13 +132,17 @@ public class ParticipantBean implements UpdateableBean{
 		return headElement;
 	}
 	
+	void setElements(Set<Integer> pes){
+		elements.clear();
+		elements.addAll(pes);
+	}
 
-	public PElementBean getElementBean(int index){
-		return elements.get(index);
+	public Set<Integer> getElements(){
+		return elements;
 	}
 	
-	public PropertyBean getParticipationBean(){
-		return propertyBean;
+	public int getHeadProperty(){
+		return property;
 	}
 
 	final static String NOPARTICGENID = "Participant has no generated id; db id = %s";
@@ -175,8 +171,41 @@ public class ParticipantBean implements UpdateableBean{
 		
 	}
 
+	/**
+	 * may not be needed, but if we ever need to reopen a database
+	 */
+	static void flushCache(){
+		cache.clear();
+	}
+
+	public static boolean isCached(int id){
+		return cache.containsKey(id);
+	}
+
+	public static ParticipantBean getCached(int id){
+		assert cache.containsKey(id) : String.format("no cache entry for %d",id);
+		return cache.get(id);
+	}
+
+	@Override
+	public void cache(){
+		if (isCached(getId())){
+			log.warn(String.format("Tried multiple caching of %s with id %d",
+					               getClass().getSimpleName(),
+					               getId()));
+		}
+		cache.put(getId(), this);
+	}
 
 
-
+	@Override
+	public void updatecache(){
+		if (!this.equals(cache.get(getId()))){
+			log.warn(String.format("Forcing update of cached bean %s with id %d",
+					               getClass().getSimpleName(),
+					               getId()));
+			cache.put(getId(), this);
+		}
+	}
 
 }
