@@ -1,6 +1,7 @@
 package org.arachb.owlbuilder.lib;
 
-import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.arachb.arachadmin.PublicationBean;
 import org.arachb.owlbuilder.Owlbuilder;
@@ -20,8 +21,6 @@ public class Publication implements GeneratingEntity {
 	private final PublicationBean bean;
 
 	private String generatedLabel;
-	
-
 
 	public Publication(PublicationBean b){
 		bean = b;
@@ -47,10 +46,19 @@ public class Publication implements GeneratingEntity {
 		return b.toString();
 	}
 
+	final private static Map<String,OWLObject> defaultElementMap = new HashMap<String,OWLObject>();
+
+	@Override
+	public OWLObject generateOWL(Owlbuilder builder) throws Exception {
+		OWLObject result = generateOWL(builder, defaultElementMap);
+		defaultElementMap.clear();
+		return result;
+	}
 
 
 	@Override
-	public OWLObject generateOWL(Owlbuilder builder) throws SQLException {
+	public OWLObject generateOWL(Owlbuilder builder, Map<String, OWLObject> elements)
+			throws Exception {
 		final OWLOntologyManager manager = builder.getOntologyManager();
 		final OWLDataFactory factory = builder.getDataFactory();
 		final OWLClass pubAboutInvestigationClass = 
@@ -70,14 +78,5 @@ public class Publication implements GeneratingEntity {
 		}	
 		return pub_ind;
 	}
-	
-	
 
-
-	
-	
-	
-
-	
-	
 }
