@@ -53,11 +53,11 @@ public class TestDBConnection {
 		assertEquals(doi3,testPub.getDoi());
 	}
 
-	@Test
-	public void testgetPublications() throws SQLException{
-		Set<PublicationBean> testSet = testConnection.getPublications();
-		assertNotNull(testSet);
-		assertEquals(4,testSet.size());
+	@Test 
+	public void testGetPublicationTable() throws SQLException{
+		Set<PublicationBean> testTable = testConnection.getPublicationTable();
+		assertNotNull(testTable);
+		assertEquals(4,testTable.size());
 	}
 
 	@Test
@@ -107,13 +107,6 @@ public class TestDBConnection {
 		assertEquals("",testNarrative2.getDescription());
 	}
 	
-	@Test
-	public void testgetTerms() throws SQLException{
-		Set<TermBean> testSet = testConnection.getTerms();
-		assertNotNull(testSet);
-		assertEquals(4,testSet.size());
-	}
-
 
 	@Test
 	public void testgetClaim() throws Exception{
@@ -140,15 +133,21 @@ public class TestDBConnection {
 
 	
 	@Test
-	public void testgetParticipants() throws Exception{
-		ClaimBean testClaim = testConnection.getClaim(1);
-		Set<ParticipantBean> testSet = testConnection.getParticipants(testClaim);
+	public void testgetParticipantSet() throws Exception{
+		Set<Integer> testSet = testConnection.getParticipantSet(1);
 		assertNotNull(testSet);
 		assertEquals(1,testSet.size());
-		for (ParticipantBean p : testSet){
-			assertEquals(1,p.getId());
-			assertEquals(testPubTaxon,p.getPublicationTaxon());
-			assertEquals(1,p.getHeadElement());
+		for (Integer index : testSet){
+			final int i = index.intValue();
+			assertEquals(1,i);
+			ParticipantBean pb = ParticipantBean.getCached(index);
+			if (pb == null){
+				pb = testConnection.getParticipant(index);
+			}
+			assertNotNull(pb);
+			assertEquals(i,pb.getId());
+			assertEquals(testPubTaxon,pb.getPublicationTaxon());
+			assertEquals(1,pb.getHeadElement());
 		}
 	}
 	
@@ -161,12 +160,13 @@ public class TestDBConnection {
 	
 	@Test
 	public void testgetPElements() throws Exception{
-		ClaimBean testClaim = testConnection.getClaim(1);
-		Set<ParticipantBean> testSet = testConnection.getParticipants(testClaim);
+		Set<Integer> testSet = testConnection.getParticipantSet(1);
 		assertNotNull(testSet);
 		assertEquals(1,testSet.size());
-		for (ParticipantBean p : testSet){
-			Set<PElementBean> elements = testConnection.getPElements(p);
+		for (Integer index : testSet){
+			ParticipantBean pb = ParticipantBean.getCached(index);
+			assertNotNull(pb);
+			Set<Integer> elements = pb.getElements();
 			assertEquals(2,elements.size());
 		}
 	}
