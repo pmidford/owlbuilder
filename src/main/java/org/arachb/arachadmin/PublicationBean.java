@@ -1,11 +1,15 @@
 package org.arachb.arachadmin;
 
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.log4j.Logger;
 
 
 
 
-public class PublicationBean extends CachingBean implements UpdateableBean {
+public class PublicationBean implements CachingBean,UpdateableBean {
 
 
 	static final int DBID = 1;
@@ -30,7 +34,10 @@ public class PublicationBean extends CachingBean implements UpdateableBean {
 	static final int DBCURATIONUPDATE = 20;
 	
 
-	
+	private static final Map<Integer, PublicationBean> cache = new HashMap<>();
+	private static Logger log = Logger.getLogger(PublicationBean.class);
+
+
 	private int id;
 	private String publication_type;
 	private String dispensation;
@@ -79,6 +86,8 @@ public class PublicationBean extends CachingBean implements UpdateableBean {
         curation_update = record.getString(DBCURATIONUPDATE);        
 	}
 	
+	/* accessors */
+
 	@Override
 	public int getId(){
 		return id;
@@ -161,6 +170,8 @@ public class PublicationBean extends CachingBean implements UpdateableBean {
 		return curation_update;
 	}
 	
+	/* Updaters */
+
 	//Just updates the id in the bean - method for updating db is in DBConnection
 	public void setGeneratedId(String id) {
 		generated_id = id;
@@ -204,6 +215,46 @@ public class PublicationBean extends CachingBean implements UpdateableBean {
 		}
 	}
 
+	/**
+	 * may not be needed, but if we ever need to reopen a database
+	 */
+	static void flushCache(){
+		cache.clear();
+	}
 
+	public static boolean isCached(int id){
+		return cache.containsKey(id);
+	}
+
+	public static int cacheSize(){
+		return cache.size();
+	}
+
+	public static PublicationBean getCached(int id){
+		assert cache.containsKey(id) : String.format("no cache entry for %d",id);
+		return cache.get(id);
+	}
+
+
+	@Override
+	public void cache(){
+		if (isCached(getId())){
+			log.warn(String.format("Tried multiple caching of %s with id %d",
+					               getClass().getSimpleName(),
+					               getId()));
+		}
+		cache.put(getId(), this);
+	}
+
+
+	@Override
+	public void updatecache(){
+		if (!this.equals(cache.get(getId()))){
+			log.warn(String.format("Forcing update of cached bean %s with id %d",
+					               getClass().getSimpleName(),
+					               getId()));
+			cache.put(this.getId(), this);
+		}
+	}
 	
 }
