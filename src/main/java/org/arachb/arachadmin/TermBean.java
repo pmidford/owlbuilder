@@ -1,9 +1,13 @@
 package org.arachb.arachadmin;
 
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.log4j.Logger;
 
 
-public class TermBean extends CachingBean implements UpdateableBean{
+public class TermBean implements CachingBean, UpdateableBean{
 
 
 	static final int DBID = 1;
@@ -14,6 +18,11 @@ public class TermBean extends CachingBean implements UpdateableBean{
 	static final int DBGENERATEDID = 6;
 	static final int DBCOMMENT = 7;
 		
+	private static final Map<Integer, TermBean> cache = new HashMap<>();
+	private static Logger log = Logger.getLogger(TermBean.class);
+
+
+	
 	private int id;
 	private String source_id;
 	private int domain;
@@ -36,12 +45,13 @@ public class TermBean extends CachingBean implements UpdateableBean{
 	}
 
 	
+	
+	/* accessor */
+	
 	public int getId(){
 		return id;
 	}
 	
-
-
 	
 	public String getSourceId(){
 		return source_id;
@@ -76,16 +86,19 @@ public class TermBean extends CachingBean implements UpdateableBean{
 	}
 
 
-	final static String NOTERMGENID = "Term has no source or generated id; db id = %s";
+	final private static String NOTERMGENID = "Term has no source or generated id; db id = %s";
 
 	@Override
 	public String getIRIString(){
-		final String genId = getGeneratedId();
-		if (genId == null){
-			final String msg = String.format(NOTERMGENID, getId());
-			throw new IllegalStateException(msg);
+		if (getSourceId() == null){
+			final String genId = getGeneratedId();
+			if (genId == null){
+				final String msg = String.format(NOTERMGENID, getId());
+				throw new IllegalStateException(msg);
+			}
+			return genId;
 		}
-		return genId;
+		return getSourceId();
 	}
 
 	@Override
@@ -104,9 +117,45 @@ public class TermBean extends CachingBean implements UpdateableBean{
 	public void updateDB(AbstractConnection c) throws SQLException {
 		c.updateTerm(this);
 	}
+
+	/**
+	 * may not be needed, but if we ever need to reopen a database
+	 */
+	static void flushCache(){
+		cache.clear();
+	}
 	
+	public static boolean isCached(int id){
+		return cache.containsKey(id);
+	}
+	
+	public static TermBean getCached(int id){
+		assert cache.containsKey(id) : String.format("no cache entry for %d",id);
+		return cache.get(id);
+	}
+
+	
+	@Override
+	public void cache(){
+		if (isCached(getId())){
+			log.warn(String.format("Tried multiple caching of %s with id %d",
+					               getClass().getSimpleName(),
+					               getId()));
+		}
+		cache.put(getId(), this);
+	}
 	
 
+	@Override
+	public void updatecache(){
+		if (!this.equals(cache.get(getId()))){
+			log.warn(String.format("Forcing update of cached bean %s with id %d",
+					               getClass().getSimpleName(),
+					               getId()));
+			cache.put(getId(), this);
+		}
+	}
+	
 
 
 }

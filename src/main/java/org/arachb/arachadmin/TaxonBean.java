@@ -1,12 +1,13 @@
 package org.arachb.arachadmin;
 
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
 
-public class TaxonBean extends CachingBean implements UpdateableBean{
+import org.apache.log4j.Logger;
+
+public class TaxonBean implements CachingBean,UpdateableBean{
 	
-	final static String BADPARENTIRI =
-			"Taxon without IRI referenced as parent of taxon: taxon id = %s; parent id = %s";
-
 
 	static final int DBID = 1;
 	static final int DBNAME = 2;
@@ -20,6 +21,11 @@ public class TaxonBean extends CachingBean implements UpdateableBean{
 	static final int MERGED = 10;
 	static final int MERGE_STATUS = 11;
 	static final int PARENT_SOURCEID = 12;
+	
+	private static final Map<Integer, TaxonBean> cache = new HashMap<>();
+	private static Logger log = Logger.getLogger(TaxonBean.class);
+
+
 	
 	private int id;
 	private String name;
@@ -54,22 +60,6 @@ public class TaxonBean extends CachingBean implements UpdateableBean{
 
 	}
 	
-	private void updateParentIRI(AbstractResults record) throws SQLException {
-		if (record.getString(PARENT_SOURCEID) != null){
-			parent_sourceid = record.getString(PARENT_SOURCEID);
-		}
-		else{
-			throwBadState(BADPARENTIRI);
-		}
-		// TODO Auto-generated method stub
-		
-	}
-
-	private void throwBadState(String template){
-		final String msg = String.format(template, id, parent_term);
-		throw new IllegalStateException(msg);
-	}
-
 	
 	public int getId(){
 		return id;
@@ -153,6 +143,62 @@ public class TaxonBean extends CachingBean implements UpdateableBean{
 		return getSourceId();
 	}
 
+	private void updateParentIRI(AbstractResults record) throws SQLException {
+		if (record.getString(PARENT_SOURCEID) != null){
+			parent_sourceid = record.getString(PARENT_SOURCEID);
+		}
+		else{
+			throwBadState(BADPARENTIRI);
+		}
+		// TODO Auto-generated method stub
+		
+	}
 
+	private final static String BADPARENTIRI =
+			"Taxon without IRI referenced as parent of taxon: taxon id = %s; parent id = %s";
+
+	private void throwBadState(String template){
+		final String msg = String.format(template, id, parent_term);
+		throw new IllegalStateException(msg);
+	}
+
+	/**
+	 * may not be needed, but if we ever need to reopen a database
+	 */
+	static void flushCache(){
+		cache.clear();
+	}
+	
+	public static boolean isCached(int id){
+		return cache.containsKey(id);
+	}
+	
+	public static TaxonBean getCached(int id){
+		assert cache.containsKey(id) : String.format("no cache entry for %d",id);
+		return cache.get(id);
+	}
+
+	
+	@Override
+	public void cache(){
+		if (isCached(getId())){
+			log.warn(String.format("Tried multiple caching of %s with id %d",
+					               getClass().getSimpleName(),
+					               getId()));
+		}
+		cache.put(getId(), this);
+	}
+	
+	
+	@Override
+	public void updatecache(){
+		if (!this.equals(cache.get(getId()))){
+			log.warn(String.format("Forcing update of cached bean %s with id %d",
+					               getClass().getSimpleName(),
+					               getId()));
+			cache.put(getId(), this);
+		}
+	}
+	
 
 }
