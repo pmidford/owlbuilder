@@ -44,8 +44,9 @@ public class Claim implements GeneratingEntity {
 
 
 	/**
+	 * generates all the owl objects and assertions required to represent the claim
 	 * @param builder
-	 * @return 
+	 * @return individual behavior corresponding to the claim
 	 */
 	@Override
 	public OWLObject generateOWL(Owlbuilder builder, Map<String, OWLObject> elements) throws Exception{
