@@ -140,8 +140,11 @@ public class TestDBConnection {
 		for (Integer index : testSet){
 			final int i = index.intValue();
 			assertEquals(1,i);
-			ParticipantBean pb = ParticipantBean.getCached(index);
-			if (pb == null){
+			ParticipantBean pb;
+			if (ParticipantBean.isCached(index)){
+				pb = ParticipantBean.getCached(index);
+			}
+			else {
 				pb = testConnection.getParticipant(index);
 			}
 			assertNotNull(pb);
