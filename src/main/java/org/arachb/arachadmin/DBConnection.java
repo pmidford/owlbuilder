@@ -143,7 +143,8 @@ public class DBConnection implements AbstractConnection{
 			"SELECT ele.id, ele.type, ele.participant, p2t.term, p2i.individual " +
 			        "FROM participant_element as ele " +
 				    "LEFT JOIN pelement2term as p2t ON (p2t.element = ele.id) " +
-					"LEFT JOIN pelement2individual as p2i ON (p2i.element = ele.id) ";
+					"LEFT JOIN pelement2individual as p2i ON (p2i.element = ele.id) " +
+				    "WHERE ele.participant = ?";
 	
 	static final String PELEMENTTERMQUERY =
 			"SELECT p2t.term FROM pelement2term as p2t WHERE element = ?";
@@ -223,6 +224,11 @@ public class DBConnection implements AbstractConnection{
 	static final String PROPERTYROWQUERY = 
 			"SELECT p.id, p.source_id, p.authority, p.label, p.generated_id, p.comment " +
 			"FROM property AS p WHERE p.id = ?";
+	
+	static final String PROPERTYROWBYSOURCEIDQUERY = 
+			"SELECT p.id, p.source_id, p.authority, p.label, p.generated_id, p.comment " +
+			"FROM property AS p WHERE p.source_id = ?";
+			
 
 	
 	static final Logger logger = Logger.getLogger(DBConnection.class.getName());
@@ -462,7 +468,14 @@ public class DBConnection implements AbstractConnection{
 				result.cache();
 			}
 			else{
-				result = null;
+				if (termStatement.getWarnings() != null){
+					log.info("statement warning is " + termStatement.getWarnings().getMessage());
+				}
+				if (termSet.getWarnings() != null){
+					log.info("result set warning is " + termSet.getWarnings().getMessage());
+				}
+				termSet.close();
+				throw new RuntimeException("Term row query with id " + id + " failed to return a result");
 			}
 			termSet.close();
 			return result;
@@ -641,6 +654,9 @@ public class DBConnection implements AbstractConnection{
 			while (participantSet.next()){
 				ParticipantBean pb = new ParticipantBean();
 				pb.fill(participantSet);
+				if (!ParticipantBean.isCached(pb.getId())){
+					pb.cache();
+				}
 				result.add(pb);
 			}
 			r.close();
@@ -654,6 +670,7 @@ public class DBConnection implements AbstractConnection{
 					c.prepareStatement(PELEMENTSETFROMPARTICIPANTQUERY);
 			try{
 				for (ParticipantBean pb : result){
+
 					log.info("About to load elements for participant " + pb.getId());
 					final Set<Integer> elements = new HashSet<Integer>();
 					elementsStatement.setInt(1, pb.getId());
@@ -665,12 +682,25 @@ public class DBConnection implements AbstractConnection{
 					pb.setElements(elements);
 					log.info("Participant " + pb.getId() + " loaded " + elements.size() + " element ids");
 				}
-				return result;
 			}
 			finally{
 				elementsStatement.close();
 			}
-
+			log.info("checking and adding head elements if not found");
+			for (ParticipantBean pb : result){
+				if (PElementBean.isCached(pb.getHeadElement())){
+					log.warn("why is head pelement " + pb.getHeadElement() + " already cached");
+				}
+				else {
+					getPElement(pb.getHeadElement()).cache();
+				}
+			}
+			log.info("adding properties to " + result.size() + " participants");
+			for (ParticipantBean pb : result){
+				log.info("About to add property for participant " + pb.getId());
+				getProperty(pb.getProperty()).cache();
+			}
+			return result;
 		}
 		return result;
 	}
@@ -715,9 +745,14 @@ public class DBConnection implements AbstractConnection{
 				if (!PElementBean.isCached(bean.getId())){
 					bean.cache();
 				}
-				if (bean.getTermId() != null){
+				if (bean.getTermId().intValue() != 0){
 					if (!TermBean.isCached(bean.getTermId())){
 						getTerm(bean.getTermId()).cache();
+					}
+				}
+				else if (bean.getIndividualId().intValue() != 0){
+					if (!IndividualBean.isCached(bean.getIndividualId())){
+						getIndividual(bean.getIndividualId()).cache();
 					}
 				}
 				result.add(bean);
@@ -911,6 +946,7 @@ public class DBConnection implements AbstractConnection{
 				ib.fill(new DBResults(individualSet));
 				ib.checkIRIString(irimanager);
 				if (!TermBean.isCached(ib.getTerm())){
+					log.info("Term id = " + ib.getTerm());
 					getTerm(ib.getTerm()).cache();
 				}
 				ib.cache();
@@ -963,10 +999,10 @@ public class DBConnection implements AbstractConnection{
 	@Override
 	public NarrativeBean getNarrative(int nId) throws SQLException{
 		final PreparedStatement narrativeStatement = c.prepareStatement(NARRATIVEROWQUERY);
+		NarrativeBean result;
 		try{
 			narrativeStatement.setInt(1, nId);
 			final ResultSet narrativeSet = narrativeStatement.executeQuery();
-			NarrativeBean result;
 			if (narrativeSet.next()){
 				result = new NarrativeBean();
 				final AbstractResults narrativeResults = new DBResults(narrativeSet);
@@ -976,11 +1012,14 @@ public class DBConnection implements AbstractConnection{
 				result = null;
 			}
 			narrativeSet.close();
-			return result;
 		}
 		finally{
 			narrativeStatement.close();
 		}
+		if (result != null) {
+			getPublication(result.getPublicationId()).cache();
+		}
+		return result;
 	}
 
 	
@@ -1009,6 +1048,33 @@ public class DBConnection implements AbstractConnection{
 			propertyStatement.close();
 		}
 	}
+
+	public PropertyBean getPropertyFromSourceId(String uid) throws Exception{
+		if (PropertyBean.isSourceIdCached(uid)){
+			return PropertyBean.getSourceIdCached(uid);
+		}
+		final PreparedStatement propertyStatement = c.prepareStatement(PROPERTYROWBYSOURCEIDQUERY);
+		try{
+			propertyStatement.setString(1, uid);
+			ResultSet propertySet = propertyStatement.executeQuery();
+			AbstractResults propertyResults = new DBResults(propertySet);
+			PropertyBean result;
+			if (propertyResults.next()){
+				result = new PropertyBean();
+				result.fill(propertyResults);
+				result.cache();
+			}
+			else{
+				result = null;
+			}
+			propertySet.close();
+			return result;
+		}
+		finally{
+			propertyStatement.close();
+		}
+	}
+
 
 
 	

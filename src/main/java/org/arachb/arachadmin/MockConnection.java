@@ -874,6 +874,22 @@ public class MockConnection implements AbstractConnection {
 		return result;
 	}
 
+	@Override
+	public PropertyBean getPropertyFromSourceId(String uid) throws Exception {
+		final PropertyBean result = new PropertyBean();
+		switch (uid){
+			case ACTIVELYPARTICIPATESINURL:
+				result.fill(mockPropertyResults306);
+				break;
+			case PARTOFURL:
+				result.fill(mockPropertyResults15);
+				break;
+			default:
+				return null;
+		}
+		return result;
+	}
+
 //	@Override
 //	public void fillPElementTerm(PElementBean pb) throws Exception {
 //		switch (pb.getId()){

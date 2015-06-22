@@ -62,19 +62,11 @@ public interface AbstractConnection {
 
 	/**
 	 * 
-	 * @return integer id's of publications in table
-	 * @throws SQLException
-	 *
-	 */
-	//Set<Integer> getPublicationSet() throws SQLException;
-	
-	/**
-	 * 
 	 * @return all the publications in the supplying resource
 	 * @throws SQLException
 	 */
 	Set<PublicationBean> getPublicationTable() throws SQLException;
-	
+
 	/**
 	 * 
 	 * @param p
@@ -89,7 +81,7 @@ public interface AbstractConnection {
 	 * @throws SQLException
 	 */
 	public Set<Integer> getParticipantSet(int claimId) throws Exception;
-	
+
 	/**
 	 * 
 	 * @param claimId id of claim with associated participants
@@ -97,27 +89,27 @@ public interface AbstractConnection {
 	 * @throws SQLException
 	 */
 	public Set<ParticipantBean> getParticipantTable(int claimId) throws Exception;
-	
-	
+
+
 	/**
 	 * 
 	 * @return bean associated with id
 	 */
 	public ParticipantBean getParticipant(int id) throws Exception;
-	
+
 	/**
 	 * 
 	 * @param p
 	 * @throws SQLException
 	 */
 	void updateParticipant(ParticipantBean p) throws SQLException;
-	
+
 	/**
 	 * @param p specifies the participant that packages these elements
 	 * @throws SQLException
 	 */
 	Set<Integer> getPElementSet(ParticipantBean p) throws Exception;
-		
+
 	/**
 	 * 
 	 * @param p
@@ -126,7 +118,7 @@ public interface AbstractConnection {
 	 */
 	Set<PElementBean> getPElementTable(ParticipantBean p) throws Exception;
 
-	
+
 	/**
 	 * 
 	 * @param id
@@ -137,11 +129,11 @@ public interface AbstractConnection {
 
 	/**
 	 * 
-	 * @return
+	 * @return set of taxa in TaxonTable as beans
 	 * @throws SQLException
 	 */
 	Set<TaxonBean>getTaxonTable() throws SQLException;
-	
+
 	/**
 	 * returns a single (curator added) taxon 
 	 * @param id integer id of the (curator added) taxon to return
@@ -174,14 +166,14 @@ public interface AbstractConnection {
 	 */
 	TermBean getTerm(int termId) throws SQLException;
 
-	
+
 	/**
 	 * 
 	 * @param termBean
 	 */
 	void updateTerm(TermBean termBean) throws SQLException;
 
-	
+
 	/**
 	 * should update the database record corresponding to the entity
 	 * @param e
@@ -189,7 +181,7 @@ public interface AbstractConnection {
 	 */
 	void updateNamedEntity(UpdateableBean b) throws SQLException;
 
-	
+
 	/**
 	 * returns representation of a single claim
 	 * @param claimId
@@ -212,8 +204,8 @@ public interface AbstractConnection {
 	 * @throws SQLException
 	 */
 	void updateIndividual(IndividualBean t) throws SQLException;
-	
-	
+
+
 	/**
 	 * 
 	 * @param nId
@@ -221,7 +213,7 @@ public interface AbstractConnection {
 	 * @throws SQLException
 	 */
 	NarrativeBean getNarrative(int nId) throws SQLException;
-	
+
 
 	/**
 	 * @param pId index of property record
@@ -229,6 +221,12 @@ public interface AbstractConnection {
 	 * @throws Exception 
 	 */
 	PropertyBean getProperty(int pId) throws Exception;
+
+	/**
+	 * the right way to access properties
+	 * @param uid string of IRI of property record
+	 */
+	PropertyBean getPropertyFromSourceId(String uid) throws Exception;
 
 	/**
 	 * 

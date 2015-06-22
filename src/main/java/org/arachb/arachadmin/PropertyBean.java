@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.semanticweb.owlapi.model.IRI;
 
 
 
@@ -18,6 +19,7 @@ public class PropertyBean implements CachingBean,BeanBase {
 	final static int DBCOMMENT = 6;
 
 	private static final Map<Integer, PropertyBean> cache = new HashMap<>();
+	private static final Map<String, PropertyBean> sourceIdCache = new HashMap<>();
 	private static Logger log = Logger.getLogger(PropertyBean.class);
 
 
@@ -71,15 +73,25 @@ public class PropertyBean implements CachingBean,BeanBase {
 	 */
 	static void flushCache(){
 		cache.clear();
+		sourceIdCache.clear();
 	}
-	
+
 	public static boolean isCached(int id){
 		return cache.containsKey(id);
 	}
-	
+
+	public static boolean isSourceIdCached(String source_id){
+		return sourceIdCache.containsKey(source_id);
+	}
+
 	public static PropertyBean getCached(int id){
 		assert cache.containsKey(id) : String.format("no cache entry for %d",id);
 		return cache.get(id);
+	}
+
+	public static PropertyBean getSourceIdCached(String source_id){
+		assert sourceIdCache.containsKey(source_id) : String.format("no cache entry for %s",source_id);
+		return sourceIdCache.get(source_id);
 	}
 
 	@Override
@@ -89,10 +101,16 @@ public class PropertyBean implements CachingBean,BeanBase {
 					               getClass().getSimpleName(),
 					               getId()));
 		}
+		if (isSourceIdCached(getSourceId())){
+			log.warn(String.format("Tried multiple caching of %s with id %s",
+		               getClass().getSimpleName(),
+		               getSourceId()));
+		}
 		cache.put(getId(), this);
+		sourceIdCache.put(getSourceId(), this);
 	}
-	
-	
+
+
 	@Override
 	public void updatecache(){
 		if (!this.equals(cache.get(getId()))){
@@ -101,8 +119,12 @@ public class PropertyBean implements CachingBean,BeanBase {
 					               getId()));
 			cache.put(getId(), this);
 		}
+		if (!this.equals(sourceIdCache.get(getSourceId()))){
+			log.warn(String.format("Forcing update of cached bean %s with id %s",
+					               getClass().getSimpleName(),
+					               getSourceId()));
+			sourceIdCache.put(getSourceId(), this);
+		}
 	}
-	
 
-	
 }
