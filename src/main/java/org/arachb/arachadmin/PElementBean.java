@@ -6,8 +6,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.arachb.owlbuilder.Owlbuilder;
-import org.arachb.owlbuilder.lib.Individual;
 
 
 
