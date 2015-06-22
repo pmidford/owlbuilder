@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.arachb.arachadmin.AbstractConnection;
 import org.arachb.arachadmin.IndividualBean;
 import org.arachb.arachadmin.NarrativeBean;
 import org.arachb.arachadmin.PublicationBean;
@@ -56,6 +55,7 @@ public class Individual implements NamedGeneratingEntity{
 				}
 				individualIRI = IRI.create(indString);
 				OWLIndividual namedIndividual = factory.getOWLNamedIndividual(individualIRI);
+				builder.initializeMiscIndividual(namedIndividual);
 				final String label = getLabelFromNarrativeSet();
 				if (label != null){
 					log.info("Individual Bean " + indString + " has label " + label);
