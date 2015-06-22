@@ -1,17 +1,13 @@
 package org.arachb.owlbuilder.lib;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.arachb.arachadmin.AbstractConnection;
-import org.arachb.arachadmin.IndividualBean;
 import org.arachb.arachadmin.PElementBean;
 import org.arachb.arachadmin.ParticipantBean;
 import org.arachb.arachadmin.PropertyBean;
@@ -19,9 +15,7 @@ import org.arachb.arachadmin.TermBean;
 import org.arachb.owlbuilder.Owlbuilder;
 import org.semanticweb.owlapi.model.AddAxiom;
 import org.semanticweb.owlapi.model.IRI;
-import org.semanticweb.owlapi.model.OWLAnnotation;
 import org.semanticweb.owlapi.model.OWLAnnotationAssertionAxiom;
-import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassAxiom;
 import org.semanticweb.owlapi.model.OWLClassExpression;
@@ -57,7 +51,8 @@ public class Participant implements GeneratingEntity{
 
 	public Participant(ParticipantBean b){
 		bean = b;
-
+		property = new PropertyTerm(PropertyBean.getCached(b.getProperty()));
+		headElement = ParticipantElement.getElement(PElementBean.getCached(bean.getHeadElement()));
 	}
 
 	/**
@@ -73,19 +68,17 @@ public class Participant implements GeneratingEntity{
 	
 	@Override
 	public OWLObject generateOWL(Owlbuilder builder, Map<String,OWLObject> owlElements) throws Exception{
-		ParticipantElement headElement = ParticipantElement.getElement(PElementBean.getCached(bean.getHeadElement()));
-		PropertyTerm headProperty = new PropertyTerm(PropertyBean.getCached(bean.getHeadProperty()));
 		OWLObject headObject = headElement.generateOWL(builder, owlElements);
 		Set <Integer>children = headElement.getChildren();
 		switch (children.size()){
 		case 0:
-			return generateNoDependentOWL(builder, headProperty, headObject,owlElements);
+			return generateNoDependentOWL(builder, property, headObject,owlElements);
 		case 1:
 			Integer childIndex = children.iterator().next();
 			ParticipantElement child = headElement.getChildElement(childIndex);
 			PropertyTerm childProperty = headElement.getChildProperty(childIndex);
 			OWLObject childObject = generateRestrictionClass(builder, owlElements, child, childProperty);
-			return generateDependentOWL(builder, headProperty, headObject, childObject, owlElements);
+			return generateDependentOWL(builder, property, headObject, childObject, owlElements);
 		default:
 			throw new RuntimeException("Didn't expect " + children.size() + " children");
 		}
@@ -214,7 +207,6 @@ public class Participant implements GeneratingEntity{
 											   ParticipantElement pe,
 											   PropertyTerm pt) throws Exception{
 		final OWLDataFactory factory = builder.getDataFactory();
-		Integer parentIndex = pe.getSingletonParent();
 		//PropertyBean childProp = peb.getParentProperty(parentIndex);
 		IRI childPropIRI = IRI.create(pt.getSourceId());
 		OWLObjectProperty childProperty = factory.getOWLObjectProperty(childPropIRI);
