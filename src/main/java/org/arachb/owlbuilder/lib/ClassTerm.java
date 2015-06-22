@@ -31,6 +31,7 @@ public class ClassTerm implements NamedGeneratingEntity,TaxonomicEntity {
 		OWLDataFactory factory = b.getDataFactory();
 		IRI classIRI = IRI.create(bean.getIRIString());
 		OWLClass newClass = factory.getOWLClass(classIRI);
+		b.initializeMiscTermAndParents(newClass);
 		elements.put(bean.getIRIString(), newClass);
 		return newClass;
 	}
