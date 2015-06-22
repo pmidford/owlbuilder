@@ -18,6 +18,7 @@ public class PropertyTerm implements NamedGeneratingEntity {
 
 	@Override
 	public OWLObject generateOWL(Owlbuilder b, Map<String, OWLObject> elements) throws Exception {
+		assert (bean.getSourceId() != null): "bean (id = %d) has null sourceId";
 		IRI propertyIRI = IRI.create(bean.getSourceId());
 		OWLObjectProperty elementProperty = b.getDataFactory().getOWLObjectProperty(propertyIRI);
 		elements.put(bean.getSourceId(), elementProperty);
