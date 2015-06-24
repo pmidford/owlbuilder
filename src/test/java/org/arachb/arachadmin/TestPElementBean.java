@@ -21,8 +21,6 @@ public class TestPElementBean {
 
     private final static int TESTPUBTAXONDBID = 4838;
     private final static int TESTPUBANATOMYID = 10473;
-    private ClaimBean testClaim1;
-    private ClaimBean testClaim26;
     private ParticipantBean testParticipant1;
     private ParticipantBean testParticipant29;
     private PElementBean testElement1;
@@ -30,76 +28,67 @@ public class TestPElementBean {
     private PElementBean testElement61;
     private PElementBean testElement62;
 	
-	@Before
-	public void setUp() throws Exception {
-		if (DBConnection.testConnection()){
-			log.info("Testing with live connection");
-			testConnection = DBConnection.getTestConnection();
-		}
-		else{
-			log.info("Testing with mock connection");
-			testConnection = DBConnection.getMockConnection();
-		}
-		testClaim1 = testConnection.getClaim(1);
-		testClaim26 = testConnection.getClaim(26);
-		assertNotNull(testClaim26);
-		testParticipant1 = getParticipantForClaim(1);
-		//testParticipant1.loadElements(testConnection);
-		testParticipant29 = getParticipantForClaim(26);
-		//testParticipant29.loadElements(testConnection);
-		assertNotNull(testParticipant29);
-		testElement1 = testConnection.getPElement(1);
-		testElement2 = testConnection.getPElement(2);
-		testElement61 = testConnection.getPElement(61);
-		testElement62 = testConnection.getPElement(62);
-		assertNotNull(testElement61);
+    @Before
+    public void setUp() throws Exception {
+	if (DBConnection.testConnection()){
+	    log.info("Testing with live connection");
+	    testConnection = DBConnection.getTestConnection();
 	}
+	else{
+	    log.info("Testing with mock connection");
+	    testConnection = DBConnection.getMockConnection();
+	}
+	testParticipant1 = getParticipantForClaim(1);
+	testParticipant29 = getParticipantForClaim(26);
+	assertNotNull(testParticipant29);
+	testElement1 = testConnection.getPElement(1);
+	testElement2 = testConnection.getPElement(2);
+	testElement61 = testConnection.getPElement(61);
+	testElement62 = testConnection.getPElement(62);
+	assertNotNull(testElement61);
+    }
 	
-	private ParticipantBean getParticipantForClaim(int claimId) throws Exception{
-		final Set<ParticipantBean>testParticipants = 
-				testConnection.getParticipantTable(claimId);
-		assertFalse(testParticipants.isEmpty());
-		Iterator<ParticipantBean> piter = testParticipants.iterator();
-		if (piter.hasNext()){
-			return piter.next();
-		}
-		return null;
+    private ParticipantBean getParticipantForClaim(int claimId) throws Exception{
+	final Set<ParticipantBean>testParticipants = 
+		    testConnection.getParticipantTable(claimId);
+	assertFalse(testParticipants.isEmpty());
+	Iterator<ParticipantBean> piter = testParticipants.iterator();
+	if (piter.hasNext()){
+	    return piter.next();
 	}
+	return null;
+    }
 
 
-	@Test
-	public void testFill() throws Exception{
-		assertEquals(1, testElement1.getId());
-		assertEquals(1, testElement1.getType());
-		assertEquals(1, testElement1.getParticipant());
-		assertEquals(2, testElement2.getId());
-		assertEquals(1, testElement2.getType());
-		assertEquals(1, testElement2.getParticipant());
-		assertEquals(61, testElement61.getId());
-		assertEquals(3, testElement61.getType());
-		assertEquals(29, testElement61.getParticipant());
-	}
+    @Test
+    public void testFill() throws Exception{
+	assertEquals(1, testElement1.getId());
+	assertEquals(1, testElement1.getType());
+	assertEquals(1, testElement1.getParticipant());
+	assertEquals(2, testElement2.getId());
+	assertEquals(1, testElement2.getType());
+	assertEquals(1, testElement2.getParticipant());
+	assertEquals(61, testElement61.getId());
+	assertEquals(3, testElement61.getType());
+	assertEquals(29, testElement61.getParticipant());
+    }
 
-	@Test
-	public void testFillTerm() throws Exception{
-		final TermBean t1 = testConnection.getTerm(TESTPUBTAXONDBID);
-		//testConnection.fillPElementTerm(testElement1);
-		final TermBean tx = TermBean.getCached(testElement1.getTermId());
-		assertNotNull(tx);
-		assertEquals(t1, tx);
-		final TermBean t2 = testConnection.getTerm(TESTPUBANATOMYID);
-		//testConnection.fillPElementTerm(testElement2);
-		final TermBean tx2 = TermBean.getCached(testElement2.getTermId());
-		assertNotNull(tx2);
-		assertEquals(t2, tx2);
-		//testConnection.fillPElementTerm(testElement61);
-		assertNull(testElement61.getTermId());
-	}
+    @Test
+    public void testFillTerm() throws Exception{
+	final TermBean t1 = testConnection.getTerm(TESTPUBTAXONDBID);
+	final TermBean tx = TermBean.getCached(testElement1.getTermId());
+	assertNotNull(tx);
+	assertEquals(t1, tx);
+	final TermBean t2 = testConnection.getTerm(TESTPUBANATOMYID);
+	final TermBean tx2 = TermBean.getCached(testElement2.getTermId());
+	assertNotNull(tx2);
+	assertEquals(t2, tx2);
+    }
 
-	
-	
-//	@Test
-//	public void testFillParents() throws Exception{
+
+    @Test
+    public void testFillParents() throws Exception{
+//		testElement1.
 //		testConnection.fillPElementParents(testElement1);
 //		final Set<Integer> parentset = testElement1.getParents();
 //		assertEquals(1, parentset.size());
@@ -109,7 +98,7 @@ public class TestPElementBean {
 //		testConnection.fillPElementParents(testElement61);
 //		final Set<Integer> parentset61 = testElement61.getParents();
 //		assertEquals(1, parentset61.size());
-//	}
+    }
 //
 //	@Test
 //	public void testFillChildren() throws Exception{
