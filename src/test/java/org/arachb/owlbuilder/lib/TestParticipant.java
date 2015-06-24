@@ -1,6 +1,7 @@
 package org.arachb.owlbuilder.lib;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -46,9 +47,18 @@ public class TestParticipant {
     	testClaim26 = testConnection.getClaim(TESTCLAIMID26);
 		beanSet1 = testConnection.getParticipantTable(TESTCLAIMID1);
 		beanSet26 = testConnection.getParticipantTable(TESTCLAIMID26);
+		for (ParticipantBean pb : beanSet1){
+			testConnection.getPElementTable(pb);
+			testConnection.getProperty(pb.getProperty());
+		}
+		for (ParticipantBean pb : beanSet26){
+			testConnection.getPElementTable(pb);
+			testConnection.getProperty(pb.getProperty());
+		}
 		allParticipants.clear();
 		allParticipants.addAll(beanSet1);
 		allParticipants.addAll(beanSet26);
+		testConnection.getPublicationTable();
     	
 	}
 
@@ -101,6 +111,7 @@ public class TestParticipant {
 	@Test
 	public void testGenerateOWL() throws Exception {
 		for (ParticipantBean pb : allParticipants){
+			assertTrue(pb.getProperty()>0);
 			Participant p = new Participant(pb);
 			OWLObject o = p.generateOWL(builder);
 			assertNotNull(o);
