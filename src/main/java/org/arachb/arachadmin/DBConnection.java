@@ -784,6 +784,7 @@ public class DBConnection implements AbstractConnection{
 		}
 	}
 	
+	//TODO this needs test code and refactoring
 	@Override
 	public PElementBean getPElement(int id) throws Exception{
 		final PreparedStatement pElementStatement = c.prepareStatement(PELEMENTROWQUERY);
@@ -837,7 +838,7 @@ public class DBConnection implements AbstractConnection{
 			finally{
 				pElementParentsStatement.close();
 			}
-			final PreparedStatement pElementChildStatement = c.prepareStatement(PELEMENTPARENTSQUERY);
+			final PreparedStatement pElementChildStatement = c.prepareStatement(PELEMENTCHILDRENQUERY);
 			try{
 				pElementChildStatement.setInt(1, pb.getId());
 				ResultSet childResults = pElementChildStatement.executeQuery();
