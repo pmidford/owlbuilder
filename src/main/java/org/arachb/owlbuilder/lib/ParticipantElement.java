@@ -5,6 +5,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
+import org.arachb.arachadmin.AbstractConnection;
 import org.arachb.arachadmin.IndividualBean;
 import org.arachb.arachadmin.PElementBean;
 import org.arachb.arachadmin.PropertyBean;
@@ -22,6 +24,8 @@ public class ParticipantElement implements GeneratingEntity {
 	NamedGeneratingEntity entity;
 	final private Map<Integer,Plink> parentLinks = new HashMap<Integer,Plink>();
 	final private Map<Integer,Plink> childLinks = new HashMap<Integer,Plink>();
+
+	private static Logger log = Logger.getLogger(ParticipantElement.class);
 
 	
 	final static String CONSTRUCTPEBADENTITY = 
@@ -43,12 +47,12 @@ public class ParticipantElement implements GeneratingEntity {
 			entity = new ClassTerm(TermBean.getCached(bean.getTermId()));
 		}
 		else if (bean.getIndividualId() > 0){
+			log.info("Setting individual for participant element, id = " + bean.getId());
 			entity = new Individual(IndividualBean.getCached(bean.getIndividualId()));
 		}
 		else {
 			throw new RuntimeException(CONSTRUCTPEBADENTITY + bean);
 		}
-		
 	}
 
 	/**
@@ -62,17 +66,47 @@ public class ParticipantElement implements GeneratingEntity {
 		return result;
 	}
 
+	/**
+	 * Can't initialize
+	 */
+	public void resolveLinks(AbstractConnection c) throws Exception{
+	for (Integer childIndex : bean.getChildren()){
+		Integer childProp = bean.getChildProperty(childIndex);
+		Plink newLink = new Plink(childIndex,childProp,c);   //TODO this feels like overdesign
+		childLinks.put(childProp, newLink);
+	}
+	for (Integer parentIndex : bean.getParents()){
+		Integer parentProp = bean.getParentProperty(parentIndex);
+		Plink newLink = new Plink(parentIndex,parentProp,c);
+		parentLinks.put(parentIndex, newLink);
+	}
+	}
+
+
 	@Override
 	public OWLObject generateOWL(Owlbuilder builder, Map<String, OWLObject> elements) throws Exception {
+		if (log.isInfoEnabled()){
+			generatingReport();
+		}
 		return entity.generateOWL(builder, elements);			
 	}
 
 	@Override
 	public OWLObject generateOWL(Owlbuilder builder) throws Exception {
+		if (log.isInfoEnabled()){
+			generatingReport();
+		}
 		return entity.generateOWL(builder);
 	}
 		
 	
+
+	private void generatingReport(){
+		if (entity instanceof Individual){
+			String iriString = ((Individual)entity).getIRIString();
+			log.info(String.format("Participant Element %d is generating code for Individual ",bean.getId(),iriString));
+		}
+	}
 
 	public Set<Integer> getParents(){
 		return parentLinks.keySet();
@@ -134,8 +168,14 @@ public class ParticipantElement implements GeneratingEntity {
 		private final PropertyTerm property;
 		private final ParticipantElement element;	
 		
-		Plink(Integer elementid, Integer propertyid){
+		Plink(Integer elementid, Integer propertyid, AbstractConnection c) throws Exception{
+			if (!PropertyBean.isCached(propertyid)){
+				c.getProperty(propertyid).cache();
+			}
 			property = new PropertyTerm(PropertyBean.getCached(propertyid));
+			if (PElementBean.isCached(elementid)){
+				c.getPElement(elementid).cache();
+			}
 			element = ParticipantElement.getElement(PElementBean.getCached(elementid));
 		}
 		
