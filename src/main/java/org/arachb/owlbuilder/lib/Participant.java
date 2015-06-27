@@ -17,6 +17,7 @@ import org.semanticweb.owlapi.model.AddAxiom;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAnnotationAssertionAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
+import org.semanticweb.owlapi.model.OWLClassAssertionAxiom;
 import org.semanticweb.owlapi.model.OWLClassAxiom;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataFactory;
@@ -66,21 +67,51 @@ public class Participant implements GeneratingEntity{
 		return result;
 	}
 	
+	final static String BADELEMENTMSG = "head Element generated neither a class or a individual: %s";
+
 	@Override
 	public OWLObject generateOWL(Owlbuilder builder, Map<String,OWLObject> owlElements) throws Exception{
 		OWLObject headObject = headElement.generateOWL(builder, owlElements);
 		Set <Integer>children = headElement.getChildren();
 		switch (children.size()){
 		case 0:
-			return generateNoDependentOWL(builder, property, headObject,owlElements);
+			if (headObject instanceof OWLClassExpression){
+				return generateNoDependentOWL(builder, property, headObject,owlElements);
+			}
+			else if (headObject instanceof OWLIndividual){
+				return generateNoDependentOWL(builder, property, headObject,owlElements);
+			}
+			else {
+				throw new RuntimeException(String.format(BADELEMENTMSG,headElement));
+			}
 		case 1:
 			Integer childIndex = children.iterator().next();
 			ParticipantElement child = headElement.getChildElement(childIndex);
 			PropertyTerm childProperty = headElement.getChildProperty(childIndex);
-			OWLObject childObject = generateRestrictionClass(builder, owlElements, child, childProperty);
-			return generateDependentOWL(builder, property, headObject, childObject, owlElements);
+			if (headObject instanceof OWLClassExpression){
+				OWLObject childObject = generateRestrictionClass(builder, owlElements, child, childProperty);
+				return generateDependentOWLClass(builder,
+						                         childProperty,
+						                         (OWLClassExpression)headObject,
+						                         childObject,
+						                         owlElements);
+			}
+			else if (headObject instanceof OWLIndividual){
+				OWLObject childObject = generateRestrictionClass(builder,
+						                                         owlElements,
+						                                         child,
+						                                         childProperty);
+				return generateDependentOWLIndividual(builder,
+													  childProperty,
+													  (OWLIndividual)headObject,
+													  childObject,
+													  owlElements);
+			}
+			else {
+				throw new RuntimeException(String.format(BADELEMENTMSG,headElement));
+			}
 		default:
-			throw new RuntimeException("Didn't expect " + children.size() + " children");
+			throw new RuntimeException(String.format("Didn't expect %d children",children.size()));
 		}
 	}
 	
@@ -109,61 +140,61 @@ public class Participant implements GeneratingEntity{
      * @param names
 	 * @return
 	 */
-	private OWLObject generateDependentOWL(Owlbuilder builder,
-										   PropertyTerm headProperty, 
-										   OWLObject headObject, 
-										   OWLObject childObject,
-										   Map<String,OWLObject> names) throws Exception{
+	private OWLObject generateDependentOWLClass(Owlbuilder builder,
+			PropertyTerm childProperty,
+			OWLClassExpression headClassExpr,
+			OWLObject childObject,
+			Map<String,OWLObject> names) throws Exception{
 		final OWLDataFactory factory = builder.getDataFactory();
-		OWLObjectProperty elementProperty = (OWLObjectProperty)headProperty.generateOWL(builder,names);
-		if (headObject instanceof OWLClassExpression){
-			final OWLClassExpression headClass = (OWLClassExpression)headObject;
-			if (childObject != null){
-				if (childObject instanceof OWLClassExpression){
-					final OWLClassExpression childClass = (OWLClassExpression)childObject;
-					OWLClassExpression intersect = 
-							factory.getOWLObjectIntersectionOf(headClass,childClass);
-					OWLClassExpression propertyRestriction = 
-							factory.getOWLObjectSomeValuesFrom(elementProperty,intersect);
-					log.info("Generated Property restriction(2): " + propertyRestriction);					
-					return propertyRestriction;
-				}
-				else if (childObject instanceof OWLIndividual){
-					log.info("Individual child of class");
-				}
-				else {
-					throw new RuntimeException("child is neither a class expression or individual: " + childObject);
-				}
+		OWLObjectProperty elementProperty = (OWLObjectProperty)childProperty.generateOWL(builder,names);
+		if (childObject != null){
+			if (childObject instanceof OWLClassExpression){
+				final OWLClassExpression childClass = (OWLClassExpression)childObject;
+				OWLClassExpression intersect = 
+						factory.getOWLObjectIntersectionOf(headClassExpr,childClass);
+				OWLClassExpression propertyRestriction = 
+						factory.getOWLObjectSomeValuesFrom(elementProperty,intersect);
+				log.info("Generated Property restriction(2): " + propertyRestriction);
+				return propertyRestriction;
 			}
-			OWLClassExpression propertyRestriction = 
-					factory.getOWLObjectSomeValuesFrom(elementProperty,headClass);
-			log.info("Generated Property restriction: " + propertyRestriction);
-			return propertyRestriction;
-		}
-		else if (headObject instanceof OWLIndividual){
-			log.info("Generated Individual reference: " + headObject);
-			final OWLIndividual headIndividual = (OWLIndividual)headObject;
-			if (childObject != null){
-				if (childObject instanceof OWLIndividual){
-					OWLIndividual childIndividual = (OWLIndividual)childObject;
-			        OWLObjectPropertyAssertionAxiom assertion = 
-			        		factory.getOWLObjectPropertyAssertionAxiom(elementProperty, headIndividual, childIndividual);
-			        // Finally, add the axiom to our ontology and save
-			        AddAxiom addAxiomChange = new AddAxiom(builder.getTarget(), assertion);
-			        builder.getOntologyManager().applyChange(addAxiomChange);
-				}
-				else {  //child is class expression?
-					log.info("class child of individual");
-				}
-				
+			else if (childObject instanceof OWLIndividual){
+				log.info("Individual child of class");
 			}
-			return headObject; //TODO finish implementing individual case
+			else {
+				throw new RuntimeException("child is neither a class expression or individual: " + childObject);
+			}
 		}
-		else {
-			throw new RuntimeException("Bad head object in participant: " + headObject);
-		}
+		OWLClassExpression propertyRestriction = 
+				factory.getOWLObjectSomeValuesFrom(elementProperty,headClassExpr);
+		log.info("Generated Property restriction: " + propertyRestriction);
+		return propertyRestriction;
 	}
 
+
+	private OWLObject generateDependentOWLIndividual(Owlbuilder builder,
+			PropertyTerm childProperty,
+			OWLIndividual headInd,
+			OWLObject childObject,
+			Map<String,OWLObject> names) throws Exception{
+		final OWLDataFactory factory = builder.getDataFactory();
+		OWLObjectProperty elementProperty = (OWLObjectProperty)childProperty.generateOWL(builder,names);
+		log.info("Generated Individual reference: " + headInd);
+		if (childObject != null){
+			if (childObject instanceof OWLIndividual){
+				OWLIndividual childIndividual = (OWLIndividual)childObject;
+				OWLObjectPropertyAssertionAxiom assertion =
+						factory.getOWLObjectPropertyAssertionAxiom(elementProperty, headInd, childIndividual);
+				// Finally, add the axiom to our ontology and save
+				AddAxiom addAxiomChange = new AddAxiom(builder.getTarget(), assertion);
+				builder.getOntologyManager().applyChange(addAxiomChange);
+			}
+			else {  //child is class expression?
+				log.info("class child of individual");
+			}
+
+		}
+		return headInd; //TODO finish implementing individual case
+	}
 	
 	/**
 	 * @param builder
@@ -187,6 +218,16 @@ public class Participant implements GeneratingEntity{
 		}
 		else if (headObject instanceof OWLIndividual){
 			log.info("Generated Individual reference: " + headObject);
+			OWLIndividual eventIndividual = factory.getOWLAnonymousIndividual();
+			//OWLClassAssertionAxiom clAssertion = factory.getOWLClassAssertionAxiom(headObject, eventIndividual);
+			//builder.getOntologyManager().addAxiom(builder.getTarget(), clAssertion);
+			OWLIndividual headIndividual = (OWLIndividual)headObject;
+	        OWLObjectPropertyAssertionAxiom assertion = 
+	        		factory.getOWLObjectPropertyAssertionAxiom(elementProperty, eventIndividual, headIndividual);
+	        // Finally, add the axiom to our ontology and save
+	        AddAxiom addAxiomChange = new AddAxiom(builder.getTarget(), assertion);
+	        builder.getOntologyManager().applyChange(addAxiomChange);
+
 			return headObject; //TODO finish implementing individual case  
 		}
 		else {
@@ -259,6 +300,7 @@ public class Participant implements GeneratingEntity{
 	//TODO should these be merged?
 	
 		public void loadElements(AbstractConnection c) throws Exception{
+			log.info("In load elements");
 			// special handling for head participation property
 			if (bean.getProperty() > 0){
 				property = new PropertyTerm(c.getProperty(bean.getProperty()));
@@ -266,15 +308,20 @@ public class Participant implements GeneratingEntity{
 			else {
 				throw new IllegalStateException("No participantProperty specified");
 			}
-			if (bean.getElements().size() == 0){
+			if (bean.getElements().isEmpty()){
 				throw new RuntimeException("bean " + bean.getId() + " has no elements");
 			}
+			log.info("Should be listing elements here");
 			for (Integer id : bean.getElements()){
-				final ParticipantElement pe = ParticipantElement.getElement(c.getPElement(id)); 
-				log.debug("    loading element" + pe);
-				log.debug("     id is" + pe.getId());
-				log.debug("     entity is " + pe.entity);
+				c.getPElement(id).cache();
+				final ParticipantElement pe = ParticipantElement.getElement(PElementBean.getCached(id)); 
+				log.info("    loading element" + pe);
+				log.info("     id is" + pe.getId());
+				log.info("     entity is " + pe.entity);
 				elements.add(pe);
+			}
+			for (ParticipantElement pe : elements){
+				pe.resolveLinks(c);
 			}
 		}
 
