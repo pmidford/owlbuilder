@@ -575,7 +575,7 @@ public class DBConnection implements AbstractConnection{
 		}
 	}
 
-	
+	/* Never called outside of tests? */
 	public Set<Integer> getParticipantSet(int claimId) throws Exception {
 		final Set<Integer> result = new HashSet<Integer>();
 		final PreparedStatement participantsStatement =
@@ -843,7 +843,7 @@ public class DBConnection implements AbstractConnection{
 				pElementChildStatement.setInt(1, pb.getId());
 				ResultSet childResults = pElementChildStatement.executeQuery();
 				while (childResults.next()){
-					int child = childResults.getInt(2);  //Constant for this?
+					int child = childResults.getInt(1);  //Constant for this?
 					int property = childResults.getInt(3);  //Constant for this?
 					pb.addChild(child,property);
 				}
