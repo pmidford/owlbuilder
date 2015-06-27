@@ -10,6 +10,8 @@ import org.arachb.arachadmin.AbstractConnection;
 import org.arachb.arachadmin.ClaimBean;
 import org.arachb.owlbuilder.Owlbuilder;
 import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLAnnotation;
+import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassAssertionAxiom;
 import org.semanticweb.owlapi.model.OWLClassExpression;
@@ -67,17 +69,29 @@ public class Claim implements GeneratingEntity {
 		for (Participant p : participants){
 			p.resolveElements();
 		}
+		for (Participant p : participants){
+			p.resolveElements();
+		}
 		final Set<OWLObject> owlParticipants = new HashSet<OWLObject>();
 		for (Participant p : participants){
 			OWLObject op = p.generateOWL(builder);
 			assert op != null;
 			owlParticipants.add(op);
 		}
-		log.info("After processing claim participants: " + bean.getId() +" database, target class count = " + target.getClassesInSignature().size());
+		log.info(String.format("After processing claim participants: %d, target class count = %d",
+				               bean.getId(),
+				               target.getClassesInSignature().size()));
+		final String iComment = String.format("Individual from claim owlgeneration, id = %d",bean.getId());
+		OWLAnnotation commentAnno = factory.getOWLAnnotation(factory.getRDFSComment(),
+				                                             factory.getOWLLiteral(iComment));
+		OWLAxiom ax = factory.getOWLAnnotationAssertionAxiom(IRI.create(bean.getIRIString()), commentAnno);
+		manager.addAxiom(builder.getTarget(),ax);
 		for (OWLObject o : owlParticipants){
 			connectParticipant(builder, o, claim_ind, behaviorClass);
 		}
-		log.info("After connecting claim participants: " + bean.getId() +" database, target class count = " + target.getClassesInSignature().size());
+		log.info(String.format("After connecting claim participants: %d, target class count = %d",
+				                bean.getId(),
+				                target.getClassesInSignature().size()));
 
 		Publication pub = new Publication(c.getPublication(bean.getPublication()));
 
