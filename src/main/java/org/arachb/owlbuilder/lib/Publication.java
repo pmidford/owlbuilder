@@ -75,7 +75,13 @@ public class Publication implements GeneratingEntity {
 			OWLAxiom ax = factory.getOWLAnnotationAssertionAxiom(publication_id, labelAnno);
 			// Add the axiom to the ontology
 			manager.addAxiom(builder.getTarget(),ax);
-		}	
+		}
+		final String iComment = "Individual from publication owlgeneration, id = " + bean.getId();
+		OWLAnnotation commentAnno = factory.getOWLAnnotation(factory.getRDFSComment(), 
+				                                             factory.getOWLLiteral(iComment));
+		OWLAxiom ax = factory.getOWLAnnotationAssertionAxiom(publication_id, commentAnno);
+		manager.addAxiom(builder.getTarget(),ax);
+
 		return pub_ind;
 	}
 
