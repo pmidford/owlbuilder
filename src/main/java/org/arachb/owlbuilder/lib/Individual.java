@@ -19,6 +19,7 @@ import org.semanticweb.owlapi.model.OWLClassAssertionAxiom;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLIndividual;
 import org.semanticweb.owlapi.model.OWLObject;
+import org.semanticweb.owlapi.model.OWLOntologyManager;
 
 public class Individual implements NamedGeneratingEntity{
 
@@ -47,6 +48,7 @@ public class Individual implements NamedGeneratingEntity{
 	@Override
 	public OWLObject generateOWL(Owlbuilder builder, Map<String, OWLObject> elements) throws Exception {
 		final OWLDataFactory factory = builder.getDataFactory();
+		final OWLOntologyManager manager = builder.getOntologyManager();
 		IRI individualIRI;
 			try {
 				String indString = bean.checkIRIString(builder.getIRIManager());
@@ -63,8 +65,13 @@ public class Individual implements NamedGeneratingEntity{
 																	   factory.getOWLLiteral(label));
 					OWLAxiom ax = factory.getOWLAnnotationAssertionAxiom(individualIRI, labelAnno);
 					// Add the axiom to the ontology
-					builder.getOntologyManager().addAxiom(builder.getTarget(),ax);
+					manager.addAxiom(builder.getTarget(),ax);
 				}
+				final String iComment = "Individual from individual owlgeneration, id = " + bean.getId();
+				OWLAnnotation commentAnno = factory.getOWLAnnotation(factory.getRDFSComment(), 
+						                                             factory.getOWLLiteral(iComment));
+				OWLAxiom ax = factory.getOWLAnnotationAssertionAxiom(individualIRI, commentAnno);
+				manager.addAxiom(builder.getTarget(),ax);
 				ClassTerm ct;
 				if (TermBean.isCached(bean.getTerm())){
 					ct =  new ClassTerm(TermBean.getCached(bean.getTerm()));
@@ -106,5 +113,9 @@ public class Individual implements NamedGeneratingEntity{
 	
 
 	/* methods to expose bean fields */
+
+	public String getIRIString(){
+		return bean.getIRIString();
+	}
 	
 }
