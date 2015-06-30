@@ -31,7 +31,11 @@ public class ParticipantElement implements GeneratingEntity {
 	final static String CONSTRUCTPEBADENTITY = 
 			"Bean for constructing Participant Element has neither ClassExpression or Individual";
 
-	
+	/**
+	 * Factory method for generating ParticipantElements from beans
+	 * @param peb bean specifying the PElement
+	 * @return new PElement
+	 */
 	public static ParticipantElement getElement(PElementBean peb){
 		if (ParticipantElement.directory.containsKey(peb.getId())){
 			return ParticipantElement.directory.get(peb.getId());
@@ -53,6 +57,10 @@ public class ParticipantElement implements GeneratingEntity {
 		else {
 			throw new RuntimeException(CONSTRUCTPEBADENTITY + bean);
 		}
+	}
+
+	public boolean isIndividual(){
+		return entity instanceof Individual;
 	}
 
 	/**

@@ -47,8 +47,8 @@ public class Participant implements GeneratingEntity{
 	
 	final Set<ParticipantElement> elements = new HashSet<ParticipantElement>();
 
-	private ParticipantElement headElement;
-	private PropertyTerm property; 
+	private final ParticipantElement headElement;
+	private final PropertyTerm property;
 
 	public Participant(ParticipantBean b){
 		bean = b;
@@ -68,6 +68,16 @@ public class Participant implements GeneratingEntity{
 	}
 	
 	final static String BADELEMENTMSG = "head Element generated neither a class or a individual: %s";
+
+	//TODO work through the assumption here
+	/*
+	 * @return true if the headElement is an individual
+	 * This should suffice, at least for the moment
+	 *
+	 */
+	boolean isIndividual(){
+		return headElement.isIndividual();
+	}
 
 	@Override
 	public OWLObject generateOWL(Owlbuilder builder, Map<String,OWLObject> owlElements) throws Exception{
@@ -300,24 +310,18 @@ public class Participant implements GeneratingEntity{
 	//TODO should these be merged?
 	
 		public void loadElements(AbstractConnection c) throws Exception{
-			log.info("In load elements");
+			log.debug("In load elements");
 			// special handling for head participation property
-			if (bean.getProperty() > 0){
-				property = new PropertyTerm(c.getProperty(bean.getProperty()));
-			}
-			else {
-				throw new IllegalStateException("No participantProperty specified");
-			}
 			if (bean.getElements().isEmpty()){
 				throw new RuntimeException("bean " + bean.getId() + " has no elements");
 			}
-			log.info("Should be listing elements here");
+			log.debug("Should be listing elements here");
 			for (Integer id : bean.getElements()){
 				c.getPElement(id).cache();
 				final ParticipantElement pe = ParticipantElement.getElement(PElementBean.getCached(id)); 
-				log.info("    loading element" + pe);
-				log.info("     id is" + pe.getId());
-				log.info("     entity is " + pe.entity);
+				log.debug("    loading element" + pe);
+				log.debug("     id is" + pe.getId());
+				log.debug("     entity is " + pe.entity);
 				elements.add(pe);
 			}
 			for (ParticipantElement pe : elements){
@@ -333,7 +337,7 @@ public class Participant implements GeneratingEntity{
 			assert PElementBean.getCached(bean.getHeadElement()) != null;
 			//assert elements.contains(bean.getHeadElement()) : "Participant: " + bean.getId() + " has unregistered head element: " + bean.getHeadElement();
 			PElementBean head = PElementBean.getCached(bean.getHeadElement());
-			headElement = ParticipantElement.getElement(head);
+			//headElement = ParticipantElement.getElement(head);
 		}
 
 		void processTaxon(Owlbuilder builder,OWLClass taxon){
@@ -380,10 +384,15 @@ public class Participant implements GeneratingEntity{
 
 		public void processSubstrate(Owlbuilder builder, OWLClass substrateClass) {
 			builder.initializeMiscTermAndParents(substrateClass);
-			
 		}
 
-	
+		public ParticipantElement getHeadElement(){
+			return headElement;
+		}
+
+		public PropertyTerm getProperty(){
+			return property;
+		}
 	
 //	/**
 //	 * 
