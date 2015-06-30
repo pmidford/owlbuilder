@@ -390,7 +390,7 @@ public class Owlbuilder{
 		log.info("initializing terms for: " + term.toStringID());
 		final NodeSet<OWLClass> termParents = preReasoner.getSuperClasses(term, false);
 		for (OWLClass c : termParents.getFlattened()){
-			log.info("examining parent term: " + c.toStringID());
+			log.debug("examining parent term: " + c.toStringID());
 			initializeMiscTerm(c);
 		}
 		
@@ -409,17 +409,17 @@ public class Owlbuilder{
 		}
 		Set<OWLAnnotationAssertionAxiom> termAnnotations = 
 				mergedSources.getAnnotationAssertionAxioms(term.getIRI());
-		log.info("Checking for label for " + term.getIRI().toString());
+		log.debug("Checking for label for " + term.getIRI().toString());
 		for (OWLAnnotationAssertionAxiom a : termAnnotations){
 			if (a.getAnnotation().getProperty().isLabel()){
-				log.info("Found label for " + term.getIRI().toString());
+				log.debug("Found label for " + term.getIRI().toString());
 				manager.addAxiom(target, a);
 			}
 		}
 
 	}
 	public void initializeMiscObjPropertyAndParents(OWLObjectProperty prop){
-		log.info("initializing property for: " + prop.toStringID());
+		log.debug("initializing property for: " + prop.toStringID());
 		initializeMiscObjProperty(prop);
 		final NodeSet<OWLObjectPropertyExpression> propParents = preReasoner.getSuperObjectProperties(prop,false);
 		for (OWLObjectPropertyExpression c : propParents.getFlattened()){
@@ -449,7 +449,7 @@ public class Owlbuilder{
 			}
 		}
 		else{
-			log.info("Adding axioms for " + prope.toString());
+			log.debug("Adding axioms for " + prope.toString());
 			manager.addAxioms(target, propertyAxioms);
 		}
 		//log.info("Annotations");
