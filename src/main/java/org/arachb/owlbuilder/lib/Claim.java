@@ -70,11 +70,8 @@ public class Claim implements GeneratingEntity {
 				factory.getOWLClass(Vocabulary.informationContentEntity);
 		allaxioms.add(factory.getOWLClassAssertionAxiom(informationContentClass, claim_ind));
 		final String iComment = String.format(FORMATTEDINDIVIDUALCOMMENT,bean.getId());
-		OWLAnnotation commentAnno = factory.getOWLAnnotation(factory.getRDFSComment(),
-				                                             factory.getOWLLiteral(iComment));
-		allaxioms.add(factory.getOWLAnnotationAssertionAxiom(IRI.create(bean.getIRIString()),
-				                                             commentAnno));
-
+		builder.addComment(bean.getIRIString(), iComment);
+		builder.addAxioms();
 		OWLClass behaviorClass = factory.getOWLClass(IRI.create(bean.getBehaviorIri()));
 		builder.initializeMiscTermAndParents(behaviorClass);
 		final Set<Participant> participants =

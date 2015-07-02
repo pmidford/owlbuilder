@@ -2,7 +2,7 @@ package org.arachb.owlbuilder;
 
 /**
  * Main class - merges or generates fresh owl file from admindb
- *
+ * @author Peter E. Midford
  */
 
 import java.io.File;
@@ -60,6 +60,7 @@ import org.semanticweb.owlapi.util.InferredOntologyGenerator;
 import org.semanticweb.owlapi.util.InferredSubClassAxiomGenerator;
 import org.semanticweb.owlapi.util.OWLOntologyMerger;
 import org.semanticweb.owlapi.util.SimpleIRIMapper;
+import org.semanticweb.owlapi.vocab.OWLRDFVocabulary;
 
 import owltools.graph.OWLGraphWrapper;
 
@@ -77,6 +78,8 @@ public class Owlbuilder{
 	private OWLReasoner preReasoner;
 	private OWLReasoner postReasoner;
 	private final Map<IRI,Taxon>nonNCBITaxa = new HashMap<IRI,Taxon>();
+	
+	private final Set<OWLAxiom> axiomset = new HashSet<OWLAxiom>();
 	
 	private final Map<String,OWLOntology>supportOntologies = new HashMap<String,OWLOntology>();
 	private OWLOntology mergedSources = null;
@@ -505,6 +508,7 @@ public class Owlbuilder{
 		return testWrapper.getDataFactory();
 	}
 	
+	
 	public IRIManager getIRIManager(){
 		return iriManager;
 	}
@@ -558,5 +562,25 @@ public class Owlbuilder{
 	}
 	
 	
+	/* Utilities - some of these maybe belong in the testwrapper */
+	
+	private void queueAxiom(OWLAxiom a){
+		axiomset.add(a);
+	}
+	
+	public void addAxioms(){
+		testWrapper.getManager().addAxioms(testWrapper.getSourceOntology(), axiomset);
+		axiomset.clear();
+	}
+	
+
+	public void addComment(String iriStr, String commentStr){
+		OWLDataFactory df = testWrapper.getDataFactory();
+		OWLAnnotation commentAnno = df.getOWLAnnotation(df.getRDFSComment(),
+                                                        df.getOWLLiteral(commentStr));
+		OWLOntologyManager om = testWrapper.getManager();
+		queueAxiom(df.getOWLAnnotationAssertionAxiom(IRI.create(iriStr),commentAnno));
+	}
+
 		
 }
