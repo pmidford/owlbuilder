@@ -36,7 +36,7 @@ public class Vocabulary {
 	public static final IRI hasPartProperty =
 			IRI.create("http://purl.obolibrary.org/obo/BFO_0000051");
 	public static final IRI participatesInProperty =
-			IRI.create("http://purl.obolibrary.org/obo/BFO_0000056");
+			IRI.create("http://purl.obolibrary.org/obo/RO_0000056");
 	public static final IRI hasParticipantProperty =
 			IRI.create("http://purl.obolibrary.org/obo/RO_0000057");
 	public static final IRI hasActiveParticipantProperty =
