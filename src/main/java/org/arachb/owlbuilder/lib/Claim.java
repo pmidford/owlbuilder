@@ -126,9 +126,7 @@ public class Claim implements GeneratingEntity {
 			                                        Set<Participant> participants,
 			                                        OWLIndividual claim_ind) throws Exception{
 		final OWLOntology target = builder.getTarget();
-		final OWLOntologyManager manager = builder.getOntologyManager();
 		final OWLDataFactory factory = builder.getDataFactory();
-		final OWLObjectProperty partofProperty = factory.getOWLObjectProperty(Vocabulary.partOfProperty);
 		OWLClass behaviorClass = factory.getOWLClass(IRI.create(bean.getBehaviorIri()));
 		builder.initializeMiscTermAndParents(behaviorClass);
 
@@ -165,7 +163,6 @@ public class Claim implements GeneratingEntity {
 		final OWLOntology target = builder.getTarget();
 		final OWLOntologyManager manager = builder.getOntologyManager();
 		final OWLDataFactory factory = builder.getDataFactory();
-		final OWLObjectProperty partofProperty = factory.getOWLObjectProperty(Vocabulary.partOfProperty);
 		final OWLObjectProperty denotesProperty = factory.getOWLObjectProperty(Vocabulary.denotesProperty);
 		OWLClass behaviorClass = factory.getOWLClass(IRI.create(bean.getBehaviorIri()));
 		builder.initializeMiscTermAndParents(behaviorClass);
@@ -302,8 +299,6 @@ public class Claim implements GeneratingEntity {
 		OWLOntologyManager manager = builder.getOntologyManager();
 		final OWLDataFactory factory = builder.getDataFactory();
 		final OWLClass textualEntityClass = factory.getOWLClass(Vocabulary.textualEntity);
-		final OWLObjectProperty denotesProp = factory.getOWLObjectProperty(Vocabulary.denotesProperty);
-		final OWLObjectProperty hasParticipant = factory.getOWLObjectProperty(Vocabulary.hasParticipantProperty);
 
 		Set<OWLClassExpression> supersets = new HashSet<OWLClassExpression>();
 		supersets.add(textualEntityClass);
