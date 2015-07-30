@@ -437,8 +437,13 @@ public class MockConnection implements AbstractConnection {
 		mockOntologyNamesMap.put("http://purl.obolibrary.org/obo/uberon.owl", "Uberon");
 	}
 
+	
+	private IRIManager irimanager;
 
-	public MockConnection() {
+
+
+	public MockConnection() throws Exception{
+		irimanager = new IRIManager(this);
 		// TODO Auto-generated constructor stub
 	}
 
@@ -745,9 +750,11 @@ public class MockConnection implements AbstractConnection {
 	}
 
 	@Override
-	public int scanPrivateIDs(){
-		return MAXMOCKIDVALUE;
+	public void updateNarrative(NarrativeBean nb) throws SQLException {
+		// TODO Auto-generated method stub
+		
 	}
+
 
 
 	@Override
@@ -949,6 +956,35 @@ public Set<Integer> getPElementSet(ParticipantBean p) throws Exception {
 	return null;
 }
 
+@Override
+public IRIManager getIRIManager(){
+	//TODO Not sure how to implement this
+	return null;
+}
+
+@Override
+public UidSet getUidSet(int setId) throws Exception {
+	// TODO Auto-generated method stub
+	return null;
+}
+
+@Override
+public Set<UidSet> getUidSetTable() throws Exception {
+	// TODO Auto-generated method stub
+	return null;
+}
+
+@Override
+public void updateUidSet(UidSet s) throws SQLException {
+	// TODO Auto-generated method stub
+	
+}
+
+@Override
+public String getUidSetLastGenId() throws Exception {
+	// TODO Auto-generated method stub
+	return null;
+}
 		
 
 

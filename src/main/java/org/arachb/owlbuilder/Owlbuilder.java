@@ -116,7 +116,7 @@ public class Owlbuilder{
 		testWrapper = new OWLGraphWrapper(targetIRI);
 		rfactory = new Reasoner.ReasonerFactory();
 		elkFactory = new ElkReasonerFactory();
-		iriManager = new IRIManager(connection);
+		iriManager = connection.getIRIManager();
 		final OWLDocumentFormat format = testWrapper.getManager().getOntologyFormat(testWrapper.getSourceOntology());
 		format.asPrefixOWLOntologyFormat().setPrefix("doi", "http://dx.doi.org/");
 	}
@@ -578,7 +578,6 @@ public class Owlbuilder{
 		OWLDataFactory df = testWrapper.getDataFactory();
 		OWLAnnotation commentAnno = df.getOWLAnnotation(df.getRDFSComment(),
                                                         df.getOWLLiteral(commentStr));
-		OWLOntologyManager om = testWrapper.getManager();
 		queueAxiom(df.getOWLAnnotationAssertionAxiom(IRI.create(iriStr),commentAnno));
 	}
 

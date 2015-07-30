@@ -22,12 +22,12 @@ public class DBConnection implements AbstractConnection{
 
 	//properties file names
 	static final String DEFAULTPROPERTIESFILE = "Connection.properties";
-	
+
 	static final String TESTPROPERTIESFILE = "TestConnection.properties";
-	
-	
+
+
 	//Query strings
-	
+
 	/* may never need to load singleton publications, but in case */
 	static final String PUBLICATIONROWQUERY = 
 			"SELECT id, publication_type,dispensation," +
@@ -48,7 +48,7 @@ public class DBConnection implements AbstractConnection{
 
 	static final String PUBLICATIONUPDATESTATEMENT = 
 			"UPDATE publication SET generated_id = ? WHERE id = ?";
-				
+
 
 	/* arachadmin has the union of all support ontologies - DO NOT want to load the whole
 	 * term table, stay with singletons and caching.
@@ -57,15 +57,15 @@ public class DBConnection implements AbstractConnection{
 			"SELECT id,source_id,domain," +
 					"authority,label,generated_id,comment " +
 					"FROM term where term.id = ?";
-		
+
 	static final String TERMSETQUERY = "SELECT id FROM term";
-			
+
 	static final String TERMUPDATESTATEMENT = 
 			"UPDATE term SET generated_id = ? WHERE id = ?";
 
 	static final String TERMIRIQUERY = 
 			"SELECT id,source_id,generated_id FROM term where term.id = ?";
-		
+
 	//TODO needs review
 	static final String PRIMARYPARTICIPANTQUERY =
 			"SELECT part.id, part.taxon, part.substrate, part.anatomy, " +
@@ -80,15 +80,15 @@ public class DBConnection implements AbstractConnection{
 					"LEFT JOIN term AS substrate ON (part.substrate = substrate.id) " +
 					"LEFT JOIN term AS anatomy ON (part.anatomy = anatomy.id) " +
 					"WHERE p2c.claim = ? AND p2c.participant_index = 1";
-	
-	
+
+
 	// Cache all the participants for a particular claim
 	static final String PARTICIPANTSINCLAIMSETQUERY = 
 			"SELECT part.id " +
 					"FROM participant2claim as p2c " + 
 					"JOIN participant AS part ON (p2c.participant = part.id) " +
 					"WHERE p2c.claim = ?";
-	
+
 	static final String PARTICIPANTSINCLAIMTABLEQUERY =
 			"SELECT part.id, part.quantification, part.label, part.generated_id, " +
 					"p2c.property, part.publication_taxon, part.publication_anatomy, " +
@@ -104,7 +104,7 @@ public class DBConnection implements AbstractConnection{
 					"part.publication_substrate, part.head_element " +
 					"FROM participant2claim as p2c " + 
 					"JOIN participant AS part ON (p2c.participant = part.id) ";
-				
+
 	// id's of participants in claim
 	static final String PARTICIPANTCLAIMSETQUERY = 
 			"SELECT part.id" +
@@ -120,56 +120,56 @@ public class DBConnection implements AbstractConnection{
 					"FROM participant AS part " +
 					"JOIN participant2claim AS p2c ON (part.id = p2c.participant) " +
 					"WHERE part.id = ?";
-	
-	
+
+
 	static final String PARTICIPANTUPDATESTATEMENT = "";
-	
+
 	static final String PELEMENTSETFROMPARTICIPANTQUERY =
 			"SELECT id FROM participant_element WHERE participant = ?";
 
 	static final String PELEMENTROWQUERY =
 			"SELECT ele.id, ele.type, ele.participant, p2t.term, p2i.individual " +
-			        "FROM participant_element as ele " +
-				    "LEFT JOIN pelement2term as p2t ON (p2t.element = ele.id) " +
+					"FROM participant_element as ele " +
+					"LEFT JOIN pelement2term as p2t ON (p2t.element = ele.id) " +
 					"LEFT JOIN pelement2individual as p2i ON (p2i.element = ele.id) " +
-				    "WHERE ele.id = ?";
-	
+					"WHERE ele.id = ?";
+
 	// set of all pelement ids
 	static final String PELEMENTSETQUERY = "SELECT ele.id FROM participant_element AS ele";
-	
-	
+
+
 	// table of all pelements
 	static final String PELEMENTTABLEQUERY =
 			"SELECT ele.id, ele.type, ele.participant, p2t.term, p2i.individual " +
-			        "FROM participant_element as ele " +
-				    "LEFT JOIN pelement2term as p2t ON (p2t.element = ele.id) " +
+					"FROM participant_element as ele " +
+					"LEFT JOIN pelement2term as p2t ON (p2t.element = ele.id) " +
 					"LEFT JOIN pelement2individual as p2i ON (p2i.element = ele.id) " +
-				    "WHERE ele.participant = ?";
-	
+					"WHERE ele.participant = ?";
+
 	static final String PELEMENTTERMQUERY =
 			"SELECT p2t.term FROM pelement2term as p2t WHERE element = ?";
-	
-	
+
+
 	static final String PELEMENTINDIVIDUALQUERY =
 			"SELECT p2i.individual FROM pelement2individual as p2i WHERE element = ?";
 
 	static final String PELEMENTPARENTSQUERY =
 			"SELECT link.child,link.parent,link.property FROM participant_link as link " +
-			        "WHERE link.child = ?";
+					"WHERE link.child = ?";
 
 	static final String PELEMENTCHILDRENQUERY =
 			"SELECT link.child,link.parent,link.property FROM participant_link as link " +
-			        "WHERE link.parent = ?";
-	
+					"WHERE link.parent = ?";
+
 	static final String CLAIMROWQUERY =
 			"SELECT c.id, c.publication, c.publication_behavior, c.behavior_term, " +
 					"c.evidence, c.generated_id, pub.doi, " +
 					"pub.generated_id, behavior.source_id, behavior.generated_id " +
-				    "FROM claim AS c " +
+					"FROM claim AS c " +
 					"LEFT JOIN publication AS pub ON (c.publication = pub.id) " +
 					"LEFT JOIN term AS behavior ON (c.behavior_term = behavior.id) " +
 					"LEFT JOIN term AS evidence ON (c.evidence = evidence.id) " +
-				    "WHERE c.id = ?";
+					"WHERE c.id = ?";
 
 	static final String CLAIMTABLEQUERY =
 			"SELECT c.id, c.publication, c.publication_behavior, c.behavior_term, " +
@@ -180,11 +180,11 @@ public class DBConnection implements AbstractConnection{
 					"LEFT JOIN term AS behavior ON (c.behavior_term = behavior.id) " +
 					"LEFT JOIN term AS evidence ON (c.evidence = evidence.id) ";
 
-	
+
 	static final String CLAIMUPDATESTATEMENT = 
 			"UPDATE claim SET generated_id = ? WHERE id = ?";
 
-	
+
 	static final String TAXONROWQUERY = 
 			"SELECT t.id,t.name,t.author, " +
 					"t.year,t.external_id,t.authority,t.parent,t.generated_id, " +
@@ -200,53 +200,73 @@ public class DBConnection implements AbstractConnection{
 					"LEFT JOIN term AS parent_record ON (t.parent_term = parent_record.id) ";
 
 	static final String TAXONUPDATESTATEMENT = "";
-	
+
 	static final String INDIVIDUALROWQUERY =
 			"SELECT i.id, i.source_id, i.generated_id, i.label, i.term " +
-			"FROM individual AS i WHERE i.id = ?";
-	
+					"FROM individual AS i WHERE i.id = ?";
+
 	static final String INDIVIDUALTABLEQUERY =
 			"SELECT i.id, i.source_id, i.generated_id, i.label, i.term " +
-			"FROM individual AS i";
-	
+					"FROM individual AS i";
+
 	static final String INDIVIDUALNARRATIVESQUERY =
 			"SELECT i2n.narrative FROM individual2narrative as i2n " +
-			        "WHERE i2n.individual = ?";
+					"WHERE i2n.individual = ?";
 
-	
+
 	static final String INDIVIDUALUPDATESTATEMENT =
 			"UPDATE individual SET generated_id = ? WHERE id = ?";	
-	
+
 	static final String NARRATIVEROWQUERY =
-			"SELECT n.id, n.publication, n.label, n.description " +
-			"FROM narrative AS n WHERE n.id = ?";
-	
+			"SELECT n.id, n.publication, n.label, n.description, n.generated_id " +
+					"FROM narrative AS n WHERE n.id = ?";
+
+	static final String NARRATIVEUPDATESTATEMENT =
+			"UPDATE narrative SET generated_id = ? WHERE id = ?";		
+
 	static final String PROPERTYROWQUERY = 
 			"SELECT p.id, p.source_id, p.authority, p.label, p.generated_id, p.comment " +
-			"FROM property AS p WHERE p.id = ?";
-	
+					"FROM property AS p WHERE p.id = ?";
+
 	static final String PROPERTYROWBYSOURCEIDQUERY = 
 			"SELECT p.id, p.source_id, p.authority, p.label, p.generated_id, p.comment " +
-			"FROM property AS p WHERE p.source_id = ?";
-			
+					"FROM property AS p WHERE p.source_id = ?";
 
+	static final String UIDSETROWQUERY = 
+			"SELECT u.id, u,source_id, u.generated_id, u.ref_id " +
+			        "FROM uidset AS u where u.source_id = ?";
+
+	static final String UIDSETTABLEQUERY = 
+			"SELECT u.id, u.source_id, u.generated_id, u.ref_id " +
+			        "FROM uidset AS u";
+	
+	static final String UIDSETLASTGENID = 
+			"SELECT MAX(generated_id) FROM uidset";
+
+	static final String UIDSETUPDATEGENIDSTATEMENT = 
+			"UPDATE uidset SET generated_id = ? WHERE id = ?";
+	
+	static final String UIDSETUPDATEREFIDSTATEMENT = 
+			"UPDATE uidset SET ref_id = ? WHERE id = ?";
+	
+	
 	
 	static final Logger logger = Logger.getLogger(DBConnection.class.getName());
 
 	private Connection c;
-	
+
 	private IRIManager irimanager;
-	
+
 	private final HashMap<Integer,String>id2domain = new HashMap<Integer,String>();
-	
+
 	private final HashMap<String,Integer>domain2id = new HashMap<String,Integer>();
 
 	private static Logger log = Logger.getLogger(DBConnection.class);
 
 	private static final String DRIVERSPEC = "com.mysql.jdbc.Driver";
-	
+
 	private static final String CONNECTIONSPEC = "jdbc:mysql://%s/%s";
-	
+
 	/**
 	 * 
 	 * @return whether the connection succeeded
@@ -290,7 +310,7 @@ public class DBConnection implements AbstractConnection{
 		}
 		return true;
 	}
-	
+
 	private DBConnection(String connectionSpec) throws Exception{
 		final Properties properties = new Properties();
 		properties.load(DBConnection.class.getClassLoader().getResourceAsStream(connectionSpec));
@@ -300,13 +320,13 @@ public class DBConnection implements AbstractConnection{
 		final String user = properties.getProperty("user");
 		final String password = properties.getProperty("password");
 		c = DriverManager.getConnection(String.format("jdbc:mysql://%s/%s",host,db),user,password);
-        initDomains(c);
-        irimanager = new IRIManager(this);
+		initDomains(c);
+		irimanager = new IRIManager(this);
 	}
-	
-	
+
+
 	private final String DOMAINSQUERY = "SELECT id,name FROM domain";
-	
+
 	@SuppressWarnings("resource")
 	private void initDomains(Connection c) throws SQLException{
 		final Statement domainStatement = c.createStatement();
@@ -327,7 +347,7 @@ public class DBConnection implements AbstractConnection{
 			domainStatement.close();
 		}
 	}
-	
+
 	/**
 	 * 
 	 * @return connection to default database identified in properties file
@@ -337,7 +357,7 @@ public class DBConnection implements AbstractConnection{
 		return new DBConnection(DEFAULTPROPERTIESFILE);
 	}
 
-	
+
 	/**
 	 * 
 	 * @return connection to a database of test data
@@ -346,21 +366,21 @@ public class DBConnection implements AbstractConnection{
 	public static DBConnection getTestConnection() throws Exception{
 		return new DBConnection(TESTPROPERTIESFILE);
 	}
-	
-	public static AbstractConnection getMockConnection() {
+
+	public static AbstractConnection getMockConnection() throws Exception{
 		return new MockConnection();
 	}
 
-	
+
 	public Connection getConnection(){
 		return c;
 	}
-		
+
 	public List<String> privateIDStrings() throws SQLException{
 		List<String> result = new ArrayList<String>();
 		return result;
 	}
-	
+
 	public PublicationBean getPublication(int id) throws SQLException{
 		if (PublicationBean.isCached(id)){
 			return PublicationBean.getCached(id);
@@ -385,7 +405,7 @@ public class DBConnection implements AbstractConnection{
 			publicationStatement.close();
 		}
 	}
-	
+
 	private AbstractResults executeAndAbstract(PreparedStatement p) throws SQLException{
 		return new DBResults(p.executeQuery());
 	}
@@ -426,11 +446,11 @@ public class DBConnection implements AbstractConnection{
 		}
 	}
 
-	
+
 	final static private String UPDATEPUBLICATIONFAIL = 
 			"publication (%s) update failed; row count = %d";
-	
-	
+
+
 	public void updatePublication(PublicationBean p) throws SQLException{
 		final PreparedStatement updateStatement = 
 				c.prepareStatement(PUBLICATIONUPDATESTATEMENT);
@@ -449,8 +469,8 @@ public class DBConnection implements AbstractConnection{
 			updateStatement.close();
 		}
 	}
-	
-	
+
+
 	public TermBean getTerm(int id) throws SQLException{
 		if (TermBean.isCached(id)){
 			return TermBean.getCached(id);
@@ -532,8 +552,8 @@ public class DBConnection implements AbstractConnection{
 			claimStatement.close();
 		}
 	}
-	
-	
+
+
 	public Set<ClaimBean> getClaimTable() throws Exception {
 		final Statement allClaimStatement = c.createStatement();
 		try{
@@ -555,7 +575,7 @@ public class DBConnection implements AbstractConnection{
 			allClaimStatement.close();
 		}
 	}
-		
+
 	public void updateClaim(ClaimBean cl) throws SQLException{
 		final PreparedStatement updateStatement = 
 				c.prepareStatement(CLAIMUPDATESTATEMENT);
@@ -594,8 +614,8 @@ public class DBConnection implements AbstractConnection{
 			participantsStatement.close();
 		}
 	}
-	
-	
+
+
 	@Override
 	public ParticipantBean getParticipant(int id) throws Exception {
 		if (ParticipantBean.isCached(id)){
@@ -705,13 +725,13 @@ public class DBConnection implements AbstractConnection{
 		return result;
 	}
 
-	
+
 	@Override
 	public void updateNamedEntity(UpdateableBean b) throws SQLException{
 		b.updateDB(this);
 	}
-	
-	
+
+
 	public void updateParticipant(ParticipantBean b) throws SQLException{
 		final PreparedStatement updateStatement = 
 				c.prepareStatement(PARTICIPANTUPDATESTATEMENT);
@@ -764,7 +784,7 @@ public class DBConnection implements AbstractConnection{
 		}
 		return result;
 	}
-	
+
 	@Override
 	public Set<Integer> getPElementSet(ParticipantBean p) throws Exception {
 		final Set<Integer> result = new HashSet<Integer>();
@@ -783,7 +803,7 @@ public class DBConnection implements AbstractConnection{
 			participantsStatement.close();
 		}
 	}
-	
+
 	//TODO this needs test code and refactoring
 	@Override
 	public PElementBean getPElement(int id) throws Exception{
@@ -886,8 +906,8 @@ public class DBConnection implements AbstractConnection{
 			taxonStatement.close();
 		}
 	}
-	
-	
+
+
 	@Override
 	public Set<TaxonBean> getTaxonTable() throws SQLException {
 		final Set<TaxonBean> result = new HashSet<TaxonBean>();
@@ -912,7 +932,7 @@ public class DBConnection implements AbstractConnection{
 	}
 
 
-	
+
 	public void updateTaxon(TaxonBean t) throws SQLException{
 		final PreparedStatement updateStatement = 
 				c.prepareStatement(TAXONUPDATESTATEMENT);
@@ -932,7 +952,7 @@ public class DBConnection implements AbstractConnection{
 		}
 	}
 
-	
+
 	public IndividualBean getIndividual(int id) throws SQLException{
 		if (IndividualBean.isCached(id)){
 			return IndividualBean.getCached(id);
@@ -980,7 +1000,7 @@ public class DBConnection implements AbstractConnection{
 		}			
 		return ib;
 	}
-	
+
 	public void updateIndividual(IndividualBean ib) throws SQLException{
 		final PreparedStatement updateStatement = 
 				c.prepareStatement(INDIVIDUALUPDATESTATEMENT);
@@ -1023,7 +1043,26 @@ public class DBConnection implements AbstractConnection{
 		return result;
 	}
 
-	
+
+	@Override
+	public void updateNarrative(NarrativeBean nb) throws SQLException{
+		final PreparedStatement updateStatement = 
+				c.prepareStatement(NARRATIVEUPDATESTATEMENT);
+		try{
+			updateStatement.setString(1, nb.getGeneratedId());  //getIRI_String() is wrong - 
+			updateStatement.setInt(2,nb.getId());
+			final int count = updateStatement.executeUpdate();
+			if (count != 1){
+				logger.error("narrative update failed; row count = " + count);
+			}
+		}
+		finally{
+			updateStatement.close();
+		}
+	}
+
+
+	@Override
 	public PropertyBean getProperty(int id) throws Exception{
 		if (PropertyBean.isCached(id)){
 			return PropertyBean.getCached(id);
@@ -1050,6 +1089,7 @@ public class DBConnection implements AbstractConnection{
 		}
 	}
 
+	@Override
 	public PropertyBean getPropertyFromSourceId(String uid) throws Exception{
 		if (PropertyBean.isSourceIdCached(uid)){
 			return PropertyBean.getSourceIdCached(uid);
@@ -1078,14 +1118,10 @@ public class DBConnection implements AbstractConnection{
 
 
 
-	
+
 	private final String ONTOLOGYSOURCEQUERY = "SELECT source_url,domain FROM ontology_source";
 
-	/**
-	 * 
-	 * @return maps source_urls, which are unique, to domain identifiers
-	 * @throws Exception
-	 */
+	@Override
 	public Map<String,String>loadImportSourceMap() throws Exception{
 		final Map<String,String> result = new HashMap<String,String>();
 		final Statement sourceOntStatement = c.createStatement();
@@ -1108,11 +1144,7 @@ public class DBConnection implements AbstractConnection{
 
 	private final String ONTOLOGYNAMEQUERY = "SELECT source_url,name FROM ontology_source";
 
-	/**
-	 * 
-	 * @return maps source_urls, which are unique, to domain identifiers
-	 * @throws SQLException
-	 */
+	@Override
 	public Map<String,String>loadOntologyNamesForLoading() throws SQLException{
 		final Map<String,String> result = new HashMap<String,String>();
 		final Statement sourceOntStatement = c.createStatement();
@@ -1132,81 +1164,153 @@ public class DBConnection implements AbstractConnection{
 		}
 	}
 
-	
+
 	public String domainName(int domain_id){
 		return id2domain.get(domain_id);
 	}
-	
+
 	public int domainId(String name){
 		return domain2id.get(name);
 	}
-	
-	
-	private static final String PUBLICATIONIDCOUNTERQUERY = 
-			"SELECT generated_id FROM publication";
-	
-	private static final String CLAIMIDCOUNTERQUERY = 
-			"SELECT generated_id FROM claim";
-	
-	private static final String INDIVIDUALIDCOUNTERQUERY = 
-			"SELECT generated_id FROM individual";
 
-	public int scanPrivateIDs() throws Exception{
-		int maxid=0;
-		final Statement countStatement = c.createStatement();
-		try {
-			ResultSet publicationSet = countStatement.executeQuery(PUBLICATIONIDCOUNTERQUERY);
-			while(publicationSet.next()){
-				final String source = publicationSet.getString("generated_id");
-				final int count = extractCount(source);
-				if (count > maxid){
-					maxid = count;
-				}
-			}
-			publicationSet.close();
-			ResultSet assertionSet = countStatement.executeQuery(CLAIMIDCOUNTERQUERY);
-			while(assertionSet.next()){
-				final String source = assertionSet.getString("generated_id");
-				final int count = extractCount(source);
-				if (count > maxid){
-					maxid = count;
-				}
-			}
-			assertionSet.close();
-			ResultSet individualSet = countStatement.executeQuery(INDIVIDUALIDCOUNTERQUERY);
-			while(individualSet.next()){
-				final String source = individualSet.getString("generated_id");
-				final int count = extractCount(source);
-				if (count > maxid){
-					maxid = count;
-				}
-			}
-			individualSet.close();
-		}
-		finally {
-			countStatement.close();
-		}
-		return maxid;
-	}
-	
-	private int extractCount(String id){
-		if (id != null && id.startsWith(IRIManager.ARACHBPREFIX)){
-			try{
-				int result = Integer.parseInt(id.substring(IRIManager.ARACHBPREFIX.length()));
-				return result;
-			}
-			catch(NumberFormatException e){
-				log.warn("Bad id format: " + id);
-				return -1;
-			}
-		}
-		return -1;
-	}
 
+
+	private static final String COUNTERQUERYTEMPLATE =
+			"SELECT generated_id FROM %s";
+
+//	public int scanPrivateIDs() throws Exception{
+//		int maxid=0;
+//		//TODO this is ugly - maybe use reflection to get all the classes that might have gen_ids
+//		final Statement countStatement = c.createStatement();
+//		maxid = updateMaxid(countStatement,"publication",maxid);
+//		maxid = updateMaxid(countStatement,"claim",maxid);
+//		maxid = updateMaxid(countStatement,"individual",maxid);
+//		maxid = updateMaxid(countStatement,"narrative",maxid);
+//		maxid = updateMaxid(countStatement,"participant",maxid);
+//		maxid = updateMaxid(countStatement,"taxon",maxid);
+//		maxid = updateMaxid(countStatement,"term",maxid);
+//		countStatement.close();
+//		return maxid;
+//	}
+	
+//	private int updateMaxid(Statement s,String table,final int maxid) throws SQLException{
+//		int localid = maxid;
+//		final String tableQuery = String.format(COUNTERQUERYTEMPLATE,table);
+//		ResultSet idSet = s.executeQuery(tableQuery);
+//		while(idSet.next()){
+//			final String source = idSet.getString("generated_id");
+//			final int count = extractCount(source);
+//			if (count > localid){
+//				localid = count;
+//			}
+//		}
+//		idSet.close();
+//		return localid;
+//	}
+
+	@Override
+	public IRIManager getIRIManager() {
+		return irimanager;
+	}
 
 	public void close() throws Exception {
 		c.close();
 	}
+
+	
+	@Override
+	public UidSet getUidSet(int setId) throws Exception {
+		if (UidSet.isCached(setId)){
+			return UidSet.getCached(setId);
+		}
+		final PreparedStatement uidStatement = c.prepareStatement(UIDSETROWQUERY);
+		try{
+			uidStatement.setInt(1, setId);
+			AbstractResults uidResults = executeAndAbstract(uidStatement);
+			UidSet result;
+			if (uidResults.next()){
+				result = new UidSet();
+				result.fill(uidResults);
+				String usable = result.checkIRIString(irimanager);
+				if (usable == null){
+					throw new RuntimeException("No usable IRI for uidset: " + result.getId());
+				}
+				result.cache();
+			}
+			else{
+				result = null;
+			}
+			uidResults.close();
+			return result;
+		}
+		finally{
+			uidStatement.close();
+		}
+	}
+
+	@Override
+	public Set<UidSet> getUidSetTable() throws Exception {
+		final Set<UidSet> result = new HashSet<>();
+		final Statement uidStatement = c.createStatement();
+		try{
+			final ResultSet r = uidStatement.executeQuery(UIDSETTABLEQUERY);
+			final AbstractResults uidSets = new DBResults(r);
+			while (uidSets.next()){
+				UidSet u = new UidSet();
+				u.fill(uidSets);
+				if (!UidSet.isCached(u.getId())){
+					u.cache();
+				}
+				result.add(u);
+			}
+			r.close();
+			return result;
+		}
+		finally{
+			uidStatement.close();
+		}
+	}
+
+	
+	@Override
+	public String getUidSetLastGenId() throws Exception {
+		String result = null;
+		final Statement countStatement = c.createStatement();
+		try{
+			ResultSet r = countStatement.executeQuery(UIDSETLASTGENID);
+			if (r.next()){
+				result = r.getString(1);
+			}
+			r.close();
+			return result;
+		}
+		finally{
+			countStatement.close();
+		}
+	}
+
+	
+
+	@Override
+	public void updateUidSet(UidSet s) throws SQLException {
+		final PreparedStatement updateStatement = 
+				c.prepareStatement(UIDSETUPDATEGENIDSTATEMENT);
+		try{
+			updateStatement.setString(1, s.getGeneratedId());  //getIRI_String() is wrong - 
+			updateStatement.setInt(2,s.getId());
+			int count = updateStatement.executeUpdate();
+			if (count != 1){
+				logger.error("uid set update failed; row count = " + count);
+			}
+			else{
+				s.updatecache();
+			}
+		}
+		finally{
+			updateStatement.close();
+		}
+	}
+
 
 
 

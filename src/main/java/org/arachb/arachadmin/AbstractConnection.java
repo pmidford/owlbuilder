@@ -150,6 +150,7 @@ public interface AbstractConnection {
 	 */
 	void updateTaxon(TaxonBean t) throws SQLException;
 
+	
 	/**
 	 * performs query and returns a mapping from uri's of support ontologies used
 	 * in this build to human readable names of the ontologies
@@ -214,7 +215,14 @@ public interface AbstractConnection {
 	 */
 	NarrativeBean getNarrative(int nId) throws SQLException;
 
+	/**
+	 * Updates the row in the backing data (database or mock) with the generated_id
+	 * @param nb
+	 * @throws SQLException
+	 */
+	public void updateNarrative(NarrativeBean nb) throws SQLException;
 
+	
 	/**
 	 * @param pId index of property record
 	 * @return bean containing record of owl property indexed by id
@@ -223,17 +231,37 @@ public interface AbstractConnection {
 	PropertyBean getProperty(int pId) throws Exception;
 
 	/**
-	 * the right way to access properties
-	 * @param uid string of IRI of property record
+	 * This is the right way to access properties.
+	 * @param uid unique string id (generally a uri) for the property
+	 * @return bean filled from the appropriate row in the database
 	 */
 	PropertyBean getPropertyFromSourceId(String uid) throws Exception;
 
+	/**
+	 * @param setId web2py integer key
+	 * @return bean filled from appropriate row in uids table
+	 */
+	UidSet getUidSet(int setId) throws Exception;
+
+	/**
+	 * 
+	 * @return set of beans filled from appropriate row in uids table
+	 */
+	Set<UidSet> getUidSetTable() throws Exception;
+
+	/**
+	 * 
+	 * @param s
+	 * @throws SQLException
+	 */
+	void updateUidSet(UidSet s) throws SQLException;
+	
 	/**
 	 * 
 	 * @return next available serial number in generated id space - not the same as resource id
 	 * @throws Exception
 	 */
-	int scanPrivateIDs() throws Exception;
+//	int scanPrivateIDs() throws Exception;
 
 	/**
 	 * 
@@ -248,6 +276,18 @@ public interface AbstractConnection {
 	 * @throws Exception
 	 */
 	//void fillPElementIndividual(PElementBean pb) throws Exception;
+
+	/**
+	 * @return object responsible for tracking generated IRI's 
+	 */
+	public IRIManager getIRIManager();
+
+	/**
+	 * Called by IRIManager to get the highest valued generated id string
+	 * @return last generated id
+	 * @throws Exception
+	 */
+	String getUidSetLastGenId() throws Exception;
 
 
 }

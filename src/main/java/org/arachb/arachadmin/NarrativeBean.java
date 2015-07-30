@@ -6,12 +6,13 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
-public class NarrativeBean implements BeanBase,CachingBean {
+public class NarrativeBean implements UpdateableBean,CachingBean {
 		
 	static final int DBID = 1;
 	static final int DBPUBLICATION = 2;
 	static final int DBLABEL = 3;
 	static final int DBDESCRIPTION = 4;
+	static final int DBGENERATEDID = 5;
 	
 	private static final Map<Integer, NarrativeBean> cache = new HashMap<>();
 	private static Logger log = Logger.getLogger(NarrativeBean.class);
@@ -22,7 +23,7 @@ public class NarrativeBean implements BeanBase,CachingBean {
 	private int publicationid;
 	private String label;
 	private String description;
-
+	private String generated_id;
 	
 	
 
@@ -32,6 +33,7 @@ public class NarrativeBean implements BeanBase,CachingBean {
 		publicationid = record.getInt(DBPUBLICATION);
 		label = record.getString(DBLABEL);
 		description = record.getString(DBDESCRIPTION);
+		generated_id = record.getString(DBGENERATEDID);
 	}
 
 	/* access methods */
@@ -53,9 +55,16 @@ public class NarrativeBean implements BeanBase,CachingBean {
 		return description;
 	}
 
+	@Override
+	public void setGeneratedId(String id) {
+		generated_id = id;
+	}
 
+	@Override
+	public String getGeneratedId() {
+		return generated_id;
+	}
 
-	
 	/**
 	 * may not be needed, but if we ever need to reopen a database
 	 */
@@ -93,6 +102,24 @@ public class NarrativeBean implements BeanBase,CachingBean {
 					               getId()));
 			cache.put(getId(), this);
 		}
+	}
+
+
+	@Override
+	public String getIRIString() throws IllegalStateException {
+		return getGeneratedId();
+	}
+
+	
+	@Override
+	public String checkIRIString(IRIManager manager) throws SQLException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void updateDB(AbstractConnection c) throws SQLException {
+		c.updateNarrative(this);
 	}
 	
 
