@@ -164,7 +164,7 @@ public class Participant implements GeneratingEntity{
 				OWLClassExpression propertyRestriction = 
 						factory.getOWLObjectSomeValuesFrom(elementProperty,intersect);
 				log.info("Generated Property restriction(2): " + propertyRestriction);
-				return propertyRestriction;
+				return intersect;
 			}
 			else if (childObject instanceof OWLIndividual){
 				log.info("Individual child of class");
@@ -176,7 +176,7 @@ public class Participant implements GeneratingEntity{
 		OWLClassExpression propertyRestriction = 
 				factory.getOWLObjectSomeValuesFrom(elementProperty,headClassExpr);
 		log.info("Generated Property restriction: " + propertyRestriction);
-		return propertyRestriction;
+		return headClassExpr;
 	}
 
 
@@ -862,17 +862,6 @@ public class Participant implements GeneratingEntity{
 	public void setGeneratedId(String s){
 		bean.setGeneratedId(s);
 	}
-
-	public String getIriString(){
-		if (getGeneratedId() == null){
-			throw new IllegalStateException("Individual has neither assigned nor generated id");
-		}
-		return getGeneratedId();
-	}
-
-	
-	
-	
 
 
 }
