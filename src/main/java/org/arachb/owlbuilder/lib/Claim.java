@@ -294,7 +294,7 @@ public class Claim implements GeneratingEntity {
 	private void connectIndividualParticipant(Owlbuilder builder,
 			                                  Entry<OWLIndividual, PropertyTerm> ePair,
 								              OWLIndividual event_ind,
-								              OWLClass behaviorClass){
+								              OWLClass behaviorClass) throws Exception{
 		OWLOntology target = builder.getTarget();
 		OWLOntologyManager manager = builder.getOntologyManager();
 		final OWLDataFactory factory = builder.getDataFactory();
@@ -304,8 +304,8 @@ public class Claim implements GeneratingEntity {
 		supersets.add(textualEntityClass);
 		OWLIndividual headIndividual = ePair.getKey();
 		PropertyTerm headProperty = ePair.getValue();
-		OWLObjectProperty pExpr = factory.getOWLObjectProperty(IRI.create(headProperty.getSourceId()));
-		OWLAxiom a1 = factory.getOWLObjectPropertyAssertionAxiom(pExpr, headIndividual, event_ind);
+		OWLObjectProperty pExpr = (OWLObjectProperty)headProperty.generateOWL(builder);
+		OWLAxiom a1 = factory.getOWLObjectPropertyAssertionAxiom(pExpr,event_ind,headIndividual);
 		manager.addAxiom(target, a1);
 	}
 
