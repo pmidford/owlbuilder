@@ -32,7 +32,7 @@ public class TestDBConnection {
 
     
 	@Before
-	public void setup() throws Exception {
+	public void setUp() throws Exception {
 		if (DBConnection.testConnection()){
 			log.info("Testing with live connection");
 			testConnection = DBConnection.getTestConnection();
