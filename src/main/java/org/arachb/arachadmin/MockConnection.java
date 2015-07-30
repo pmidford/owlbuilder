@@ -176,7 +176,6 @@ public class MockConnection implements AbstractConnection {
 		mockParticipantResults1.setInteger(0,ParticipantBean.DBID,1);
 		mockParticipantResults1.setString(0,ParticipantBean.DBQUANTIFICATION,"some");
 		mockParticipantResults1.setString(0,ParticipantBean.DBLABEL,"");
-		mockParticipantResults1.setString(0,ParticipantBean.DBGENERATEDID,null);
 		mockParticipantResults1.setInteger(0,ParticipantBean.DBPROPERTY, 306);  //used
 		mockParticipantResults1.setString(0,ParticipantBean.DBPUBLICATIONTAXON,TESTPUBTAXON);
 		mockParticipantResults1.setString(0,ParticipantBean.DBPUBLICATIONANATOMY,"");
@@ -189,7 +188,6 @@ public class MockConnection implements AbstractConnection {
 		mockParticipantResults29.setInteger(0,ParticipantBean.DBID,29);
 		mockParticipantResults29.setString(0,ParticipantBean.DBQUANTIFICATION,"individual");
 		mockParticipantResults29.setString(0,ParticipantBean.DBLABEL,"female");
-		mockParticipantResults29.setString(0,ParticipantBean.DBGENERATEDID,"http://arachb.org/arachb/ARACHB_0000349");
 		mockParticipantResults29.setInteger(0,ParticipantBean.DBPROPERTY, 306);  //used
 		mockParticipantResults29.setString(0,ParticipantBean.DBPUBLICATIONTAXON,"Leucauge mariana");
 		mockParticipantResults29.setString(0,ParticipantBean.DBPUBLICATIONANATOMY,"female");
@@ -203,7 +201,6 @@ public class MockConnection implements AbstractConnection {
 		mockParticipantResults2.setInteger(0,ParticipantBean.DBID,2);
 		mockParticipantResults2.setString(0,ParticipantBean.DBQUANTIFICATION,"some");
 		mockParticipantResults2.setString(0,ParticipantBean.DBLABEL,"");
-		mockParticipantResults2.setString(0,ParticipantBean.DBGENERATEDID,null);
 		mockParticipantResults2.setString(0,ParticipantBean.DBPUBLICATIONTAXON,TESTPUBTAXON);
 		mockParticipantResults2.setString(0,ParticipantBean.DBPUBLICATIONANATOMY,"");
 		mockParticipantResults2.setString(0,ParticipantBean.DBPUBLICATIONSUBSTRATE,"");

@@ -90,7 +90,7 @@ public class DBConnection implements AbstractConnection{
 					"WHERE p2c.claim = ?";
 
 	static final String PARTICIPANTSINCLAIMTABLEQUERY =
-			"SELECT part.id, part.quantification, part.label, part.generated_id, " +
+			"SELECT part.id, part.quantification, part.label, " +
 					"p2c.property, part.publication_taxon, part.publication_anatomy, " +
 					"part.publication_substrate, part.head_element " +
 					"FROM participant2claim as p2c " + 
@@ -99,7 +99,7 @@ public class DBConnection implements AbstractConnection{
 
 	// should we just cache all the participants at once?
 	static final String PARTICIPANTTABLEQUERY = 
-			"SELECT part.id, part.quantification, part.label, part.generated_id, " +
+			"SELECT part.id, part.quantification, part.label," +
 					"p2c.property, part.publication_taxon, part.publication_anatomy, " +
 					"part.publication_substrate, part.head_element " +
 					"FROM participant2claim as p2c " + 
@@ -114,7 +114,7 @@ public class DBConnection implements AbstractConnection{
 
 	// singleton participant
 	static final String PARTICIPANTROWQUERY = 
-			"SELECT part.id, part.quantification, part.label, part.generated_id, " +
+			"SELECT part.id, part.quantification, part.label, " +
 					"p2c.property, part.publication_taxon, part.publication_anatomy, " +
 					"part.publication_substrate, part.head_element " +
 					"FROM participant AS part " +
