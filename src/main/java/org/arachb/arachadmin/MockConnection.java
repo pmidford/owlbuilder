@@ -541,13 +541,6 @@ public class MockConnection implements AbstractConnection {
 
 
 
-	@Override
-	public void updateTerm(TermBean termBean) throws SQLException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	
 
 	@Override
 	public Set<ParticipantBean> getParticipantTable(int claimId) throws SQLException {
@@ -745,13 +738,6 @@ public class MockConnection implements AbstractConnection {
 		}
 		return nb;
 	}
-
-	@Override
-	public void updateNarrative(NarrativeBean nb) throws SQLException {
-		// TODO Auto-generated method stub
-		
-	}
-
 
 
 	@Override

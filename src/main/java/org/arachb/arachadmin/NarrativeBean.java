@@ -13,6 +13,7 @@ public class NarrativeBean implements UpdateableBean,CachingBean {
 	static final int DBLABEL = 3;
 	static final int DBDESCRIPTION = 4;
 	static final int DBGENERATEDID = 5;
+	static final int DBUIDSET = 6;
 	
 	private static final Map<Integer, NarrativeBean> cache = new HashMap<>();
 	private static Logger log = Logger.getLogger(NarrativeBean.class);
@@ -24,6 +25,7 @@ public class NarrativeBean implements UpdateableBean,CachingBean {
 	private String label;
 	private String description;
 	private String generated_id;
+	private int uidset;
 	
 	
 
@@ -34,6 +36,7 @@ public class NarrativeBean implements UpdateableBean,CachingBean {
 		label = record.getString(DBLABEL);
 		description = record.getString(DBDESCRIPTION);
 		generated_id = record.getString(DBGENERATEDID);
+		uidset = record.getInt(DBUIDSET);
 	}
 
 	/* access methods */
@@ -57,13 +60,27 @@ public class NarrativeBean implements UpdateableBean,CachingBean {
 
 	@Override
 	public void setGeneratedId(String id) {
-		generated_id = id;
+		UidSet.getCached(uidset).setGeneratedId(id);
 	}
 
 	@Override
 	public String getGeneratedId() {
-		return generated_id;
+		//This will fail if uidset is not cached, but that error should be seen
+		return UidSet.getCached(uidset).getGeneratedId();
 	}
+	
+	@Override
+	public String checkIRIString(IRIManager manager) throws SQLException {
+		return UidSet.getCached(uidset).checkIRIString(manager);
+	}
+
+	@Override
+	public void updateDB(AbstractConnection c) throws SQLException {
+		c.updateUidSet(UidSet.getCached(uidset));
+		//c.updateNarrative(this);
+	}
+	
+
 
 	/**
 	 * may not be needed, but if we ever need to reopen a database
@@ -110,17 +127,6 @@ public class NarrativeBean implements UpdateableBean,CachingBean {
 		return getGeneratedId();
 	}
 
-	
-	@Override
-	public String checkIRIString(IRIManager manager) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void updateDB(AbstractConnection c) throws SQLException {
-		c.updateNarrative(this);
-	}
 	
 
 }

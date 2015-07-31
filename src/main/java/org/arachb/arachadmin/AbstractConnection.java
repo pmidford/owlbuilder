@@ -168,12 +168,6 @@ public interface AbstractConnection {
 	TermBean getTerm(int termId) throws SQLException;
 
 
-	/**
-	 * 
-	 * @param termBean
-	 */
-	void updateTerm(TermBean termBean) throws SQLException;
-
 
 	/**
 	 * should update the database record corresponding to the entity
@@ -215,12 +209,6 @@ public interface AbstractConnection {
 	 */
 	NarrativeBean getNarrative(int nId) throws SQLException;
 
-	/**
-	 * Updates the row in the backing data (database or mock) with the generated_id
-	 * @param nb
-	 * @throws SQLException
-	 */
-	public void updateNarrative(NarrativeBean nb) throws SQLException;
 
 	
 	/**

@@ -54,8 +54,8 @@ public class DBConnection implements AbstractConnection{
 	 * term table, stay with singletons and caching.
 	 */
 	static final String TERMROWQUERY = 
-			"SELECT id,source_id,domain," +
-					"authority,label,generated_id,comment " +
+			"SELECT id,source_id,domain,authority, " +
+					"label,generated_id,comment,uidset " +
 					"FROM term where term.id = ?";
 
 	static final String TERMSETQUERY = "SELECT id FROM term";
@@ -164,7 +164,8 @@ public class DBConnection implements AbstractConnection{
 	static final String CLAIMROWQUERY =
 			"SELECT c.id, c.publication, c.publication_behavior, c.behavior_term, " +
 					"c.evidence, c.generated_id, pub.doi, " +
-					"pub.generated_id, behavior.source_id, behavior.generated_id " +
+					"pub.generated_id, behavior.source_id, behavior.generated_id, " +
+					"c.uidset " +
 					"FROM claim AS c " +
 					"LEFT JOIN publication AS pub ON (c.publication = pub.id) " +
 					"LEFT JOIN term AS behavior ON (c.behavior_term = behavior.id) " +
@@ -174,7 +175,8 @@ public class DBConnection implements AbstractConnection{
 	static final String CLAIMTABLEQUERY =
 			"SELECT c.id, c.publication, c.publication_behavior, c.behavior_term, " +
 					"c.evidence, c.generated_id, pub.doi, " +
-					"pub.generated_id, behavior.source_id, behavior.generated_id " +
+					"pub.generated_id, behavior.source_id, behavior.generated_id, " +
+					"c.uidset " +
 					"FROM claim AS c " +
 					"LEFT JOIN publication AS pub ON (c.publication = pub.id) " +
 					"LEFT JOIN term AS behavior ON (c.behavior_term = behavior.id) " +
@@ -218,7 +220,7 @@ public class DBConnection implements AbstractConnection{
 			"UPDATE individual SET generated_id = ? WHERE id = ?";	
 
 	static final String NARRATIVEROWQUERY =
-			"SELECT n.id, n.publication, n.label, n.description, n.generated_id " +
+			"SELECT n.id, n.publication, n.label, n.description, n.generated_id, n.uidset " +
 					"FROM narrative AS n WHERE n.id = ?";
 
 	static final String NARRATIVEUPDATESTATEMENT =
@@ -504,27 +506,6 @@ public class DBConnection implements AbstractConnection{
 			termStatement.close();
 		}
 	}
-
-
-	public void updateTerm(TermBean t) throws SQLException{
-		final PreparedStatement updateStatement = 
-				c.prepareStatement(TERMUPDATESTATEMENT);
-		try{
-			updateStatement.setString(1, t.getGeneratedId());  //getIRI_String() is wrong - 
-			updateStatement.setInt(2, t.getId());
-			int count = updateStatement.executeUpdate();
-			if (count != 1){
-				logger.error("term update failed; row count = " + count);
-			}
-			else{
-				t.updatecache();
-			}
-		}
-		finally{
-			updateStatement.close();
-		}
-	}
-
 
 
 	public ClaimBean getClaim(int id) throws Exception{
@@ -1044,23 +1025,6 @@ public class DBConnection implements AbstractConnection{
 	}
 
 
-	@Override
-	public void updateNarrative(NarrativeBean nb) throws SQLException{
-		final PreparedStatement updateStatement = 
-				c.prepareStatement(NARRATIVEUPDATESTATEMENT);
-		try{
-			updateStatement.setString(1, nb.getGeneratedId());  //getIRI_String() is wrong - 
-			updateStatement.setInt(2,nb.getId());
-			final int count = updateStatement.executeUpdate();
-			if (count != 1){
-				logger.error("narrative update failed; row count = " + count);
-			}
-		}
-		finally{
-			updateStatement.close();
-		}
-	}
-
 
 	@Override
 	public PropertyBean getProperty(int id) throws Exception{
@@ -1175,39 +1139,6 @@ public class DBConnection implements AbstractConnection{
 
 
 
-	private static final String COUNTERQUERYTEMPLATE =
-			"SELECT generated_id FROM %s";
-
-//	public int scanPrivateIDs() throws Exception{
-//		int maxid=0;
-//		//TODO this is ugly - maybe use reflection to get all the classes that might have gen_ids
-//		final Statement countStatement = c.createStatement();
-//		maxid = updateMaxid(countStatement,"publication",maxid);
-//		maxid = updateMaxid(countStatement,"claim",maxid);
-//		maxid = updateMaxid(countStatement,"individual",maxid);
-//		maxid = updateMaxid(countStatement,"narrative",maxid);
-//		maxid = updateMaxid(countStatement,"participant",maxid);
-//		maxid = updateMaxid(countStatement,"taxon",maxid);
-//		maxid = updateMaxid(countStatement,"term",maxid);
-//		countStatement.close();
-//		return maxid;
-//	}
-	
-//	private int updateMaxid(Statement s,String table,final int maxid) throws SQLException{
-//		int localid = maxid;
-//		final String tableQuery = String.format(COUNTERQUERYTEMPLATE,table);
-//		ResultSet idSet = s.executeQuery(tableQuery);
-//		while(idSet.next()){
-//			final String source = idSet.getString("generated_id");
-//			final int count = extractCount(source);
-//			if (count > localid){
-//				localid = count;
-//			}
-//		}
-//		idSet.close();
-//		return localid;
-//	}
-
 	@Override
 	public IRIManager getIRIManager() {
 		return irimanager;
@@ -1290,24 +1221,33 @@ public class DBConnection implements AbstractConnection{
 	}
 
 	
-
+	final static String UIDSETUPDATEFAILURE = "Uidset %s update failed; row count = %d";
 	@Override
 	public void updateUidSet(UidSet s) throws SQLException {
-		final PreparedStatement updateStatement = 
+		final PreparedStatement updateGenIdStatement = 
 				c.prepareStatement(UIDSETUPDATEGENIDSTATEMENT);
+		final PreparedStatement updateRefIdStatement = 
+				c.prepareStatement(UIDSETUPDATEREFIDSTATEMENT);
 		try{
-			updateStatement.setString(1, s.getGeneratedId());  //getIRI_String() is wrong - 
-			updateStatement.setInt(2,s.getId());
-			int count = updateStatement.executeUpdate();
+			updateGenIdStatement.setString(1, s.getGeneratedId()); 
+			updateGenIdStatement.setInt(2,s.getId());
+			int count = updateGenIdStatement.executeUpdate();
 			if (count != 1){
-				logger.error("uid set update failed; row count = " + count);
+				throw new RuntimeException(String.format(UIDSETUPDATEFAILURE,"generated_id",count)); 
 			}
-			else{
-				s.updatecache();
+			if (s.getSourceId() == null){
+				updateRefIdStatement.setString(1, s.getRefId()); 
+				updateRefIdStatement.setInt(2,s.getId());
+				count = updateGenIdStatement.executeUpdate();
+				if (count != 1){
+					throw new RuntimeException(String.format(UIDSETUPDATEFAILURE,"reference_id",count)); 
+				}
 			}
+			s.updatecache();
 		}
 		finally{
-			updateStatement.close();
+			updateRefIdStatement.close();
+			updateGenIdStatement.close();
 		}
 	}
 
