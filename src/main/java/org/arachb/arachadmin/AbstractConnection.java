@@ -69,13 +69,6 @@ public interface AbstractConnection {
 
 	/**
 	 * 
-	 * @param p
-	 * @throws SQLException
-	 */
-	void updatePublication(PublicationBean p) throws SQLException;
-
-	/**
-	 * 
 	 * @param claimId id of claim with associated participants
 	 * @return id's of participant beans associated with claim
 	 * @throws SQLException

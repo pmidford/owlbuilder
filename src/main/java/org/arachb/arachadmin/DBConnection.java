@@ -33,7 +33,7 @@ public class DBConnection implements AbstractConnection{
 			"SELECT id, publication_type,dispensation," +
 					"downloaded,reviewed,title,alternate_title,author_list,editor_list," +
 					"source_publication, volume,issue,serial_identifier,page_range,publication_date," +
-					"publication_year,doi,generated_id,curation_status,curation_update " +
+					"publication_year,doi,generated_id,curation_status,curation_update,uidset " +
 					"FROM publication where publication.id = ?";
 
 	static final String PUBLICATIONSETQUERY = "SELECT id FROM publication";
@@ -43,7 +43,7 @@ public class DBConnection implements AbstractConnection{
 			"SELECT id, publication_type,dispensation," +
 					"downloaded,reviewed,title,alternate_title,author_list,editor_list," +
 					"source_publication,volume,issue,serial_identifier,page_range,publication_date," +
-					"publication_year,doi,generated_id,curation_status, curation_update " +
+					"publication_year,doi,generated_id,curation_status, curation_update, uidset " +
 					"FROM publication";
 
 	static final String PUBLICATIONUPDATESTATEMENT = 
@@ -190,25 +190,27 @@ public class DBConnection implements AbstractConnection{
 	static final String TAXONROWQUERY = 
 			"SELECT t.id,t.name,t.author, " +
 					"t.year,t.external_id,t.authority,t.parent,t.generated_id, " +
-					"t.parent_term, t.merged, t.merge_status, parent_record.source_id " +
+					"t.parent_term, t.merged, t.merge_status, parent_uids.ref_id, t.uidset " +
 					"FROM taxon AS t where taxon.id = ? " +
-					"LEFT JOIN term AS parent_record ON (t.parent_term = parent_record.id) ";
+					"LEFT JOIN term AS parent_record ON (t.parent_term = parent_record.id) " +
+					"LEFT JOIN uidset AS parent_uids ON (parent_record.uidset = parent_uids.id)";
 
 	static final String TAXONTABLEQUERY = 
 			"SELECT t.id,t.name,t.author, " +
 					"t.year,t.external_id,t.authority,t.parent,t.generated_id, " +
-					"t.parent_term,t.merged,t.merge_status, parent_record.source_id " +
+					"t.parent_term,t.merged,t.merge_status, parent_uids.ref_id, t.uidset " +
 					"FROM taxon AS t " +
-					"LEFT JOIN term AS parent_record ON (t.parent_term = parent_record.id) ";
-
+					"LEFT JOIN term AS parent_record ON (t.parent_term = parent_record.id) " +
+					"LEFT JOIN uidset AS parent_uids ON (parent_record.uidset = parent_uids.id)";
+	
 	static final String TAXONUPDATESTATEMENT = "";
 
 	static final String INDIVIDUALROWQUERY =
-			"SELECT i.id, i.source_id, i.generated_id, i.label, i.term " +
+			"SELECT i.id, i.source_id, i.generated_id, i.label, i.term, i.uidset " +
 					"FROM individual AS i WHERE i.id = ?";
 
 	static final String INDIVIDUALTABLEQUERY =
-			"SELECT i.id, i.source_id, i.generated_id, i.label, i.term " +
+			"SELECT i.id, i.source_id, i.generated_id, i.label, i.term, i.uidset " +
 					"FROM individual AS i";
 
 	static final String INDIVIDUALNARRATIVESQUERY =
@@ -451,26 +453,6 @@ public class DBConnection implements AbstractConnection{
 
 	final static private String UPDATEPUBLICATIONFAIL = 
 			"publication (%s) update failed; row count = %d";
-
-
-	public void updatePublication(PublicationBean p) throws SQLException{
-		final PreparedStatement updateStatement = 
-				c.prepareStatement(PUBLICATIONUPDATESTATEMENT);
-		try{
-			updateStatement.setString(1, p.getGeneratedId());  //getIRI_String() is wrong - 
-			updateStatement.setInt(2,p.getId());
-			final int count = updateStatement.executeUpdate();
-			if (count != 1){
-				logger.error(String.format(UPDATEPUBLICATIONFAIL,p,count));
-			}
-			else {
-				p.updatecache();
-			}
-		}
-		finally{
-			updateStatement.close();
-		}
-	}
 
 
 	public TermBean getTerm(int id) throws SQLException{

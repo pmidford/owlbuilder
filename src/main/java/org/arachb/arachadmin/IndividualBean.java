@@ -22,17 +22,19 @@ public class IndividualBean implements BeanBase,UpdateableBean,CachingBean{
 	static final int DBGENERATEDID = 3;
 	static final int DBLABEL= 4;
 	static final int DBTERM = 5;
+	static final int DBUIDSET = 6;
 
 	private static final Map<Integer, IndividualBean> cache = new HashMap<>();
 	private static Logger log = Logger.getLogger(IndividualBean.class);
 
 
-	private int id;
-	private String source_id;
+	private int id;  //id assigned by web2py
+	private String source_id;   //externally assigned (are there any?
 	private String generated_id;
 	private String label;
 	private int term;  //the individual's class
-
+	private int uidset;
+	
 	private Set<Integer> narratives = new HashSet<>();
 
 
@@ -43,6 +45,7 @@ public class IndividualBean implements BeanBase,UpdateableBean,CachingBean{
 		generated_id = record.getString(DBGENERATEDID);
 		label = record.getString(DBLABEL);
 		term = record.getInt(DBTERM);
+		uidset = record.getInt(DBUIDSET);
 	}
 
 	@Override
@@ -51,11 +54,11 @@ public class IndividualBean implements BeanBase,UpdateableBean,CachingBean{
 	}
 	
 	public String getSourceId() {
-		return source_id;
+		return UidSet.getCached(uidset).getSourceId();
 	}
 	
 	public String getGeneratedId() {
-		return generated_id;
+		return UidSet.getCached(uidset).getGeneratedId();
 	}
 
 	public String getLabel(){
@@ -69,8 +72,7 @@ public class IndividualBean implements BeanBase,UpdateableBean,CachingBean{
 
 	@Override
 	public void setGeneratedId(String id) {
-		generated_id = id;
-		
+		UidSet.getCached(uidset).setGeneratedId(id);
 	}
 
 	public Set<Integer> getNaratives(){
@@ -85,30 +87,22 @@ public class IndividualBean implements BeanBase,UpdateableBean,CachingBean{
 
 	@Override
 	public String getIRIString() {
-		if (getSourceId() == null){
-			if (getGeneratedId() == null){
-				throw new IllegalStateException(INDBADDOIGENID + getId());
-			}
-			return getGeneratedId();
+		String refid = UidSet.getCached(uidset).getRefId();
+		if (refid == null){
+			final String msg = String.format(INDBADDOIGENID, getId());
+			throw new IllegalStateException(msg);			
 		}
-		return getSourceId();
+		return refid;
 	}
 
 	@Override
 	public String checkIRIString(IRIManager manager) throws SQLException{
-		if (getSourceId() == null){
-			if (getGeneratedId() == null){
-				manager.generateIRI(this);
-			}
-			return getGeneratedId();
-		}
-		return getSourceId();
+		return UidSet.getCached(uidset).checkIRIString(manager);
 	}
 
 	@Override
 	public void updateDB(AbstractConnection c) throws SQLException {
-		// TODO Auto-generated method stub
-		
+		c.updateUidSet(UidSet.getCached(uidset));
 	}
 
 	/**

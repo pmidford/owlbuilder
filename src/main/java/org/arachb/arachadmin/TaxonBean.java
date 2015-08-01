@@ -20,7 +20,8 @@ public class TaxonBean implements CachingBean,UpdateableBean{
 	static final int PARENT_TERM = 9;
 	static final int MERGED = 10;
 	static final int MERGE_STATUS = 11;
-	static final int PARENT_SOURCEID = 12;
+	static final int DBPARENTREFID = 12;
+	static final int DBUIDSET = 13;
 	
 	private static final Map<Integer, TaxonBean> cache = new HashMap<>();
 	private static Logger log = Logger.getLogger(TaxonBean.class);
@@ -38,7 +39,8 @@ public class TaxonBean implements CachingBean,UpdateableBean{
 	private int parent_term;
 	private boolean merged;
 	private String merge_status;
-	private String parent_sourceid;
+	private String parent_refid;
+	private int uidset;
 	
 
 	//maybe make this a constructor
@@ -55,9 +57,9 @@ public class TaxonBean implements CachingBean,UpdateableBean{
 		merged = record.getBoolean(MERGED);
 		merge_status = record.getString(MERGE_STATUS);
 		if (parent_term != 0){
-			updateParentIRI(record);
+			setParentIRI(record);
 		}
-
+		uidset = record.getInt(DBUIDSET);
 	}
 	
 	
@@ -85,13 +87,13 @@ public class TaxonBean implements CachingBean,UpdateableBean{
 	
 
 	public String getGeneratedId(){
-		return generated_id;
+		return UidSet.getCached(uidset).getGeneratedId();
 	}
 	
 	
-	//Just updates the id in the bean - method for updating db is in DBConnection
+	//Just updates the id in the uidset - method for updating db is in DBConnection
 	public void setGeneratedId(String new_id){
-		generated_id = new_id;
+		UidSet.getCached(uidset).setGeneratedId(new_id);
 	}
 	
 	public String getAuthority(){
@@ -110,8 +112,8 @@ public class TaxonBean implements CachingBean,UpdateableBean{
 		return merge_status;
 	}
 	
-	public String getParentSourceId(){
-		return parent_sourceid;
+	public String getParentRefId(){
+		return parent_refid;
 	}
 
 	@Override
@@ -119,39 +121,29 @@ public class TaxonBean implements CachingBean,UpdateableBean{
 		c.updateTaxon(this);
 	}
 	
-	final static String PUBBADDOIGENID = "Publication has neither doi nor generated id";
+	final static String TAXONBADSOURCEGENID = "Taxon has neither source nor generated id";
 	
 	@Override
 	public String getIRIString() {
-		if (getSourceId() == null){
-			if (getGeneratedId() == null){
-				throw new IllegalStateException(PUBBADDOIGENID);
-			}
-			return getGeneratedId();
+		String refid = UidSet.getCached(uidset).getRefId();
+		if (refid == null){
+				throw new IllegalStateException(TAXONBADSOURCEGENID);
 		}
-		return getSourceId();
+		return refid;
 	}
 	
 	@Override
 	public String checkIRIString(IRIManager manager) throws SQLException{
-		if (getSourceId() == null){
-			if (getGeneratedId() == null){
-				manager.generateIRI(this);
-			}
-			return getGeneratedId();
-		}
-		return getSourceId();
+		return UidSet.getCached(uidset).checkIRIString(manager);
 	}
 
-	private void updateParentIRI(AbstractResults record) throws SQLException {
-		if (record.getString(PARENT_SOURCEID) != null){
-			parent_sourceid = record.getString(PARENT_SOURCEID);
+	private void setParentIRI(AbstractResults record) throws SQLException {
+		if (record.getString(DBPARENTREFID) != null){
+			parent_refid = record.getString(DBPARENTREFID);
 		}
 		else{
 			throwBadState(BADPARENTIRI);
 		}
-		// TODO Auto-generated method stub
-		
 	}
 
 	private final static String BADPARENTIRI =

@@ -32,6 +32,7 @@ public class PublicationBean implements CachingBean,UpdateableBean {
 	static final int DBGENERATEDID = 18;
 	static final int DBCURATIONSTATUS = 19;
 	static final int DBCURATIONUPDATE = 20;
+	static final int DBUIDSET = 21;
 	
 
 	private static final Map<Integer, PublicationBean> cache = new HashMap<>();
@@ -58,7 +59,7 @@ public class PublicationBean implements CachingBean,UpdateableBean {
 	private String generated_id;
 	private String curation_status;
 	private String curation_update;
-	
+	private int uidset;
 
 	
 	
@@ -83,7 +84,8 @@ public class PublicationBean implements CachingBean,UpdateableBean {
 		doi = record.getString(DBDOI);
 		generated_id = record.getString(DBGENERATEDID);
         curation_status = record.getString(DBCURATIONSTATUS);
-        curation_update = record.getString(DBCURATIONUPDATE);        
+        curation_update = record.getString(DBCURATIONUPDATE);
+        uidset = record.getInt(DBUIDSET);
 	}
 	
 	/* accessors */
@@ -155,11 +157,11 @@ public class PublicationBean implements CachingBean,UpdateableBean {
 	}
 	
 	public String getDoi(){
-		return doi;
+		return UidSet.getCached(uidset).getSourceId();
 	}
 
 	public String getGeneratedId(){
-		return generated_id;
+		return UidSet.getCached(uidset).getGeneratedId();
 	}
 
 	public String getCurationStatus(){
@@ -174,45 +176,29 @@ public class PublicationBean implements CachingBean,UpdateableBean {
 
 	//Just updates the id in the bean - method for updating db is in DBConnection
 	public void setGeneratedId(String id) {
-		generated_id = id;
+		UidSet.getCached(uidset).setGeneratedId(id);
 	}
 
 	
 	public void updateDB(AbstractConnection c) throws SQLException{
-		c.updatePublication(this);
+		c.updateUidSet(UidSet.getCached(uidset));   //hide uncaching?
 	}
 	
-	final static String PUBBADDOIGENID = "Publication has neither doi nor generated id";
+	final private static String NOTERMGENID = "Publication has no doi or generated id; db id = %s";
+
 	@Override
-	public String getIRIString() {
-		if (getDoi() == null){
-			if (getGeneratedId() == null){
-				throw new IllegalStateException(PUBBADDOIGENID);
-			}
-			return getGeneratedId();
+	public String getIRIString(){
+		String refid = UidSet.getCached(uidset).getRefId();
+		if (refid == null){
+			final String msg = String.format(NOTERMGENID, getId());
+			throw new IllegalStateException(msg);			
 		}
-		try {
-			return IRIManager.cleanupDoi(getDoi());
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return "";
-		}
+		return refid;
 	}
 
 	@Override
-	public String checkIRIString(IRIManager manager) throws SQLException {
-		if (getDoi() == null){
-			manager.generateIRI(this);
-			return getGeneratedId();
-		}
-		try {
-			return IRIManager.cleanupDoi(getDoi());
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return "";
-		}
+	public String checkIRIString(IRIManager manager) throws SQLException{
+		return UidSet.getCached(uidset).checkIRIString(manager);
 	}
 
 	/**
@@ -255,6 +241,11 @@ public class PublicationBean implements CachingBean,UpdateableBean {
 					               getId()));
 			cache.put(this.getId(), this);
 		}
+	}
+
+	public int getuidset() {
+		// TODO Auto-generated method stub
+		return uidset;
 	}
 	
 }

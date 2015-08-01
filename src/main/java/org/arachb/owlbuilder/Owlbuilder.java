@@ -537,7 +537,7 @@ public class Owlbuilder{
 			Taxon t = new Taxon(tb);
 			final IRI taxonIRI = IRI.create(tb.getIRIString());
 			OWLClass taxonClass = getDataFactory().getOWLClass(taxonIRI);
-			String parentString = tb.getParentSourceId();
+			String parentString = tb.getParentRefId();
 			if (parentString == null){
 				log.error("No parent specified for curator added taxon: " + tb.getId());
 			}
