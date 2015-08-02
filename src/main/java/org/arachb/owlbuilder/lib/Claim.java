@@ -12,7 +12,6 @@ import org.arachb.arachadmin.ClaimBean;
 import org.arachb.owlbuilder.Owlbuilder;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAnnotation;
-import org.semanticweb.owlapi.model.OWLAnonymousIndividual;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassAssertionAxiom;
@@ -21,7 +20,6 @@ import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLIndividual;
 import org.semanticweb.owlapi.model.OWLObject;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
-import org.semanticweb.owlapi.model.OWLObjectPropertyAssertionAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 
@@ -224,22 +222,28 @@ public class Claim implements GeneratingEntity {
 			if (p.isIndividual()){
 				switch (result){
 				case UNKNOWN:
+				case INDIVIDUALONLY:
 					result = Profile.INDIVIDUALONLY;
 					break;
 				case CLASSONLY:
 					result = Profile.MIXED;
+					break;
 				default:
+					result = Profile.UNKNOWN;
 					break;
 				}
 			}
 			else{
-				switch (claimProfile){
+				switch (result){
 				case UNKNOWN:
+				case CLASSONLY:
 					result = Profile.CLASSONLY;
 					break;
 				case INDIVIDUALONLY:
 					result = Profile.MIXED;
+					break;
 				default:
+					result = Profile.UNKNOWN;
 					break;
 				}
 			}
@@ -294,18 +298,14 @@ public class Claim implements GeneratingEntity {
 	private void connectIndividualParticipant(Owlbuilder builder,
 			                                  Entry<OWLIndividual, PropertyTerm> ePair,
 								              OWLIndividual event_ind,
-								              OWLClass behaviorClass){
+								              OWLClass behaviorClass) throws Exception{
 		OWLOntology target = builder.getTarget();
 		OWLOntologyManager manager = builder.getOntologyManager();
 		final OWLDataFactory factory = builder.getDataFactory();
-		final OWLClass textualEntityClass = factory.getOWLClass(Vocabulary.textualEntity);
-
-		Set<OWLClassExpression> supersets = new HashSet<OWLClassExpression>();
-		supersets.add(textualEntityClass);
 		OWLIndividual headIndividual = ePair.getKey();
 		PropertyTerm headProperty = ePair.getValue();
-		OWLObjectProperty pExpr = factory.getOWLObjectProperty(IRI.create(headProperty.getSourceId()));
-		OWLAxiom a1 = factory.getOWLObjectPropertyAssertionAxiom(pExpr, headIndividual, event_ind);
+		OWLObjectProperty pExpr = (OWLObjectProperty)headProperty.generateOWL(builder);
+		OWLAxiom a1 = factory.getOWLObjectPropertyAssertionAxiom(pExpr,event_ind,headIndividual);
 		manager.addAxiom(target, a1);
 	}
 

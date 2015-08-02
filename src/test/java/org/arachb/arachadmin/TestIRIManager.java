@@ -17,7 +17,7 @@ public class TestIRIManager {
 	private AbstractConnection c;
 
 	@Before
-	public void setup() throws Exception {
+	public void setUp() throws Exception {
 		c = new MockConnection();
 
 	}

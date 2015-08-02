@@ -112,7 +112,7 @@ public class ParticipantElement implements GeneratingEntity {
 	private void generatingReport(){
 		if (entity instanceof Individual){
 			String iriString = ((Individual)entity).getIRIString();
-			log.info(String.format("Participant Element %d is generating code for Individual ",bean.getId(),iriString));
+			log.info(String.format("Participant Element %d is generating code for Individual %s",bean.getId(),iriString));
 		}
 	}
 

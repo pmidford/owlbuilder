@@ -24,8 +24,8 @@ public class Taxon implements NamedGeneratingEntity,TaxonomicEntity{
 	}
 
 
-	public String getParentSourceId(){
-		return bean.getParentSourceId();
+	public String getParentRefId(){
+		return bean.getParentRefId();
 	}
 
 

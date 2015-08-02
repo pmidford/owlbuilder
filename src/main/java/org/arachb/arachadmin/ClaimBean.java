@@ -19,8 +19,9 @@ public class ClaimBean implements BeanBase,UpdateableBean,CachingBean{  //do all
 	final static int DBPUBGENERATEDID = 8;
 	final static int DBBEHAVIORSOURCEID = 9;
 	final static int DBBEHAVIORGENERATEDID = 10;
-	final static int DBEVIDENCESOURCEID = 11;
-	final static int DBEVIDENCEGENERATEDID = 12;
+	final static int DBUIDSET = 11;
+	final static int DBEVIDENCESOURCEID = 12;
+	final static int DBEVIDENCEGENERATEDID = 13;
 	
 	final static String BADPUBLICATIONIRI =
 			"Publication without IRI referenced as publication cited in claim: claim id = %s; publication id = %s";
@@ -39,10 +40,11 @@ public class ClaimBean implements BeanBase,UpdateableBean,CachingBean{  //do all
 	private int behavior;
 	private String publicationBehavior;
 	private int evidence;
-	private String generated_id = null;  //for validity checking
+	//private String generated_id = null;  //for validity checking
 	private String behaviorIRI;
 	private String publicationIRI;
 	private String evidenceIRI;
+	private int uidset;
 	
 	static final ClaimBean dummy = new ClaimBean(); 
 
@@ -54,7 +56,7 @@ public class ClaimBean implements BeanBase,UpdateableBean,CachingBean{  //do all
 		publicationBehavior = record.getString(DBPUBLICATIONBEHAVIOR);
 		behavior= record.getInt(DBBEHAVIORTERM);
 		evidence = record.getInt(DBEVIDENCE);
-		generated_id = record.getString(DBGENERATEDID);
+		//generated_id = record.getString(DBGENERATEDID);
 		if (publication != 0){
 			updatePublicationIRI(record);
 		}
@@ -64,6 +66,7 @@ public class ClaimBean implements BeanBase,UpdateableBean,CachingBean{  //do all
 		if (evidence != 0){
 			updateEvidenceIRI(record);
 		}
+		uidset = record.getInt(DBUIDSET);
 	}
 	
 	private void updatePublicationIRI(AbstractResults record) throws SQLException{
@@ -142,7 +145,10 @@ public class ClaimBean implements BeanBase,UpdateableBean,CachingBean{  //do all
 	}
 	
 	public String getGeneratedId(){
-		return generated_id;
+		if (UidSet.isCached(uidset)){
+			return UidSet.getCached(uidset).getGeneratedId();
+		}
+		return null;
 	}
 
 	
@@ -168,7 +174,7 @@ public class ClaimBean implements BeanBase,UpdateableBean,CachingBean{  //do all
 	}
 
 	public void setGeneratedId(String id){
-		generated_id = id;
+		UidSet.getCached(uidset).setGeneratedId(id);
 	}
 
 	

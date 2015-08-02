@@ -6,12 +6,14 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
-public class NarrativeBean implements BeanBase,CachingBean {
+public class NarrativeBean implements UpdateableBean,CachingBean {
 		
 	static final int DBID = 1;
 	static final int DBPUBLICATION = 2;
 	static final int DBLABEL = 3;
 	static final int DBDESCRIPTION = 4;
+	static final int DBGENERATEDID = 5;
+	static final int DBUIDSET = 6;
 	
 	private static final Map<Integer, NarrativeBean> cache = new HashMap<>();
 	private static Logger log = Logger.getLogger(NarrativeBean.class);
@@ -22,7 +24,8 @@ public class NarrativeBean implements BeanBase,CachingBean {
 	private int publicationid;
 	private String label;
 	private String description;
-
+	private String generated_id;
+	private int uidset;
 	
 	
 
@@ -32,6 +35,8 @@ public class NarrativeBean implements BeanBase,CachingBean {
 		publicationid = record.getInt(DBPUBLICATION);
 		label = record.getString(DBLABEL);
 		description = record.getString(DBDESCRIPTION);
+		generated_id = record.getString(DBGENERATEDID);
+		uidset = record.getInt(DBUIDSET);
 	}
 
 	/* access methods */
@@ -53,9 +58,30 @@ public class NarrativeBean implements BeanBase,CachingBean {
 		return description;
 	}
 
+	@Override
+	public void setGeneratedId(String id) {
+		UidSet.getCached(uidset).setGeneratedId(id);
+	}
 
-
+	@Override
+	public String getGeneratedId() {
+		//This will fail if uidset is not cached, but that error should be seen
+		return UidSet.getCached(uidset).getGeneratedId();
+	}
 	
+	@Override
+	public String checkIRIString(IRIManager manager) throws SQLException {
+		return UidSet.getCached(uidset).checkIRIString(manager);
+	}
+
+	@Override
+	public void updateDB(AbstractConnection c) throws SQLException {
+		c.updateUidSet(UidSet.getCached(uidset));
+		//c.updateNarrative(this);
+	}
+	
+
+
 	/**
 	 * may not be needed, but if we ever need to reopen a database
 	 */
@@ -94,6 +120,13 @@ public class NarrativeBean implements BeanBase,CachingBean {
 			cache.put(getId(), this);
 		}
 	}
+
+
+	@Override
+	public String getIRIString() throws IllegalStateException {
+		return getGeneratedId();
+	}
+
 	
 
 }

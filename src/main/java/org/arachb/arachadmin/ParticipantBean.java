@@ -8,19 +8,18 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 
-public class ParticipantBean implements CachingBean,UpdateableBean{
+public class ParticipantBean implements CachingBean,BeanBase{
 
 
 		
 	final static int DBID = 1;
 	final static int DBQUANTIFICATION = 2;
 	final static int DBLABEL = 3;
-	final static int DBGENERATEDID = 4;
-	final static int DBPROPERTY = 5;
-	final static int DBPUBLICATIONTAXON = 6;
-	final static int DBPUBLICATIONANATOMY = 7;
-	final static int DBPUBLICATIONSUBSTRATE = 8;
-	final static int DBHEADELEMENT = 9;
+	final static int DBPROPERTY = 4;
+	final static int DBPUBLICATIONTAXON = 5;
+	final static int DBPUBLICATIONANATOMY = 6;
+	final static int DBPUBLICATIONSUBSTRATE = 7;
+	final static int DBHEADELEMENT = 8;
 
 	final static String BADTAXONIRI =
 			"Term without IRI referenced as participant taxon: participant id = %s; taxon id = %s";
@@ -35,7 +34,6 @@ public class ParticipantBean implements CachingBean,UpdateableBean{
 	private int substrate;
 	private int anatomy;
 	private String quantification;
-	private String generatedId;
 	private int property;
 	private String publicationTaxon;
 	private String label;
@@ -60,7 +58,6 @@ public class ParticipantBean implements CachingBean,UpdateableBean{
 		id = record.getInt(DBID);
 		quantification = record.getString(DBQUANTIFICATION);
 		label = record.getString(DBLABEL);
-		generatedId = record.getString(DBGENERATEDID);
 		property = record.getInt(DBPROPERTY);
 		publicationTaxon = record.getString(DBPUBLICATIONTAXON);
 		publicationAnatomy = record.getString(DBPUBLICATIONANATOMY);
@@ -120,14 +117,6 @@ public class ParticipantBean implements CachingBean,UpdateableBean{
 		return anatomyIRI;
 	}
 	
-	public String getGeneratedId(){
-		return generatedId;
-	}
-	
-	public void setGeneratedId(String s){
-		generatedId = s;
-	}
-	
 	public int getHeadElement(){
 		return headElement;
 	}
@@ -147,29 +136,6 @@ public class ParticipantBean implements CachingBean,UpdateableBean{
 
 	final static String NOPARTICGENID = "Participant has no generated id; db id = %s";
 
-	@Override
-	public String getIRIString() {
-		final String genId = getGeneratedId();
-		if (genId == null){
-			final String msg = String.format(NOPARTICGENID, getId());
-			throw new IllegalStateException(msg);
-		}
-		return genId;
-	}
-
-	@Override
-	public String checkIRIString(IRIManager manager) throws SQLException{
-		if (getGeneratedId() == null){
-			manager.generateIRI(this);
-		}
-		return getGeneratedId();
-	}
-
-	@Override
-	public void updateDB(AbstractConnection c) throws SQLException {
-		// TODO Auto-generated method stub
-		
-	}
 
 	/**
 	 * may not be needed, but if we ever need to reopen a database
