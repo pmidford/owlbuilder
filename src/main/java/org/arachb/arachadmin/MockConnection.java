@@ -643,24 +643,21 @@ public class MockConnection implements AbstractConnection {
 		}
 	}
 	
-	@Override
-	public void updateParticipant(ParticipantBean p){
-		
-	}
 	
-	@Override
-	public void updatePublication(PublicationBean p){
-		switch (p.getId()){
-		case 2:
-			mockPublicationResults2.setString(0,PublicationBean.DBGENERATEDID, p.getGeneratedId());
-			break;
-		case 3:
-			mockPublicationResults3.setString(0,PublicationBean.DBGENERATEDID, p.getGeneratedId());
-			break;
-		default:
-			break;
-		}
-	}		
+// keep this as template - update uidset will be pretty massive	
+//	@Override
+//	public void updatePublication(PublicationBean p){
+//		switch (p.getId()){
+//		case 2:
+//			mockPublicationResults2.setString(0,PublicationBean.DBGENERATEDID, p.getGeneratedId());
+//			break;
+//		case 3:
+//			mockPublicationResults3.setString(0,PublicationBean.DBGENERATEDID, p.getGeneratedId());
+//			break;
+//		default:
+//			break;
+//		}
+//	}		
 	
 	
 	@Override

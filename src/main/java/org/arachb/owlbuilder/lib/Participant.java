@@ -855,13 +855,6 @@ public class Participant implements GeneratingEntity{
 	}
 
 	
-	public String getGeneratedId(){
-		return bean.getGeneratedId();
-	}
-
-	public void setGeneratedId(String s){
-		bean.setGeneratedId(s);
-	}
 
 
 }

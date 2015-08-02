@@ -13,9 +13,10 @@ import org.junit.Test;
 public class TestParticipantBean {
 
     private static Logger log = Logger.getLogger(TestParticipantBean.class);
-
+    
     private AbstractConnection testConnection;
-
+    private IRIManager im;
+    
     private ClaimBean testClaim1;
     private ClaimBean testClaim26;
     
@@ -30,6 +31,7 @@ public class TestParticipantBean {
 			log.info("Testing with mock connection");
 			testConnection = DBConnection.getMockConnection();
 		}
+		im = new IRIManager(testConnection);
 		testClaim1 = testConnection.getClaim(1);
 		testClaim26 = testConnection.getClaim(26);
 	}
@@ -42,7 +44,6 @@ public class TestParticipantBean {
 			assertEquals(1, pb.getId());
 			assertEquals("some",pb.getQuantification());
 			assertEquals("",pb.getLabel());  //should improve this
-			assertEquals(null,pb.getGeneratedId());  //improve ??
 			assertEquals(306,pb.getProperty());
 			assertEquals("Tetragnatha straminea", pb.getPublicationTaxon());
 			assertEquals("", pb.getPublicationAnatomy());
@@ -55,7 +56,6 @@ public class TestParticipantBean {
 			assertEquals(29, pb.getId());
 			assertEquals("individual",pb.getQuantification());
 			assertEquals("female",pb.getLabel());  //should improve this
-			assertEquals("http://arachb.org/arachb/ARACHB_0000349",pb.getGeneratedId());  //improve ??
 			assertEquals(306,pb.getProperty());
 			assertEquals("Leucauge mariana", pb.getPublicationTaxon());
 			assertEquals("female", pb.getPublicationAnatomy());

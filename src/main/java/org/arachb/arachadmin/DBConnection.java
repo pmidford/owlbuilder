@@ -695,25 +695,6 @@ public class DBConnection implements AbstractConnection{
 	}
 
 
-	public void updateParticipant(ParticipantBean b) throws SQLException{
-		final PreparedStatement updateStatement = 
-				c.prepareStatement(PARTICIPANTUPDATESTATEMENT);
-		try{
-			updateStatement.setString(1, b.getGeneratedId());  //getIRI_String() is wrong - 
-			updateStatement.setInt(2, b.getId());
-			int count = updateStatement.executeUpdate();
-			if (count != 1){
-				logger.error("entity update failed; row count = " + count);
-			}
-			else{
-				b.updatecache();
-			}
-		}
-		finally{
-			updateStatement.close();
-		}
-	}
-
 	@Override
 	public Set<PElementBean> getPElementTable(ParticipantBean p) throws Exception {
 		final PreparedStatement pElementStatement = c.prepareStatement(PELEMENTTABLEQUERY);

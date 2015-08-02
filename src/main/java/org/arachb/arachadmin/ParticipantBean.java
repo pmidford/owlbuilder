@@ -34,7 +34,6 @@ public class ParticipantBean implements CachingBean,BeanBase{
 	private int substrate;
 	private int anatomy;
 	private String quantification;
-	private String generatedId;
 	private int property;
 	private String publicationTaxon;
 	private String label;
@@ -116,14 +115,6 @@ public class ParticipantBean implements CachingBean,BeanBase{
 	
 	public String getAnatomyIri(){
 		return anatomyIRI;
-	}
-	
-	public String getGeneratedId(){
-		return generatedId;
-	}
-	
-	public void setGeneratedId(String s){
-		generatedId = s;
 	}
 	
 	public int getHeadElement(){

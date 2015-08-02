@@ -91,13 +91,6 @@ public interface AbstractConnection {
 	public ParticipantBean getParticipant(int id) throws Exception;
 
 	/**
-	 * 
-	 * @param p
-	 * @throws SQLException
-	 */
-	void updateParticipant(ParticipantBean p) throws SQLException;
-
-	/**
 	 * @param p specifies the participant that packages these elements
 	 * @throws SQLException
 	 */
