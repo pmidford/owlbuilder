@@ -1,5 +1,6 @@
 package org.arachb.owlbuilder.lib;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -15,23 +16,24 @@ public class Vocabulary {
 
 	private Vocabulary() {}  // prevent instantiation
 
-	public static final IRI pubAboutInvestigation = 
+	public static final IRI pubAboutInvestigation =
 			IRI.create("http://purl.obolibrary.org/obo/IAO_0000312");
 	public static final IRI denotesProperty =
 			IRI.create("http://purl.obolibrary.org/obo/IAO_0000219");
-	public static final IRI informationContentEntity = 
+	public static final IRI informationContentEntity =
 			IRI.create("http://purl.obolibrary.org/obo/IAO_0000030");
 	public static final IRI textualEntity =
 			IRI.create("http://purl.obolibrary.org/obo/IAO_0000300");
 
-	public static final Set<IRI> iaoImports = new HashSet<IRI>();
+	private static final Set<IRI> iaoImports_mod = new HashSet<IRI>();
 	static {
-		iaoImports.add(pubAboutInvestigation);
-		iaoImports.add(denotesProperty);
-		iaoImports.add(informationContentEntity);
+		iaoImports_mod.add(pubAboutInvestigation);
+		iaoImports_mod.add(denotesProperty);
+		iaoImports_mod.add(informationContentEntity);
 	}
-	
-	public static final IRI partOfProperty = 
+	public static final Set<IRI> iaoImports = Collections.unmodifiableSet(iaoImports_mod);
+
+	public static final IRI partOfProperty =
 			IRI.create("http://purl.obolibrary.org/obo/BFO_0000050");
 	public static final IRI hasPartProperty =
 			IRI.create("http://purl.obolibrary.org/obo/BFO_0000051");
@@ -56,13 +58,14 @@ public class Vocabulary {
 
 
 
-	public static final Set<IRI> bfoImports = new HashSet<IRI>();
+	private static final Set<IRI> bfoImports_mod = new HashSet<IRI>();
 	static {
-		bfoImports.add(partOfProperty);
-		bfoImports.add(hasParticipantProperty);
+		bfoImports_mod.add(partOfProperty);
+		bfoImports_mod.add(hasParticipantProperty);
 	}
-	
-	public static final IRI arachnidaTaxon = 
+	public static final Set<IRI> bfoImports = Collections.unmodifiableSet(bfoImports_mod);
+
+	public static final IRI arachnidaTaxon =
 			IRI.create("http://purl.obolibrary.org/obo/NCBITaxon_6854");
 
 

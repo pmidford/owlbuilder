@@ -1,8 +1,6 @@
 package org.arachb.arachadmin;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 
 import java.util.Set;
 
@@ -13,14 +11,14 @@ import org.junit.Test;
 public class TestParticipantBean {
 
     private static Logger log = Logger.getLogger(TestParticipantBean.class);
-    
+
     private AbstractConnection testConnection;
     private IRIManager im;
-    
+
     private ClaimBean testClaim1;
     private ClaimBean testClaim26;
-    
-	
+
+
 	@Before
 	public void setUp() throws Exception {
 		if (DBConnection.testConnection()){

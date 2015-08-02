@@ -29,7 +29,7 @@ public class DBConnection implements AbstractConnection{
 	//Query strings
 
 	/* may never need to load singleton publications, but in case */
-	static final String PUBLICATIONROWQUERY = 
+	static final String PUBLICATIONROWQUERY =
 			"SELECT id, publication_type,dispensation," +
 					"downloaded,reviewed,title,alternate_title,author_list,editor_list," +
 					"source_publication, volume,issue,serial_identifier,page_range,publication_date," +
@@ -39,31 +39,31 @@ public class DBConnection implements AbstractConnection{
 	static final String PUBLICATIONSETQUERY = "SELECT id FROM publication";
 
 	/* keep this, because it may be faster to process the whole publication table */
-	static final String PUBLICATIONTABLEQUERY = 
+	static final String PUBLICATIONTABLEQUERY =
 			"SELECT id, publication_type,dispensation," +
 					"downloaded,reviewed,title,alternate_title,author_list,editor_list," +
 					"source_publication,volume,issue,serial_identifier,page_range,publication_date," +
 					"publication_year,doi,generated_id,curation_status, curation_update, uidset " +
 					"FROM publication";
 
-	static final String PUBLICATIONUPDATESTATEMENT = 
+	static final String PUBLICATIONUPDATESTATEMENT =
 			"UPDATE publication SET generated_id = ? WHERE id = ?";
 
 
 	/* arachadmin has the union of all support ontologies - DO NOT want to load the whole
 	 * term table, stay with singletons and caching.
 	 */
-	static final String TERMROWQUERY = 
+	static final String TERMROWQUERY =
 			"SELECT id,source_id,domain,authority, " +
 					"label,generated_id,comment,uidset " +
 					"FROM term where term.id = ?";
 
 	static final String TERMSETQUERY = "SELECT id FROM term";
 
-	static final String TERMUPDATESTATEMENT = 
+	static final String TERMUPDATESTATEMENT =
 			"UPDATE term SET generated_id = ? WHERE id = ?";
 
-	static final String TERMIRIQUERY = 
+	static final String TERMIRIQUERY =
 			"SELECT id,source_id,generated_id FROM term where term.id = ?";
 
 	//TODO needs review
@@ -74,7 +74,7 @@ public class DBConnection implements AbstractConnection{
 					"taxon.source_id, taxon.generated_id, " +
 					"substrate.source_id, substrate.generated_id, " +
 					"anatomy.source_id, anatomy.generated_id " +
-					"FROM participant2claim as p2c " + 
+					"FROM participant2claim as p2c " +
 					"JOIN participant AS part ON (p2c.participant = part.id) " +
 					"LEFT JOIN term AS taxon ON (part.taxon = taxon.id) " +
 					"LEFT JOIN term AS substrate ON (part.substrate = substrate.id) " +
@@ -83,9 +83,9 @@ public class DBConnection implements AbstractConnection{
 
 
 	// Cache all the participants for a particular claim
-	static final String PARTICIPANTSINCLAIMSETQUERY = 
+	static final String PARTICIPANTSINCLAIMSETQUERY =
 			"SELECT part.id " +
-					"FROM participant2claim as p2c " + 
+					"FROM participant2claim as p2c " +
 					"JOIN participant AS part ON (p2c.participant = part.id) " +
 					"WHERE p2c.claim = ?";
 
@@ -93,27 +93,27 @@ public class DBConnection implements AbstractConnection{
 			"SELECT part.id, part.quantification, part.label, " +
 					"p2c.property, part.publication_taxon, part.publication_anatomy, " +
 					"part.publication_substrate, part.head_element " +
-					"FROM participant2claim as p2c " + 
+					"FROM participant2claim as p2c " +
 					"JOIN participant AS part ON (p2c.participant = part.id) " +
 					"WHERE p2c.claim = ?";
 
 	// should we just cache all the participants at once?
-	static final String PARTICIPANTTABLEQUERY = 
+	static final String PARTICIPANTTABLEQUERY =
 			"SELECT part.id, part.quantification, part.label," +
 					"p2c.property, part.publication_taxon, part.publication_anatomy, " +
 					"part.publication_substrate, part.head_element " +
-					"FROM participant2claim as p2c " + 
+					"FROM participant2claim as p2c " +
 					"JOIN participant AS part ON (p2c.participant = part.id) ";
 
 	// id's of participants in claim
-	static final String PARTICIPANTCLAIMSETQUERY = 
+	static final String PARTICIPANTCLAIMSETQUERY =
 			"SELECT part.id" +
-					"FROM participant2claim as p2c " + 
+					"FROM participant2claim as p2c " +
 					"JOIN participant AS part ON (p2c.participant = part.id) " +
 					"WHERE p2c.claim = ?";
 
 	// singleton participant
-	static final String PARTICIPANTROWQUERY = 
+	static final String PARTICIPANTROWQUERY =
 			"SELECT part.id, part.quantification, part.label, " +
 					"p2c.property, part.publication_taxon, part.publication_anatomy, " +
 					"part.publication_substrate, part.head_element " +
@@ -183,11 +183,11 @@ public class DBConnection implements AbstractConnection{
 					"LEFT JOIN term AS evidence ON (c.evidence = evidence.id) ";
 
 
-	static final String CLAIMUPDATESTATEMENT = 
+	static final String CLAIMUPDATESTATEMENT =
 			"UPDATE claim SET generated_id = ? WHERE id = ?";
 
 
-	static final String TAXONROWQUERY = 
+	static final String TAXONROWQUERY =
 			"SELECT t.id,t.name,t.author, " +
 					"t.year,t.external_id,t.authority,t.parent,t.generated_id, " +
 					"t.parent_term, t.merged, t.merge_status, parent_uids.ref_id, t.uidset " +
@@ -195,14 +195,14 @@ public class DBConnection implements AbstractConnection{
 					"LEFT JOIN term AS parent_record ON (t.parent_term = parent_record.id) " +
 					"LEFT JOIN uidset AS parent_uids ON (parent_record.uidset = parent_uids.id)";
 
-	static final String TAXONTABLEQUERY = 
+	static final String TAXONTABLEQUERY =
 			"SELECT t.id,t.name,t.author, " +
 					"t.year,t.external_id,t.authority,t.parent,t.generated_id, " +
 					"t.parent_term,t.merged,t.merge_status, parent_uids.ref_id, t.uidset " +
 					"FROM taxon AS t " +
 					"LEFT JOIN term AS parent_record ON (t.parent_term = parent_record.id) " +
 					"LEFT JOIN uidset AS parent_uids ON (parent_record.uidset = parent_uids.id)";
-	
+
 	static final String TAXONUPDATESTATEMENT = "";
 
 	static final String INDIVIDUALROWQUERY =
@@ -219,42 +219,42 @@ public class DBConnection implements AbstractConnection{
 
 
 	static final String INDIVIDUALUPDATESTATEMENT =
-			"UPDATE individual SET generated_id = ? WHERE id = ?";	
+			"UPDATE individual SET generated_id = ? WHERE id = ?";
 
 	static final String NARRATIVEROWQUERY =
 			"SELECT n.id, n.publication, n.label, n.description, n.generated_id, n.uidset " +
 					"FROM narrative AS n WHERE n.id = ?";
 
 	static final String NARRATIVEUPDATESTATEMENT =
-			"UPDATE narrative SET generated_id = ? WHERE id = ?";		
+			"UPDATE narrative SET generated_id = ? WHERE id = ?";
 
-	static final String PROPERTYROWQUERY = 
+	static final String PROPERTYROWQUERY =
 			"SELECT p.id, p.source_id, p.authority, p.label, p.generated_id, p.comment " +
 					"FROM property AS p WHERE p.id = ?";
 
-	static final String PROPERTYROWBYSOURCEIDQUERY = 
+	static final String PROPERTYROWBYSOURCEIDQUERY =
 			"SELECT p.id, p.source_id, p.authority, p.label, p.generated_id, p.comment " +
 					"FROM property AS p WHERE p.source_id = ?";
 
-	static final String UIDSETROWQUERY = 
+	static final String UIDSETROWQUERY =
 			"SELECT u.id, u,source_id, u.generated_id, u.ref_id " +
 			        "FROM uidset AS u where u.source_id = ?";
 
-	static final String UIDSETTABLEQUERY = 
+	static final String UIDSETTABLEQUERY =
 			"SELECT u.id, u.source_id, u.generated_id, u.ref_id " +
 			        "FROM uidset AS u";
-	
-	static final String UIDSETLASTGENID = 
+
+	static final String UIDSETLASTGENID =
 			"SELECT MAX(generated_id) FROM uidset";
 
-	static final String UIDSETUPDATEGENIDSTATEMENT = 
+	static final String UIDSETUPDATEGENIDSTATEMENT =
 			"UPDATE uidset SET generated_id = ? WHERE id = ?";
-	
-	static final String UIDSETUPDATEREFIDSTATEMENT = 
+
+	static final String UIDSETUPDATEREFIDSTATEMENT =
 			"UPDATE uidset SET ref_id = ? WHERE id = ?";
-	
-	
-	
+
+
+
 	static final Logger logger = Logger.getLogger(DBConnection.class.getName());
 
 	private Connection c;
@@ -272,7 +272,7 @@ public class DBConnection implements AbstractConnection{
 	private static final String CONNECTIONSPEC = "jdbc:mysql://%s/%s";
 
 	/**
-	 * 
+	 *
 	 * @return whether the connection succeeded
 	 * resource warning suppressed because the connection remains open until the end
 	 */
@@ -336,7 +336,7 @@ public class DBConnection implements AbstractConnection{
 		final Statement domainStatement = c.createStatement();
 		ResultSet domainResult = null;
 		try{
-			domainResult = domainStatement.executeQuery(DOMAINSQUERY); 
+			domainResult = domainStatement.executeQuery(DOMAINSQUERY);
 			if (domainResult.next()){
 				int id = domainResult.getInt("id");
 				String label = domainResult.getString("name");
@@ -353,7 +353,7 @@ public class DBConnection implements AbstractConnection{
 	}
 
 	/**
-	 * 
+	 *
 	 * @return connection to default database identified in properties file
 	 * @throws Exception
 	 */
@@ -363,7 +363,7 @@ public class DBConnection implements AbstractConnection{
 
 
 	/**
-	 * 
+	 *
 	 * @return connection to a database of test data
 	 * @throws Exception
 	 */
@@ -451,10 +451,6 @@ public class DBConnection implements AbstractConnection{
 	}
 
 
-	final static private String UPDATEPUBLICATIONFAIL = 
-			"publication (%s) update failed; row count = %d";
-
-
 	public TermBean getTerm(int id) throws SQLException{
 		if (TermBean.isCached(id)){
 			return TermBean.getCached(id);
@@ -540,10 +536,10 @@ public class DBConnection implements AbstractConnection{
 	}
 
 	public void updateClaim(ClaimBean cl) throws SQLException{
-		final PreparedStatement updateStatement = 
+		final PreparedStatement updateStatement =
 				c.prepareStatement(CLAIMUPDATESTATEMENT);
 		try{
-			updateStatement.setString(1, cl.getGeneratedId());  //getIRI_String() is wrong - 
+			updateStatement.setString(1, cl.getGeneratedId());  //getIRI_String() is wrong -
 			updateStatement.setInt(2,cl.getId());
 			int count = updateStatement.executeUpdate();
 			if (count != 1){
@@ -816,7 +812,7 @@ public class DBConnection implements AbstractConnection{
 			finally{
 				pElementChildStatement.close();
 			}
-		}			
+		}
 		return pb;
 	}
 
@@ -878,10 +874,10 @@ public class DBConnection implements AbstractConnection{
 
 
 	public void updateTaxon(TaxonBean t) throws SQLException{
-		final PreparedStatement updateStatement = 
+		final PreparedStatement updateStatement =
 				c.prepareStatement(TAXONUPDATESTATEMENT);
 		try{
-			updateStatement.setString(1, t.getGeneratedId());  //getIRI_String() is wrong - 
+			updateStatement.setString(1, t.getGeneratedId());  //getIRI_String() is wrong -
 			updateStatement.setInt(2, t.getId());
 			int count = updateStatement.executeUpdate();
 			if (count != 1){
@@ -941,15 +937,15 @@ public class DBConnection implements AbstractConnection{
 			finally{
 				individualNarrativesStatement.close();
 			}
-		}			
+		}
 		return ib;
 	}
 
 	public void updateIndividual(IndividualBean ib) throws SQLException{
-		final PreparedStatement updateStatement = 
+		final PreparedStatement updateStatement =
 				c.prepareStatement(INDIVIDUALUPDATESTATEMENT);
 		try{
-			updateStatement.setString(1, ib.getGeneratedId());  //getIRI_String() is wrong - 
+			updateStatement.setString(1, ib.getGeneratedId());  //getIRI_String() is wrong -
 			updateStatement.setInt(2,ib.getId());
 			final int count = updateStatement.executeUpdate();
 			if (count != 1){
@@ -1111,7 +1107,7 @@ public class DBConnection implements AbstractConnection{
 		c.close();
 	}
 
-	
+
 	@Override
 	public UidSet getUidSet(int setId) throws Exception {
 		if (UidSet.isCached(setId)){
@@ -1165,7 +1161,7 @@ public class DBConnection implements AbstractConnection{
 		}
 	}
 
-	
+
 	@Override
 	public String getUidSetLastGenId() throws Exception {
 		String result = null;
@@ -1183,27 +1179,27 @@ public class DBConnection implements AbstractConnection{
 		}
 	}
 
-	
+
 	final static String UIDSETUPDATEFAILURE = "Uidset %s update failed; row count = %d";
 	@Override
 	public void updateUidSet(UidSet s) throws SQLException {
-		final PreparedStatement updateGenIdStatement = 
+		final PreparedStatement updateGenIdStatement =
 				c.prepareStatement(UIDSETUPDATEGENIDSTATEMENT);
-		final PreparedStatement updateRefIdStatement = 
+		final PreparedStatement updateRefIdStatement =
 				c.prepareStatement(UIDSETUPDATEREFIDSTATEMENT);
 		try{
-			updateGenIdStatement.setString(1, s.getGeneratedId()); 
+			updateGenIdStatement.setString(1, s.getGeneratedId());
 			updateGenIdStatement.setInt(2,s.getId());
 			int count = updateGenIdStatement.executeUpdate();
 			if (count != 1){
-				throw new RuntimeException(String.format(UIDSETUPDATEFAILURE,"generated_id",count)); 
+				throw new RuntimeException(String.format(UIDSETUPDATEFAILURE,"generated_id",count));
 			}
 			if (s.getSourceId() == null){
-				updateRefIdStatement.setString(1, s.getRefId()); 
+				updateRefIdStatement.setString(1, s.getRefId());
 				updateRefIdStatement.setInt(2,s.getId());
 				count = updateGenIdStatement.executeUpdate();
 				if (count != 1){
-					throw new RuntimeException(String.format(UIDSETUPDATEFAILURE,"reference_id",count)); 
+					throw new RuntimeException(String.format(UIDSETUPDATEFAILURE,"reference_id",count));
 				}
 			}
 			s.updatecache();

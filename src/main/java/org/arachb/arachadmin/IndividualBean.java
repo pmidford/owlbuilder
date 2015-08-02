@@ -16,7 +16,7 @@ import org.apache.log4j.Logger;
  *
  */
 public class IndividualBean implements BeanBase,UpdateableBean,CachingBean{
-	
+
 	static final int DBID = 1;
 	static final int DBSOURCEID = 2;
 	static final int DBGENERATEDID = 3;
@@ -34,7 +34,7 @@ public class IndividualBean implements BeanBase,UpdateableBean,CachingBean{
 	private String label;
 	private int term;  //the individual's class
 	private int uidset;
-	
+
 	private Set<Integer> narratives = new HashSet<>();
 
 
@@ -52,11 +52,11 @@ public class IndividualBean implements BeanBase,UpdateableBean,CachingBean{
 	public int getId() {
 		return id;
 	}
-	
+
 	public String getSourceId() {
 		return UidSet.getCached(uidset).getSourceId();
 	}
-	
+
 	public String getGeneratedId() {
 		return UidSet.getCached(uidset).getGeneratedId();
 	}
@@ -83,14 +83,14 @@ public class IndividualBean implements BeanBase,UpdateableBean,CachingBean{
 		narratives.add(narrative_id);
 	}
 
-	final static String INDBADDOIGENID = "Individual has neither source id nor generated id: ";
+	final static String INDBADDOIGENID = "Individual has neither source id nor generated id: %s";
 
 	@Override
 	public String getIRIString() {
 		String refid = UidSet.getCached(uidset).getRefId();
 		if (refid == null){
 			final String msg = String.format(INDBADDOIGENID, getId());
-			throw new IllegalStateException(msg);			
+			throw new IllegalStateException(msg);
 		}
 		return refid;
 	}
