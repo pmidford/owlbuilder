@@ -176,7 +176,6 @@ public class MockConnection implements AbstractConnection {
 		mockParticipantResults1.setInteger(0,ParticipantBean.DBID,1);
 		mockParticipantResults1.setString(0,ParticipantBean.DBQUANTIFICATION,"some");
 		mockParticipantResults1.setString(0,ParticipantBean.DBLABEL,"");
-		mockParticipantResults1.setString(0,ParticipantBean.DBGENERATEDID,null);
 		mockParticipantResults1.setInteger(0,ParticipantBean.DBPROPERTY, 306);  //used
 		mockParticipantResults1.setString(0,ParticipantBean.DBPUBLICATIONTAXON,TESTPUBTAXON);
 		mockParticipantResults1.setString(0,ParticipantBean.DBPUBLICATIONANATOMY,"");
@@ -189,7 +188,6 @@ public class MockConnection implements AbstractConnection {
 		mockParticipantResults29.setInteger(0,ParticipantBean.DBID,29);
 		mockParticipantResults29.setString(0,ParticipantBean.DBQUANTIFICATION,"individual");
 		mockParticipantResults29.setString(0,ParticipantBean.DBLABEL,"female");
-		mockParticipantResults29.setString(0,ParticipantBean.DBGENERATEDID,"http://arachb.org/arachb/ARACHB_0000349");
 		mockParticipantResults29.setInteger(0,ParticipantBean.DBPROPERTY, 306);  //used
 		mockParticipantResults29.setString(0,ParticipantBean.DBPUBLICATIONTAXON,"Leucauge mariana");
 		mockParticipantResults29.setString(0,ParticipantBean.DBPUBLICATIONANATOMY,"female");
@@ -203,7 +201,6 @@ public class MockConnection implements AbstractConnection {
 		mockParticipantResults2.setInteger(0,ParticipantBean.DBID,2);
 		mockParticipantResults2.setString(0,ParticipantBean.DBQUANTIFICATION,"some");
 		mockParticipantResults2.setString(0,ParticipantBean.DBLABEL,"");
-		mockParticipantResults2.setString(0,ParticipantBean.DBGENERATEDID,null);
 		mockParticipantResults2.setString(0,ParticipantBean.DBPUBLICATIONTAXON,TESTPUBTAXON);
 		mockParticipantResults2.setString(0,ParticipantBean.DBPUBLICATIONANATOMY,"");
 		mockParticipantResults2.setString(0,ParticipantBean.DBPUBLICATIONSUBSTRATE,"");
@@ -437,8 +434,13 @@ public class MockConnection implements AbstractConnection {
 		mockOntologyNamesMap.put("http://purl.obolibrary.org/obo/uberon.owl", "Uberon");
 	}
 
+	
+	private IRIManager irimanager;
 
-	public MockConnection() {
+
+
+	public MockConnection() throws Exception{
+		irimanager = new IRIManager(this);
 		// TODO Auto-generated constructor stub
 	}
 
@@ -539,13 +541,6 @@ public class MockConnection implements AbstractConnection {
 
 
 
-	@Override
-	public void updateTerm(TermBean termBean) throws SQLException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	
 
 	@Override
 	public Set<ParticipantBean> getParticipantTable(int claimId) throws SQLException {
@@ -648,24 +643,21 @@ public class MockConnection implements AbstractConnection {
 		}
 	}
 	
-	@Override
-	public void updateParticipant(ParticipantBean p){
-		
-	}
 	
-	@Override
-	public void updatePublication(PublicationBean p){
-		switch (p.getId()){
-		case 2:
-			mockPublicationResults2.setString(0,PublicationBean.DBGENERATEDID, p.getGeneratedId());
-			break;
-		case 3:
-			mockPublicationResults3.setString(0,PublicationBean.DBGENERATEDID, p.getGeneratedId());
-			break;
-		default:
-			break;
-		}
-	}		
+// keep this as template - update uidset will be pretty massive	
+//	@Override
+//	public void updatePublication(PublicationBean p){
+//		switch (p.getId()){
+//		case 2:
+//			mockPublicationResults2.setString(0,PublicationBean.DBGENERATEDID, p.getGeneratedId());
+//			break;
+//		case 3:
+//			mockPublicationResults3.setString(0,PublicationBean.DBGENERATEDID, p.getGeneratedId());
+//			break;
+//		default:
+//			break;
+//		}
+//	}		
 	
 	
 	@Override
@@ -742,11 +734,6 @@ public class MockConnection implements AbstractConnection {
 			throw new IllegalStateException("mock Narrative Bean has unknown id: " + nId);
 		}
 		return nb;
-	}
-
-	@Override
-	public int scanPrivateIDs(){
-		return MAXMOCKIDVALUE;
 	}
 
 
@@ -949,6 +936,35 @@ public Set<Integer> getPElementSet(ParticipantBean p) throws Exception {
 	return null;
 }
 
+@Override
+public IRIManager getIRIManager(){
+	//TODO Not sure how to implement this
+	return null;
+}
+
+@Override
+public UidSet getUidSet(int setId) throws Exception {
+	// TODO Auto-generated method stub
+	return null;
+}
+
+@Override
+public Set<UidSet> getUidSetTable() throws Exception {
+	// TODO Auto-generated method stub
+	return null;
+}
+
+@Override
+public void updateUidSet(UidSet s) throws SQLException {
+	// TODO Auto-generated method stub
+	
+}
+
+@Override
+public String getUidSetLastGenId() throws Exception {
+	// TODO Auto-generated method stub
+	return null;
+}
 		
 
 

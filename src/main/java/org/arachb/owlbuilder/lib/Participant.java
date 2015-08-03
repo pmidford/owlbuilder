@@ -43,7 +43,7 @@ public class Participant implements GeneratingEntity{
 
 	private static Logger log = Logger.getLogger(Participant.class);
 	private final ParticipantBean bean;
-	
+
 	final Set<ParticipantElement> elements = new HashSet<ParticipantElement>();
 
 	private final ParticipantElement headElement;
@@ -65,7 +65,7 @@ public class Participant implements GeneratingEntity{
 		}
 		return result;
 	}
-	
+
 	final static String BADELEMENTMSG = "head Element generated neither a class or a individual: %s";
 
 	//TODO work through the assumption here
@@ -123,7 +123,7 @@ public class Participant implements GeneratingEntity{
 			throw new RuntimeException(String.format("Didn't expect %d children",children.size()));
 		}
 	}
-	
+
 
 	final Map<String,OWLObject> defaultElementTable = new HashMap<String,OWLObject>();
 
@@ -159,9 +159,9 @@ public class Participant implements GeneratingEntity{
 		if (childObject != null){
 			if (childObject instanceof OWLClassExpression){
 				final OWLClassExpression childClass = (OWLClassExpression)childObject;
-				OWLClassExpression intersect = 
+				OWLClassExpression intersect =
 						factory.getOWLObjectIntersectionOf(headClassExpr,childClass);
-				OWLClassExpression propertyRestriction = 
+				OWLClassExpression propertyRestriction =
 						factory.getOWLObjectSomeValuesFrom(elementProperty,intersect);
 				log.info("Generated Property restriction(2): " + propertyRestriction);
 				return intersect;
@@ -173,7 +173,7 @@ public class Participant implements GeneratingEntity{
 				throw new RuntimeException("child is neither a class expression or individual: " + childObject);
 			}
 		}
-		OWLClassExpression propertyRestriction = 
+		OWLClassExpression propertyRestriction =
 				factory.getOWLObjectSomeValuesFrom(elementProperty,headClassExpr);
 		log.info("Generated Property restriction: " + propertyRestriction);
 		return headClassExpr;
@@ -204,7 +204,7 @@ public class Participant implements GeneratingEntity{
 		}
 		return headInd; //TODO finish implementing individual case
 	}
-	
+
 	/**
 	 * @param builder
 	 * @param headProperty
@@ -213,15 +213,15 @@ public class Participant implements GeneratingEntity{
 	 * @return
 	 */
 	private OWLObject generateNoDependentOWL(Owlbuilder builder,
-											 PropertyTerm headProperty, 
+											 PropertyTerm headProperty,
 											 OWLObject headObject,
 											 Map<String,OWLObject> names) throws Exception {
 		final OWLDataFactory factory = builder.getDataFactory();
 		final OWLObjectProperty elementProperty = (OWLObjectProperty)headProperty.generateOWL(builder,names);
 		if (headObject instanceof OWLClassExpression){
 			final OWLClassExpression headClass = (OWLClassExpression)headObject;
-			OWLClassExpression propertyRestriction = 
-					factory.getOWLObjectSomeValuesFrom(elementProperty,headClass); 
+			OWLClassExpression propertyRestriction =
+					factory.getOWLObjectSomeValuesFrom(elementProperty,headClass);
 			log.info("Generated Property restriction: " + propertyRestriction);
 			return propertyRestriction;
 		}
@@ -231,20 +231,20 @@ public class Participant implements GeneratingEntity{
 			//OWLClassAssertionAxiom clAssertion = factory.getOWLClassAssertionAxiom(headObject, eventIndividual);
 			//builder.getOntologyManager().addAxiom(builder.getTarget(), clAssertion);
 			OWLIndividual headIndividual = (OWLIndividual)headObject;
-	        OWLObjectPropertyAssertionAxiom assertion = 
+	        OWLObjectPropertyAssertionAxiom assertion =
 	        		factory.getOWLObjectPropertyAssertionAxiom(elementProperty, eventIndividual, headIndividual);
 	        // Finally, add the axiom to our ontology and save
 	        AddAxiom addAxiomChange = new AddAxiom(builder.getTarget(), assertion);
 	        builder.getOntologyManager().applyChange(addAxiomChange);
 
-			return headObject; //TODO finish implementing individual case  
+			return headObject; //TODO finish implementing individual case
 		}
 		else {
 			throw new RuntimeException("Bad head object in participant: " + headObject);
 		}
 	}
 
-	
+
 	/**
 	 * @param builder
 	 * @param owlElements
@@ -267,7 +267,7 @@ public class Participant implements GeneratingEntity{
 		}
 		if (childElement instanceof OWLClassExpression){
 			final OWLClassExpression childClass = (OWLClassExpression)childElement;
-			OWLClassExpression childPropertyRestriction = 
+			OWLClassExpression childPropertyRestriction =
 					factory.getOWLObjectSomeValuesFrom(childProperty, childClass);
 			log.info("Generated (child) Property restriction: " + childPropertyRestriction);
 			return childPropertyRestriction;
@@ -279,9 +279,9 @@ public class Participant implements GeneratingEntity{
 			throw new RuntimeException("Bad child element: " + childElement);
 		}
 	}
-	
-	
-		
+
+
+
 	public OWLClassExpression generateTermOWL(TermBean tb, Owlbuilder builder, Map<String, OWLObject> elements){
 		final OWLDataFactory factory = builder.getDataFactory();
 		IRI termIRI;
@@ -302,12 +302,12 @@ public class Participant implements GeneratingEntity{
 			return null;
 		}
 	}
-	
 
-	
-	
+
+
+
 	//TODO should these be merged?
-	
+
 		public void loadElements(AbstractConnection c) throws Exception{
 			log.debug("In load elements");
 			// special handling for head participation property
@@ -317,7 +317,7 @@ public class Participant implements GeneratingEntity{
 			log.debug("Should be listing elements here");
 			for (Integer id : bean.getElements()){
 				c.getPElement(id).cache();
-				final ParticipantElement pe = ParticipantElement.getElement(PElementBean.getCached(id)); 
+				final ParticipantElement pe = ParticipantElement.getElement(PElementBean.getCached(id));
 				log.debug("    loading element" + pe);
 				log.debug("     id is" + pe.getId());
 				log.debug("     entity is " + pe.entity);
@@ -335,7 +335,7 @@ public class Participant implements GeneratingEntity{
 			assert bean.getProperty() > 0;
 			assert PElementBean.getCached(bean.getHeadElement()) != null;
 			//assert elements.contains(bean.getHeadElement()) : "Participant: " + bean.getId() + " has unregistered head element: " + bean.getHeadElement();
-			PElementBean head = PElementBean.getCached(bean.getHeadElement());
+			//PElementBean head = PElementBean.getCached(bean.getHeadElement());
 			//headElement = ParticipantElement.getElement(head);
 		}
 
@@ -367,7 +367,7 @@ public class Participant implements GeneratingEntity{
 				log.info("Need to add anatomy: " + anatomyClass.getIRI());
 				Set<OWLClassAxiom> anatAxioms = merged.getAxioms(anatomyClass,org.semanticweb.owlapi.model.parameters.Imports.INCLUDED);
 				manager.addAxioms(extracted, anatAxioms);
-				Set<OWLAnnotationAssertionAxiom> anatAnnotations = 
+				Set<OWLAnnotationAssertionAxiom> anatAnnotations =
 						merged.getAnnotationAssertionAxioms(anatomyClass.getIRI());
 				for (OWLAnnotationAssertionAxiom a : anatAnnotations){
 					//log.info("   Annotation Axiom: " + a.toString());
@@ -378,7 +378,7 @@ public class Participant implements GeneratingEntity{
 				}
 			}
 	    	builder.initializeMiscTermAndParents(anatomyClass);
-			
+
 		}
 
 		public void processSubstrate(Owlbuilder builder, OWLClass substrateClass) {
@@ -392,9 +392,9 @@ public class Participant implements GeneratingEntity{
 		public PropertyTerm getProperty(){
 			return property;
 		}
-	
+
 //	/**
-//	 * 
+//	 *
 //	 * @param builder
 //	 * @param iri
 //	 */
@@ -413,7 +413,7 @@ public class Participant implements GeneratingEntity{
 //		}
 //	}
 //
-//	
+//
 //	/**
 //	 * @param builder
 //	 * @param factory
@@ -444,7 +444,7 @@ public class Participant implements GeneratingEntity{
 //						OWLClassAssertionAxiom taxonAssertion = factory.getOWLClassAssertionAxiom(taxon,organism);
 //						log.warn("assert " + organism + " is " + taxon);
 //						manager.addAxiom(target, taxonAssertion);
-//						OWLObjectPropertyAssertionAxiom partofAssertion = 
+//						OWLObjectPropertyAssertionAxiom partofAssertion =
 //								factory.getOWLObjectPropertyAssertionAxiom(partofProperty, organism, ind);
 //						log.warn("assert " + organism + " part of " + ind);
 //						manager.addAxiom(target, partofAssertion);
@@ -455,7 +455,7 @@ public class Participant implements GeneratingEntity{
 //					else {
 //						final String msg = String.format("No taxon IRI available; id = %s",getId());
 //						throw new IllegalStateException(msg);
-//					}				
+//					}
 //				}
 //				else {
 //		             final String msg = String.format("No taxon specified; id = %s", getId());
@@ -468,9 +468,9 @@ public class Participant implements GeneratingEntity{
 //			}
 //		}
 //	}
-//	
+//
 //	/**
-//	 * 
+//	 *
 //	 * @param builder
 //	 * @param iri
 //	 * @return
@@ -495,7 +495,7 @@ public class Participant implements GeneratingEntity{
 //
 //
 //	/**
-//	 * 
+//	 *
 //	 * @param builder
 //	 * @param iri
 //	 * @return class for anatomy
@@ -583,7 +583,7 @@ public class Participant implements GeneratingEntity{
 //		}
 //	}
 //
-//	
+//
 //	void participantProcessTaxon(Owlbuilder builder,OWLClass taxon){
 //		final OWLOntologyManager manager = builder.getOntologyManager();
 //		final OWLOntology merged = builder.getMergedSources();
@@ -607,7 +607,7 @@ public class Participant implements GeneratingEntity{
 //
 //
 //	/**
-//	 * 
+//	 *
 //	 * @param builder
 //	 * @param iri
 //	 * @return
@@ -630,7 +630,7 @@ public class Participant implements GeneratingEntity{
 //	}
 //
 //	/**
-//	 * 
+//	 *
 //	 * @param builder
 //	 * @param iri
 //	 * @return
@@ -673,7 +673,7 @@ public class Participant implements GeneratingEntity{
 //	}
 //
 //
-//	
+//
 //	/**
 //	 * @param builder
 //	 * @param iri
@@ -736,7 +736,7 @@ public class Participant implements GeneratingEntity{
 //			return taxonClass; // may not be right
 //		}
 //	}
-//	
+//
 //	public void participantProcessAnatomy(Owlbuilder builder, OWLClass anatomyClass) {
 //		final OWLOntologyManager manager = builder.getOntologyManager();
 //		final OWLOntology merged = builder.getMergedSources();
@@ -769,7 +769,7 @@ public class Participant implements GeneratingEntity{
 //			log.info("Need to add anatomy: " + anatomyClass.getIRI());
 //			Set<OWLClassAxiom> anatAxioms = merged.getAxioms(anatomyClass);
 //			manager.addAxioms(extracted, anatAxioms);
-//			Set<OWLAnnotationAssertionAxiom> anatAnnotations = 
+//			Set<OWLAnnotationAssertionAxiom> anatAnnotations =
 //					merged.getAnnotationAssertionAxioms(anatomyClass.getIRI());
 //			for (OWLAnnotationAssertionAxiom a : anatAnnotations){
 //				//log.info("   Annotation Axiom: " + a.toString());
@@ -801,11 +801,11 @@ public class Participant implements GeneratingEntity{
 //	}
 //
 //	public void processSubstrate(Owlbuilder builder, OWLClass substrateClass) {
-//		builder.initializeMiscTermAndParents(substrateClass);	
-//	}	
+//		builder.initializeMiscTermAndParents(substrateClass);
+//	}
 //
 
-	
+
 	public int getId(){
 		return bean.getId();
 	}
@@ -852,15 +852,6 @@ public class Participant implements GeneratingEntity{
 
 	public String getAnatomyIri(){
 		return bean.getAnatomyIri();
-	}
-
-	
-	public String getGeneratedId(){
-		return bean.getGeneratedId();
-	}
-
-	public void setGeneratedId(String s){
-		bean.setGeneratedId(s);
 	}
 
 

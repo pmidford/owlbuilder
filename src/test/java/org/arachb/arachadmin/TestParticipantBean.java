@@ -1,8 +1,6 @@
 package org.arachb.arachadmin;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 
 import java.util.Set;
 
@@ -15,11 +13,12 @@ public class TestParticipantBean {
     private static Logger log = Logger.getLogger(TestParticipantBean.class);
 
     private AbstractConnection testConnection;
+    private IRIManager im;
 
     private ClaimBean testClaim1;
     private ClaimBean testClaim26;
-    
-	
+
+
 	@Before
 	public void setUp() throws Exception {
 		if (DBConnection.probeTestConnection()){
@@ -30,6 +29,7 @@ public class TestParticipantBean {
 			log.info("Testing with mock connection");
 			testConnection = DBConnection.getMockConnection();
 		}
+		im = new IRIManager(testConnection);
 		testClaim1 = testConnection.getClaim(1);
 		testClaim26 = testConnection.getClaim(26);
 	}

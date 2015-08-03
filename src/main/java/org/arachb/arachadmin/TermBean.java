@@ -17,6 +17,7 @@ public class TermBean implements CachingBean, UpdateableBean{
 	static final int DBLABEL = 5;
 	static final int DBGENERATEDID = 6;
 	static final int DBCOMMENT = 7;
+	static final int DBUIDSET = 8;
 		
 	private static final Map<Integer, TermBean> cache = new HashMap<>();
 	private static Logger log = Logger.getLogger(TermBean.class);
@@ -30,6 +31,7 @@ public class TermBean implements CachingBean, UpdateableBean{
 	private String label;
 	private String generated_id;
 	private String comment;
+	private int uidset;
 	
 		
 
@@ -42,6 +44,7 @@ public class TermBean implements CachingBean, UpdateableBean{
 		label = record.getString(DBLABEL);
 		generated_id = record.getString(DBGENERATEDID);
 		comment = record.getString(DBCOMMENT);
+		uidset = record.getInt(DBUIDSET);
 	}
 
 	
@@ -54,7 +57,8 @@ public class TermBean implements CachingBean, UpdateableBean{
 	
 	
 	public String getSourceId(){
-		return source_id;
+		//exception if not cached, want to see that error
+		return UidSet.getCached(uidset).getGeneratedId();
 	}
 
 	public int getDomain(){
@@ -76,13 +80,15 @@ public class TermBean implements CachingBean, UpdateableBean{
 
 	@Override
 	public void setGeneratedId(String id) {
-		generated_id = id;
+		//exception if not cached, want to see that error
+		UidSet.getCached(uidset).setGeneratedId(id);
 	}
 
 
 	@Override
 	public String getGeneratedId() {
-		return generated_id;
+		//exception if not cached, want to see that error
+		return UidSet.getCached(uidset).getGeneratedId();
 	}
 
 
@@ -90,32 +96,23 @@ public class TermBean implements CachingBean, UpdateableBean{
 
 	@Override
 	public String getIRIString(){
-		if (getSourceId() == null){
-			final String genId = getGeneratedId();
-			if (genId == null){
-				final String msg = String.format(NOTERMGENID, getId());
-				throw new IllegalStateException(msg);
-			}
-			return genId;
+		String refid = UidSet.getCached(uidset).getRefId();
+		if (refid == null){
+			final String msg = String.format(NOTERMGENID, getId());
+			throw new IllegalStateException(msg);			
 		}
-		return getSourceId();
+		return refid;
 	}
 
 	@Override
 	public String checkIRIString(IRIManager manager) throws SQLException{
-		if (getSourceId() == null){
-			if (getGeneratedId() == null){
-				manager.generateIRI(this);
-			}
-			return getGeneratedId();
-		}
-		return getSourceId();
+		return UidSet.getCached(uidset).checkIRIString(manager);
 	}
 
 
 	@Override
 	public void updateDB(AbstractConnection c) throws SQLException {
-		c.updateTerm(this);
+		c.updateUidSet(UidSet.getCached(uidset));   //hide uncaching?
 	}
 
 	/**

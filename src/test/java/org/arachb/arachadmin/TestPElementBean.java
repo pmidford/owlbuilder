@@ -3,7 +3,6 @@ package org.arachb.arachadmin;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 
 import java.util.Iterator;
 import java.util.Set;
@@ -14,7 +13,7 @@ import org.junit.Test;
 
 public class TestPElementBean {
 
-	
+
     private static Logger log = Logger.getLogger(TestParticipantBean.class);
 
     private AbstractConnection testConnection;
@@ -27,7 +26,7 @@ public class TestPElementBean {
     private PElementBean testElement2;
     private PElementBean testElement61;
     private PElementBean testElement62;
-	
+
     @Before
     public void setUp() throws Exception {
 	if (DBConnection.probeTestConnection()){
@@ -47,16 +46,16 @@ public class TestPElementBean {
 	testElement62 = testConnection.getPElement(62);
 	assertNotNull(testElement61);
     }
-	
+
     private ParticipantBean getParticipantForClaim(int claimId) throws Exception{
-	final Set<ParticipantBean>testParticipants = 
-		    testConnection.getParticipantTable(claimId);
-	assertFalse(testParticipants.isEmpty());
-	Iterator<ParticipantBean> piter = testParticipants.iterator();
-	if (piter.hasNext()){
-	    return piter.next();
-	}
-	return null;
+    	final Set<ParticipantBean>testParticipants =
+    			testConnection.getParticipantTable(claimId);
+    	assertFalse(testParticipants.isEmpty());
+    	Iterator<ParticipantBean> piter = testParticipants.iterator();
+    	if (piter.hasNext()){
+    		return piter.next();
+    	}
+    	return null;
     }
 
 
@@ -120,7 +119,7 @@ public class TestPElementBean {
 //		testConnection.fillPElementParents(testElement2);
 //		testElement2.resolveParents(testParticipant1,testConnection);
 //		testConnection.fillPElementParents(testElement61);
-//		testElement61.resolveParents(testParticipant29,testConnection);	
+//		testElement61.resolveParents(testParticipant29,testConnection);
 //		testConnection.fillPElementChildren(testElement62);
 //		testElement62.resolveParents(testParticipant29,testConnection);
 //	}
@@ -153,7 +152,7 @@ public class TestPElementBean {
 //		testElement2.resolveParents(testParticipant1,testConnection);
 //		assertEquals(0,testElement2.getParents().size());
 //		testConnection.fillPElementParents(testElement61);
-//		testElement61.resolveParents(testParticipant29,testConnection);	
+//		testElement61.resolveParents(testParticipant29,testConnection);
 //		for (Integer index : testElement61.getParents()){
 //			assertEquals(62,index.intValue());
 //			PropertyBean parentProp = testElement61.getParentProperty(index);

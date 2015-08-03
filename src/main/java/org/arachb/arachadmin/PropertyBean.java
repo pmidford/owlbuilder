@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.semanticweb.owlapi.model.IRI;
 
 
 
@@ -23,15 +22,15 @@ public class PropertyBean implements CachingBean,BeanBase {
 	private static Logger log = Logger.getLogger(PropertyBean.class);
 
 
-	
+
 	private int id;
 	private String sourceId;
 	private int authority;
 	private String label;
 	private String generatedId;  //this is dubious
 	private String comment;
-	
-	
+
+
 	@Override
 	public int getId() {
 		return id;
@@ -44,10 +43,10 @@ public class PropertyBean implements CachingBean,BeanBase {
 		authority = record.getInt(DBAUTHORITY);
 		label = record.getString(DBLABEL);
 		generatedId = record.getString(DBGENERATEDID);
-		comment = record.getString(DBCOMMENT);		
+		comment = record.getString(DBCOMMENT);
 	}
-	
-	
+
+
 	public String getSourceId(){
 		return sourceId;
 	}
@@ -55,19 +54,19 @@ public class PropertyBean implements CachingBean,BeanBase {
 	public int getAuthority(){
 		return authority;
 	}
-	
+
 	public String getLabel(){
 		return label;
 	}
-	
+
 	public String getGeneratedId(){
 		return generatedId;
 	}
-	
+
 	public String getComment(){
 		return comment;
 	}
-	
+
 	/**
 	 * may not be needed, but if we ever need to reopen a database
 	 */
