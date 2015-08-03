@@ -107,7 +107,7 @@ public class Owlbuilder{
 	
 	public Owlbuilder() throws Exception{
 		config = new Config("");
-		if (DBConnection.testConnection()){
+		if (DBConnection.probeConnection()){
 			connection = DBConnection.getDBConnection();
 		}
 		else{

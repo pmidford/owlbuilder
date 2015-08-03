@@ -30,7 +30,7 @@ public class TestPElementBean {
 	
     @Before
     public void setUp() throws Exception {
-	if (DBConnection.testConnection()){
+	if (DBConnection.probeTestConnection()){
 	    log.info("Testing with live connection");
 	    testConnection = DBConnection.getTestConnection();
 	}

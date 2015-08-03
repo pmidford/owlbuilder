@@ -249,13 +249,23 @@ public class DBConnection implements AbstractConnection{
 	
 	/**
 	 * 
+	 */
+	public static boolean probeConnection(){
+		return probeUsingProperties(DEFAULTPROPERTIESFILE);
+	}
+	
+	public static boolean probeTestConnection(){
+		return probeUsingProperties(TESTPROPERTIESFILE);
+	}
+	
+	/**
+	 *
 	 * @return whether the connection succeeded
 	 * resource warning suppressed because the connection remains open until the end
 	 */
-	@SuppressWarnings("resource")
-	public static boolean testConnection(){
+	//@SuppressWarnings("resource")
+	private static boolean probeUsingProperties(String connectionSpec){
 		Connection c = null;
-		final String connectionSpec = DEFAULTPROPERTIESFILE;
 		try {
 			final Properties properties = new Properties();
 			properties.load(DBConnection.class.getClassLoader().getResourceAsStream(connectionSpec));
@@ -290,8 +300,10 @@ public class DBConnection implements AbstractConnection{
 		}
 		return true;
 	}
+
 	
 	private DBConnection(String connectionSpec) throws Exception{
+		log.info("reading properties file: " + connectionSpec);
 		final Properties properties = new Properties();
 		properties.load(DBConnection.class.getClassLoader().getResourceAsStream(connectionSpec));
 		Class.forName("com.mysql.jdbc.Driver");

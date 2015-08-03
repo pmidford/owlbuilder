@@ -22,7 +22,7 @@ public class TestParticipantBean {
 	
 	@Before
 	public void setUp() throws Exception {
-		if (DBConnection.testConnection()){
+		if (DBConnection.probeTestConnection()){
 			log.info("Testing with live connection");
 			testConnection = DBConnection.getTestConnection();
 		}
@@ -42,7 +42,6 @@ public class TestParticipantBean {
 			assertEquals(1, pb.getId());
 			assertEquals("some",pb.getQuantification());
 			assertEquals("",pb.getLabel());  //should improve this
-			assertEquals(null,pb.getGeneratedId());  //improve ??
 			assertEquals(306,pb.getProperty());
 			assertEquals("Tetragnatha straminea", pb.getPublicationTaxon());
 			assertEquals("", pb.getPublicationAnatomy());
@@ -55,7 +54,6 @@ public class TestParticipantBean {
 			assertEquals(29, pb.getId());
 			assertEquals("individual",pb.getQuantification());
 			assertEquals("female",pb.getLabel());  //should improve this
-			assertEquals("http://arachb.org/arachb/ARACHB_0000349",pb.getGeneratedId());  //improve ??
 			assertEquals(306,pb.getProperty());
 			assertEquals("Leucauge mariana", pb.getPublicationTaxon());
 			assertEquals("female", pb.getPublicationAnatomy());
