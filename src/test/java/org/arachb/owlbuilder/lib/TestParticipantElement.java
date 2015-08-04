@@ -6,7 +6,6 @@ import org.apache.log4j.Logger;
 import org.arachb.arachadmin.AbstractConnection;
 import org.arachb.arachadmin.DBConnection;
 import org.arachb.arachadmin.PElementBean;
-import org.arachb.arachadmin.TestParticipantBean;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -14,7 +13,7 @@ public class TestParticipantElement {
 
     private AbstractConnection testConnection;
 
-    private static Logger log = Logger.getLogger(TestParticipantBean.class);
+    private static Logger log = Logger.getLogger(TestParticipantElement.class);
 
 	
 	@Before

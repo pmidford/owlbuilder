@@ -41,10 +41,10 @@ public class TestParticipant {
 			log.info("Testing with mock connection");
 			testConnection = DBConnection.getMockConnection();
 		}
-    	builder = new Owlbuilder();
-    	builder.setUpForTesting();
-    	testClaim1 = testConnection.getClaim(TESTCLAIMID1);
-    	testClaim26 = testConnection.getClaim(TESTCLAIMID26);
+		builder = new Owlbuilder(testConnection);
+		builder.setUpForTesting();
+		testClaim1 = testConnection.getClaim(TESTCLAIMID1);
+		testClaim26 = testConnection.getClaim(TESTCLAIMID26);
 		beanSet1 = testConnection.getParticipantTable(TESTCLAIMID1);
 		beanSet26 = testConnection.getParticipantTable(TESTCLAIMID26);
 		for (ParticipantBean pb : beanSet1){
@@ -59,7 +59,7 @@ public class TestParticipant {
 		allParticipants.addAll(beanSet1);
 		allParticipants.addAll(beanSet26);
 		testConnection.getPublicationTable();
-    	
+
 	}
 
 	@Test

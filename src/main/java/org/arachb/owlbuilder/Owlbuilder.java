@@ -118,6 +118,18 @@ public class Owlbuilder{
 		format.asPrefixOWLOntologyFormat().setPrefix("doi", "http://dx.doi.org/");
 	}
 
+	public Owlbuilder(AbstractConnection existingConnection) throws Exception{
+		config = new Config("");
+		connection = existingConnection;
+		testWrapper = new OWLGraphWrapper(targetIRI);
+		rfactory = new Reasoner.ReasonerFactory();
+		elkFactory = new ElkReasonerFactory();
+		iriManager = connection.getIRIManager();
+		final OWLDocumentFormat format = testWrapper.getManager().getOntologyFormat(testWrapper.getSourceOntology());
+		format.asPrefixOWLOntologyFormat().setPrefix("doi", "http://dx.doi.org/");
+
+	}
+
 	public void setUpForTesting() throws Exception{
 		mergedSources = testWrapper.getSourceOntology();
 		preReasoner = elkFactory.createReasoner(mergedSources);
