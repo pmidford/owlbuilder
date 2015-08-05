@@ -14,6 +14,7 @@ public class NarrativeBean implements UpdateableBean,CachingBean {
 	static final int DBDESCRIPTION = 4;
 	static final int DBGENERATEDID = 5;
 	static final int DBUIDSET = 6;
+	static final int DBBEHAVIORANNOTATION = 7;
 	
 	private static final Map<Integer, NarrativeBean> cache = new HashMap<>();
 	private static Logger log = Logger.getLogger(NarrativeBean.class);
@@ -26,6 +27,7 @@ public class NarrativeBean implements UpdateableBean,CachingBean {
 	private String description;
 	private String generated_id;
 	private int uidset;
+	private int behavior_annotation;
 	
 	
 
@@ -37,6 +39,7 @@ public class NarrativeBean implements UpdateableBean,CachingBean {
 		description = record.getString(DBDESCRIPTION);
 		generated_id = record.getString(DBGENERATEDID);
 		uidset = record.getInt(DBUIDSET);
+		behavior_annotation = record.getInt(DBBEHAVIORANNOTATION);
 	}
 
 	/* access methods */
@@ -56,6 +59,10 @@ public class NarrativeBean implements UpdateableBean,CachingBean {
 	
 	public String getDescription(){
 		return description;
+	}
+	
+	public int getBehaviorAnnotation(){
+		return behavior_annotation;
 	}
 
 	@Override

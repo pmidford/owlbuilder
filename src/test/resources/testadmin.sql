@@ -291,11 +291,14 @@ CREATE TABLE `narrative` (
   `description` varchar(512) DEFAULT NULL,
   `generated_id` varchar(512) DEFAULT NULL,
   `uidset` int(11) DEFAULT NULL,
+  `behavior_annotation` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `publication__idx` (`publication`),
   KEY `uidset__idx` (`uidset`),
+  KEY `behavior_annotation__idx` (`behavior_annotation`),
   CONSTRAINT `narrative_ibfk_1` FOREIGN KEY (`publication`) REFERENCES `publication` (`id`) ON DELETE NO ACTION,
-  CONSTRAINT `narrative_ibfk_2` FOREIGN KEY (`uidset`) REFERENCES `uidset` (`id`) ON DELETE NO ACTION
+  CONSTRAINT `narrative_ibfk_2` FOREIGN KEY (`uidset`) REFERENCES `uidset` (`id`) ON DELETE NO ACTION,
+  CONSTRAINT `narrative_ibfk_3` FOREIGN KEY (`behavior_annotation`) REFERENCES `term` (`id`) ON DELETE NO ACTION
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -305,7 +308,7 @@ CREATE TABLE `narrative` (
 
 LOCK TABLES `narrative` WRITE;
 /*!40000 ALTER TABLE `narrative` DISABLE KEYS */;
-INSERT INTO `narrative` VALUES (1,123,'courtship sequence','','http://arachb.org/arachb/ARACHB_0000424',8),(2,123,'sperm induction','','http://arachb.org/arachb/ARACHB_0000425',9);
+INSERT INTO `narrative` VALUES (1,123,'courtship sequence','','http://arachb.org/arachb/ARACHB_0000424',8,11059),(2,123,'sperm induction','','http://arachb.org/arachb/ARACHB_0000425',9,11059);
 /*!40000 ALTER TABLE `narrative` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -782,7 +785,7 @@ CREATE TABLE `term` (
 
 LOCK TABLES `term` WRITE;
 /*!40000 ALTER TABLE `term` DISABLE KEYS */;
-INSERT INTO `term` VALUES (4838,'http://purl.obolibrary.org/obo/NCBITaxon_336608',3,NULL,'Tetragnatha straminea','http://arachb.org/arachb/TEST_0000001',NULL,1),(10473,'http://purl.obolibrary.org/obo/SPD_0000001',2,NULL,'whole organism','http://purl.obolibrary.org/obo/SPD_0000001',NULL,2),(11052,'http://purl.obolibrary.org/obo/NBO_0000002',1,4,'whole body movement',NULL,NULL,15),(11398,'http://purl.obolibrary.org/obo/NBO_0000358',1,4,'resting posture',NULL,'\"Intentionally or habitually assumed arrangement of the body and its limbs in inactivity.\" [NBO:GVG]',16),(111938,'urn:lsid:amnh.org:spidersp:013764',3,10,'Leucauge mariana',NULL,NULL,14);
+INSERT INTO `term` VALUES (4838,'http://purl.obolibrary.org/obo/NCBITaxon_336608',3,NULL,'Tetragnatha straminea','http://arachb.org/arachb/TEST_0000001',NULL,1),(10473,'http://purl.obolibrary.org/obo/SPD_0000001',2,NULL,'whole organism','http://purl.obolibrary.org/obo/SPD_0000001',NULL,2),(11052,'http://purl.obolibrary.org/obo/NBO_0000002',1,4,'whole body movement',NULL,NULL,15),(11059,'http://purl.obolibrary.org/obo/NBO_0000010',1,4,'reproductive behavior',NULL,NULL,17),(11398,'http://purl.obolibrary.org/obo/NBO_0000358',1,4,'resting posture',NULL,'\"Intentionally or habitually assumed arrangement of the body and its limbs in inactivity.\" [NBO:GVG]',16),(111938,'urn:lsid:amnh.org:spidersp:013764',3,10,'Leucauge mariana',NULL,NULL,14);
 /*!40000 ALTER TABLE `term` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -801,7 +804,7 @@ CREATE TABLE `uidset` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `generated_id` (`generated_id`),
   UNIQUE KEY `ref_id` (`ref_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -810,7 +813,7 @@ CREATE TABLE `uidset` (
 
 LOCK TABLES `uidset` WRITE;
 /*!40000 ALTER TABLE `uidset` DISABLE KEYS */;
-INSERT INTO `uidset` VALUES (1,'http://purl.obolibrary.org/obo/NCBITaxon_336608',NULL,'http://purl.obolibrary.org/obo/NCBITaxon_336608'),(2,'http://purl.obolibrary.org/obo/SPD_0000001',NULL,'http://purl.obolibrary.org/obo/SPD_0000001'),(3,NULL,'http://arachb.org/arachb/ARACHB_0000322','http://arachb.org/arachb/ARACHB_0000322'),(4,NULL,'http://arachb.org/arachb/ARACHB_0000321','http://arachb.org/arachb/ARACHB_0000321'),(5,NULL,'http://arachb.org/arachb/ARACHB_0000343','http://arachb.org/arachb/ARACHB_0000343'),(6,NULL,'http://arachb.org/arachb/ARACHB_0000410','http://arachb.org/arachb/ARACHB_0000410'),(7,NULL,'http://arachb.org/arachb/ARACHB_0000411','http://arachb.org/arachb/ARACHB_0000411'),(8,NULL,'http://arachb.org/arachb/ARACHB_0000424','http://arachb.org/arachb/ARACHB_0000424'),(9,NULL,'http://arachb.org/arachb/ARACHB_0000425','http://arachb.org/arachb/ARACHB_0000425'),(10,NULL,'http://arachb.org/arachb/ARACHB_0000099','http://arachb.org/arachb/ARACHB_0000099'),(11,NULL,'http://arachb.org/arachb/ARACHB_0000285','http://arachb.org/arachb/ARACHB_0000285'),(12,'http://dx.doi.org/10.1636/0161-8202(2000)028[0097:HDLHAB]2.0.CO;2',NULL,'http://dx.doi.org/10.1636/0161-8202(2000)028[0097:HDLHAB]2.0.CO;'),(13,'http://arachb.org/arachb/ARACHB_0000311',NULL,'http://arachb.org/arachb/ARACHB_0000311'),(14,NULL,'urn:lsid:amnh.org:spidersp:013764','urn:lsid:amnh.org:spidersp:013764'),(15,'http://purl.obolibrary.org/obo/NBO_0000002',NULL,'http://purl.obolibrary.org/obo/NBO_0000002'),(16,'http://purl.obolibrary.org/obo/NBO_0000358',NULL,'http://purl.obolibrary.org/obo/NBO_0000358');
+INSERT INTO `uidset` VALUES (1,'http://purl.obolibrary.org/obo/NCBITaxon_336608',NULL,'http://purl.obolibrary.org/obo/NCBITaxon_336608'),(2,'http://purl.obolibrary.org/obo/SPD_0000001',NULL,'http://purl.obolibrary.org/obo/SPD_0000001'),(3,NULL,'http://arachb.org/arachb/ARACHB_0000322','http://arachb.org/arachb/ARACHB_0000322'),(4,NULL,'http://arachb.org/arachb/ARACHB_0000321','http://arachb.org/arachb/ARACHB_0000321'),(5,NULL,'http://arachb.org/arachb/ARACHB_0000343','http://arachb.org/arachb/ARACHB_0000343'),(6,NULL,'http://arachb.org/arachb/ARACHB_0000410','http://arachb.org/arachb/ARACHB_0000410'),(7,NULL,'http://arachb.org/arachb/ARACHB_0000411','http://arachb.org/arachb/ARACHB_0000411'),(8,NULL,'http://arachb.org/arachb/ARACHB_0000424','http://arachb.org/arachb/ARACHB_0000424'),(9,NULL,'http://arachb.org/arachb/ARACHB_0000425','http://arachb.org/arachb/ARACHB_0000425'),(10,NULL,'http://arachb.org/arachb/ARACHB_0000099','http://arachb.org/arachb/ARACHB_0000099'),(11,NULL,'http://arachb.org/arachb/ARACHB_0000285','http://arachb.org/arachb/ARACHB_0000285'),(12,'http://dx.doi.org/10.1636/0161-8202(2000)028[0097:HDLHAB]2.0.CO;2',NULL,'http://dx.doi.org/10.1636/0161-8202(2000)028[0097:HDLHAB]2.0.CO;'),(13,'http://arachb.org/arachb/ARACHB_0000311',NULL,'http://arachb.org/arachb/ARACHB_0000311'),(14,NULL,'urn:lsid:amnh.org:spidersp:013764','urn:lsid:amnh.org:spidersp:013764'),(15,'http://purl.obolibrary.org/obo/NBO_0000002',NULL,'http://purl.obolibrary.org/obo/NBO_0000002'),(16,'http://purl.obolibrary.org/obo/NBO_0000358',NULL,'http://purl.obolibrary.org/obo/NBO_0000358'),(17,'http://purl.obolibrary.org/obo/NB0_0000010',NULL,'http://purl.obolibrary.org/obo/NB0_0000010');
 /*!40000 ALTER TABLE `uidset` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -823,4 +826,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2015-08-01 20:15:58
+-- Dump completed on 2015-08-05 10:19:44

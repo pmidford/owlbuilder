@@ -222,8 +222,9 @@ public class DBConnection implements AbstractConnection{
 			"UPDATE individual SET generated_id = ? WHERE id = ?";
 
 	static final String NARRATIVEROWQUERY =
-			"SELECT n.id, n.publication, n.label, n.description, n.generated_id, n.uidset " +
-					"FROM narrative AS n WHERE n.id = ?";
+			"SELECT n.id, n.publication, n.label, n.description, n.generated_id, n.uidset, " +
+	                "n.behavior_annotation " +
+					"FROM narrative AS n WHERE id = ?";
 
 	static final String NARRATIVEUPDATESTATEMENT =
 			"UPDATE narrative SET generated_id = ? WHERE id = ?";
