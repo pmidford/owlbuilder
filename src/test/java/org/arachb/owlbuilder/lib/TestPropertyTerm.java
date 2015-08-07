@@ -10,7 +10,9 @@ import org.arachb.arachadmin.AbstractConnection;
 import org.arachb.arachadmin.DBConnection;
 import org.arachb.arachadmin.PropertyBean;
 import org.arachb.owlbuilder.Owlbuilder;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.semanticweb.owlapi.model.OWLObject;
 import org.semanticweb.owlapi.model.OWLObjectPropertyExpression;
@@ -19,15 +21,14 @@ public class TestPropertyTerm {
 
 	private Owlbuilder builder;
 	private static Logger log = Logger.getLogger(TestPropertyTerm.class);
-	private AbstractConnection testConnection;
+	private static AbstractConnection testConnection;
 
-	private String hasPartIRI = Vocabulary.hasPartProperty.toString();
-	private PropertyBean hasPartBean;
-	private PropertyTerm hasPartPropertyTerm;
+	private static String hasPartIRI = Vocabulary.hasPartProperty.toString();
+	private static PropertyBean hasPartBean;
+	private static PropertyTerm hasPartPropertyTerm;
 
-
-	@Before
-	public void setUp() throws Exception {
+	@BeforeClass
+	public static void setUpBeforeClass() throws Exception{
 		if (DBConnection.probeTestConnection()){
 			log.info("Testing with live connection");
 			testConnection = DBConnection.getTestConnection();
@@ -36,10 +37,14 @@ public class TestPropertyTerm {
 			log.info("Testing with mock connection");
 			testConnection = DBConnection.getMockConnection();
 		}
-		builder = new Owlbuilder(testConnection);
-		builder.setUpForTesting();
 		hasPartBean = testConnection.getPropertyFromSourceId(hasPartIRI);
 		hasPartPropertyTerm = new PropertyTerm(hasPartBean);
+	}
+
+	@Before
+	public void setUp() throws Exception {
+		builder = new Owlbuilder(testConnection);
+		builder.setUpForTesting();
 	}
 
 
@@ -60,5 +65,9 @@ public class TestPropertyTerm {
 		assertEquals(owlObj,elements.get(hasPartIRI));
 	}
 
+	@AfterClass
+	public static void tearDownAfterClass() throws Exception{
+		testConnection.close();
+	}
 
 }
