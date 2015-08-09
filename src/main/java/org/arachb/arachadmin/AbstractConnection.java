@@ -195,6 +195,13 @@ public interface AbstractConnection {
 	 */
 	NarrativeBean getNarrative(int nId) throws SQLException;
 
+	/**
+	 * 
+	 * @return
+	 * @throws SQLException
+	 */
+	Set<NarrativeBean>getNarrativeTable() throws SQLException;
+
 
 	
 	/**
@@ -262,6 +269,7 @@ public interface AbstractConnection {
 	 * @throws Exception
 	 */
 	String getUidSetLastGenId() throws Exception;
+
 
 
 }

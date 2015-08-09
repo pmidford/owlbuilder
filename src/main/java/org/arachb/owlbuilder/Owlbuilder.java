@@ -23,6 +23,7 @@ import org.arachb.arachadmin.PropertyBean;
 import org.arachb.arachadmin.TaxonBean;
 import org.arachb.owlbuilder.lib.Claim;
 import org.arachb.owlbuilder.lib.Config;
+import org.arachb.owlbuilder.lib.Narrative;
 import org.arachb.owlbuilder.lib.Participant;
 import org.arachb.owlbuilder.lib.Taxon;
 import org.arachb.owlbuilder.lib.Vocabulary;
@@ -40,6 +41,7 @@ import org.semanticweb.owlapi.model.OWLClassAxiom;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLDocumentFormat;
 import org.semanticweb.owlapi.model.OWLIndividual;
+import org.semanticweb.owlapi.model.OWLObject;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLObjectPropertyAxiom;
 import org.semanticweb.owlapi.model.OWLObjectPropertyExpression;
@@ -223,8 +225,10 @@ public class Owlbuilder{
 	}
 
 	void processDatabase() throws Exception{
+		log.info("Processing Narratives");
+		Map<String,OWLObject> narrativeIndividuals = processNarratives();
 		log.info("Processing Claims");
-		processClaims();
+		processClaims(narrativeIndividuals);
 		connection.close();
 	}
 
@@ -267,9 +271,17 @@ public class Owlbuilder{
 		return merged;
 	}
 
+	Map<String, OWLObject> processNarratives() throws Exception{
+		Map<String,OWLObject> results = new HashMap<>();
+		final Set<Narrative> narratives = Narrative.wrapSet(connection.getNarrativeTable());
+		return results;
+	}
 
-
-	void processClaims() throws Exception{
+	/**
+	 * @param narratives map of ids and OWLObjects generated in processNarratives
+	 * @throws Exception
+	 */
+	void processClaims(Map<String, OWLObject> narratives) throws Exception{
 		final Set<Claim> claims = Claim.wrapSet(connection.getClaimTable());
 		log.info("In ProcessClaims");
 		for (Claim cl : claims){

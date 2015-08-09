@@ -965,6 +965,12 @@ public String getUidSetLastGenId() throws Exception {
 	// TODO Auto-generated method stub
 	return null;
 }
+
+@Override
+public Set<NarrativeBean> getNarrativeTable() throws SQLException {
+	// TODO Auto-generated method stub
+	return null;
+}
 		
 
 

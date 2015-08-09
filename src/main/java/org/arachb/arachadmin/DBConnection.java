@@ -191,9 +191,10 @@ public class DBConnection implements AbstractConnection{
 			"SELECT t.id,t.name,t.author, " +
 					"t.year,t.external_id,t.authority,t.parent,t.generated_id, " +
 					"t.parent_term, t.merged, t.merge_status, parent_uids.ref_id, t.uidset " +
-					"FROM taxon AS t where taxon.id = ? " +
+					"FROM taxon AS t " +
 					"LEFT JOIN term AS parent_record ON (t.parent_term = parent_record.id) " +
-					"LEFT JOIN uidset AS parent_uids ON (parent_record.uidset = parent_uids.id)";
+					"LEFT JOIN uidset AS parent_uids ON (parent_record.uidset = parent_uids.id) " +
+					"WHERE t.id = ? ";
 
 	static final String TAXONTABLEQUERY =
 			"SELECT t.id,t.name,t.author, " +
@@ -221,10 +222,16 @@ public class DBConnection implements AbstractConnection{
 	static final String INDIVIDUALUPDATESTATEMENT =
 			"UPDATE individual SET generated_id = ? WHERE id = ?";
 
+
 	static final String NARRATIVEROWQUERY =
 			"SELECT n.id, n.publication, n.label, n.description, n.generated_id, n.uidset, " +
 	                "n.behavior_annotation " +
 					"FROM narrative AS n WHERE id = ?";
+
+	static final String NARRATIVETABLEQUERY =
+			"SELECT n.id, n.publication, n.label, n.description, n.generated_id, n.uidset, " +
+	                "n.behavior_annotation " +
+					"FROM narrative AS n";
 
 	static final String NARRATIVEUPDATESTATEMENT =
 			"UPDATE narrative SET generated_id = ? WHERE id = ?";
@@ -996,6 +1003,28 @@ public class DBConnection implements AbstractConnection{
 		return result;
 	}
 
+	@Override
+	public Set<NarrativeBean> getNarrativeTable() throws SQLException {
+		final Set<NarrativeBean> result = new HashSet<>();
+		final Statement narrativeStatement = c.createStatement();
+		try{
+			final ResultSet r = narrativeStatement.executeQuery(NARRATIVETABLEQUERY);
+			final AbstractResults narrativeSet = new DBResults(r);
+			while (narrativeSet.next()){
+				NarrativeBean tb = new NarrativeBean();
+				tb.fill(narrativeSet);
+				if (!NarrativeBean.isCached(tb.getId())){
+					tb.cache();
+				}
+				result.add(tb);
+			}
+			r.close();
+			return result;
+		}
+		finally{
+			narrativeStatement.close();
+		}
+	}
 
 
 	@Override
