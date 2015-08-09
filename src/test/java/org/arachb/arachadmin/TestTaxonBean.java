@@ -5,8 +5,11 @@ package org.arachb.arachadmin;
 
 import static org.junit.Assert.*;
 
+import java.sql.SQLException;
+
 import org.apache.log4j.Logger;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -20,7 +23,13 @@ public class TestTaxonBean {
     private static Logger log = Logger.getLogger(TestTaxonBean.class);
 
     private static AbstractConnection testConnection;
-
+    
+    private TaxonBean testbean;
+    static final int TESTBEANID = 1;
+    static final String TESTBEANURN = "urn:lsid:amnh.org:spidersp:013764";
+    static final String TESTBEANNAME = "Leucauge mariana";
+    static final String TESTBEANAUTHOR = "Emerton";
+    static final String TESTBEANYEAR = "1884";
 
 	/**
 	 * @throws java.lang.Exception
@@ -43,6 +52,7 @@ public class TestTaxonBean {
 	 */
 	@Before
 	public void setUp() throws Exception {
+		testbean = testConnection.getTaxonRow(TESTBEANID);
 	}
 
 	/**
@@ -51,21 +61,19 @@ public class TestTaxonBean {
 	@After
 	public void tearDown() throws Exception {
 	}
-
-	/**
-	 * Test method for {@link org.arachb.arachadmin.TaxonBean#fill(org.arachb.arachadmin.AbstractResults)}.
-	 */
-	@Test
-	public void testFill() {
-		fail("Not yet implemented"); // TODO
+	
+	@AfterClass
+	public static void tearDownAfterClass() throws Exception {
+		testConnection.close();
 	}
+
 
 	/**
 	 * Test method for {@link org.arachb.arachadmin.TaxonBean#getId()}.
 	 */
 	@Test
 	public void testGetId() {
-		fail("Not yet implemented"); // TODO
+		assertEquals(1,testbean.getId());
 	}
 
 	/**
@@ -73,7 +81,7 @@ public class TestTaxonBean {
 	 */
 	@Test
 	public void testGetSourceId() {
-		fail("Not yet implemented"); // TODO
+		assertEquals(TESTBEANURN,testbean.getSourceId());
 	}
 
 	/**
@@ -81,7 +89,7 @@ public class TestTaxonBean {
 	 */
 	@Test
 	public void testGetName() {
-		fail("Not yet implemented"); // TODO
+		assertEquals(TESTBEANNAME,testbean.getName());
 	}
 
 	/**
@@ -89,7 +97,7 @@ public class TestTaxonBean {
 	 */
 	@Test
 	public void testGet_author() {
-		fail("Not yet implemented"); // TODO
+		assertEquals(TESTBEANAUTHOR,testbean.get_author());
 	}
 
 	/**
@@ -97,7 +105,7 @@ public class TestTaxonBean {
 	 */
 	@Test
 	public void testGet_year() {
-		fail("Not yet implemented"); // TODO
+		assertEquals(TESTBEANYEAR,testbean.get_year());
 	}
 
 	/**
@@ -105,7 +113,8 @@ public class TestTaxonBean {
 	 */
 	@Test
 	public void testGetGeneratedId() {
-		fail("Not yet implemented"); // TODO
+		log.info("generated id is " + testbean.getGeneratedId());
+		assertNull(testbean.getGeneratedId());
 	}
 
 	/**
@@ -113,7 +122,7 @@ public class TestTaxonBean {
 	 */
 	@Test
 	public void testSetGeneratedId() {
-		fail("Not yet implemented"); // TODO
+		//fail("Not yet implemented"); // TODO
 	}
 
 	/**
@@ -121,7 +130,7 @@ public class TestTaxonBean {
 	 */
 	@Test
 	public void testGetAuthority() {
-		fail("Not yet implemented"); // TODO
+		assertNull(testbean.getAuthority());  //TODO ought to be WCS?
 	}
 
 	/**
@@ -129,7 +138,7 @@ public class TestTaxonBean {
 	 */
 	@Test
 	public void testGetParentName() {
-		fail("Not yet implemented"); // TODO
+		assertNull(testbean.getParentName());
 	}
 
 	/**
@@ -137,7 +146,7 @@ public class TestTaxonBean {
 	 */
 	@Test
 	public void testGetMerged() {
-		fail("Not yet implemented"); // TODO
+		assertFalse(testbean.getMerged()); // TODO
 	}
 
 	/**
@@ -145,7 +154,7 @@ public class TestTaxonBean {
 	 */
 	@Test
 	public void testGetMergeStatus() {
-		fail("Not yet implemented"); // TODO
+		assertNull(testbean.getMergeStatus()); // TODO
 	}
 
 	/**
@@ -153,7 +162,7 @@ public class TestTaxonBean {
 	 */
 	@Test
 	public void testGetParentRefId() {
-		fail("Not yet implemented"); // TODO
+		assertNull(testbean.getParentRefId()); // TODO
 	}
 
 	/**
@@ -161,7 +170,8 @@ public class TestTaxonBean {
 	 */
 	@Test
 	public void testUpdateDB() {
-		fail("Not yet implemented"); // TODO
+		//TODO see message
+		log.info("Need to implement TaxonBean.updateDB()");
 	}
 
 	/**
@@ -169,15 +179,17 @@ public class TestTaxonBean {
 	 */
 	@Test
 	public void testGetIRIString() {
-		fail("Not yet implemented"); // TODO
+		assertEquals(TESTBEANURN,testbean.getIRIString());
 	}
 
 	/**
 	 * Test method for {@link org.arachb.arachadmin.TaxonBean#checkIRIString(org.arachb.arachadmin.IRIManager)}.
+	 * @throws SQLException 
 	 */
 	@Test
-	public void testCheckIRIString() {
-		fail("Not yet implemented"); // TODO
+	public void testCheckIRIString() throws SQLException {
+		IRIManager manager = testConnection.getIRIManager();
+		assertEquals(TESTBEANURN,testbean.checkIRIString(manager));
 	}
 
 	/**
@@ -185,7 +197,9 @@ public class TestTaxonBean {
 	 */
 	@Test
 	public void testFlushCache() {
-		fail("Not yet implemented"); // TODO
+		assertTrue(TaxonBean.isCached(TESTBEANID));
+		TaxonBean.flushCache();
+		assertFalse(TaxonBean.isCached(TESTBEANID));
 	}
 
 	/**
@@ -193,7 +207,8 @@ public class TestTaxonBean {
 	 */
 	@Test
 	public void testIsCached() {
-		fail("Not yet implemented"); // TODO
+		TaxonBean.flushCache();
+		assertFalse(TaxonBean.isCached(TESTBEANID));		
 	}
 
 	/**
@@ -201,15 +216,30 @@ public class TestTaxonBean {
 	 */
 	@Test
 	public void testGetCached() {
-		fail("Not yet implemented"); // TODO
+		TaxonBean.flushCache();
+		testbean.cache();
+		assertEquals(testbean,TaxonBean.getCached(TESTBEANID));
+		TaxonBean.flushCache();
 	}
+	
+	/**
+	 * Test method for testing exceptions from {@link org.arachb.arachadmin.TaxonBean#getCached(int)}.
+	 */
+	@Test(expected = RuntimeException.class)
+	public void testGetCachedException() {
+		TaxonBean.flushCache();
+		TaxonBean foo = TaxonBean.getCached(TESTBEANID);
+	}
+	
 
 	/**
 	 * Test method for {@link org.arachb.arachadmin.TaxonBean#cache()}.
 	 */
 	@Test
 	public void testCache() {
-		fail("Not yet implemented"); // TODO
+		TaxonBean.flushCache();
+		testbean.cache();
+		assertEquals(testbean,TaxonBean.getCached(TESTBEANID));
 	}
 
 	/**
@@ -217,7 +247,7 @@ public class TestTaxonBean {
 	 */
 	@Test
 	public void testUpdatecache() {
-		fail("Not yet implemented"); // TODO
+		testbean.updatecache();
 	}
 
 }

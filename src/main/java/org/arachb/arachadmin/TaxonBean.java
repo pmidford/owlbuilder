@@ -165,9 +165,17 @@ public class TaxonBean implements CachingBean,UpdateableBean{
 		return cache.containsKey(id);
 	}
 	
+	/**
+	 * Retrieves a bean from the class-specific cache
+	 * @param id identifies Taxonbean desired
+	 * @return cached taxonbean with specified id
+	 * @throws RuntimeException
+	 */
 	public static TaxonBean getCached(int id){
-		assert cache.containsKey(id) : String.format("no cache entry for %d",id);
-		return cache.get(id);
+		if (cache.containsKey(id)) {
+			return cache.get(id);
+		}
+		throw new RuntimeException(String.format("Cache miss for TaxonBean, id = %d",id));
 	}
 
 	
