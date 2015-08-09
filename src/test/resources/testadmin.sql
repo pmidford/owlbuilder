@@ -709,9 +709,17 @@ CREATE TABLE `taxon` (
   `merged` char(1) DEFAULT NULL,
   `merge_status` varchar(64) DEFAULT NULL,
   `uidset` int(11) DEFAULT NULL,
+  `authority` int(11) DEFAULT NULL,
+  `parent` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
+  KEY `parent_term__idx` (`parent_term`),
   KEY `uidset__idx` (`uidset`),
-  CONSTRAINT `taxon_ibfk_1` FOREIGN KEY (`uidset`) REFERENCES `uidset` (`id`) ON DELETE CASCADE
+  KEY `authority__idx` (`authority`),
+  KEY `parent__idx` (`parent`),
+  CONSTRAINT `taxon_ibfk_1` FOREIGN KEY (`parent_term`) REFERENCES `term` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `taxon_ibfk_2` FOREIGN KEY (`uidset`) REFERENCES `uidset` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `taxon_ibfk_3` FOREIGN KEY (`authority`) REFERENCES `authority` (`id`) ON DELETE NO ACTION,
+  CONSTRAINT `taxon_ibfk_4` FOREIGN KEY (`parent`) REFERENCES `taxon` (`id`) ON DELETE NO ACTION
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -721,7 +729,7 @@ CREATE TABLE `taxon` (
 
 LOCK TABLES `taxon` WRITE;
 /*!40000 ALTER TABLE `taxon` DISABLE KEYS */;
-INSERT INTO `taxon` VALUES (1,'Leucauge mariana',NULL,NULL,'Emerton','1884','urn:lsid:amnh.org:spidersp:013764',NULL,NULL,NULL,NULL,14);
+INSERT INTO `taxon` VALUES (1,'Leucauge mariana',NULL,NULL,'Emerton','1884','urn:lsid:amnh.org:spidersp:013764',NULL,NULL,NULL,NULL,14,NULL,NULL);
 /*!40000 ALTER TABLE `taxon` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -813,7 +821,7 @@ CREATE TABLE `uidset` (
 
 LOCK TABLES `uidset` WRITE;
 /*!40000 ALTER TABLE `uidset` DISABLE KEYS */;
-INSERT INTO `uidset` VALUES (1,'http://purl.obolibrary.org/obo/NCBITaxon_336608',NULL,'http://purl.obolibrary.org/obo/NCBITaxon_336608'),(2,'http://purl.obolibrary.org/obo/SPD_0000001',NULL,'http://purl.obolibrary.org/obo/SPD_0000001'),(3,NULL,'http://arachb.org/arachb/ARACHB_0000322','http://arachb.org/arachb/ARACHB_0000322'),(4,NULL,'http://arachb.org/arachb/ARACHB_0000321','http://arachb.org/arachb/ARACHB_0000321'),(5,NULL,'http://arachb.org/arachb/ARACHB_0000343','http://arachb.org/arachb/ARACHB_0000343'),(6,NULL,'http://arachb.org/arachb/ARACHB_0000410','http://arachb.org/arachb/ARACHB_0000410'),(7,NULL,'http://arachb.org/arachb/ARACHB_0000411','http://arachb.org/arachb/ARACHB_0000411'),(8,NULL,'http://arachb.org/arachb/ARACHB_0000424','http://arachb.org/arachb/ARACHB_0000424'),(9,NULL,'http://arachb.org/arachb/ARACHB_0000425','http://arachb.org/arachb/ARACHB_0000425'),(10,NULL,'http://arachb.org/arachb/ARACHB_0000099','http://arachb.org/arachb/ARACHB_0000099'),(11,NULL,'http://arachb.org/arachb/ARACHB_0000285','http://arachb.org/arachb/ARACHB_0000285'),(12,'http://dx.doi.org/10.1636/0161-8202(2000)028[0097:HDLHAB]2.0.CO;2',NULL,'http://dx.doi.org/10.1636/0161-8202(2000)028[0097:HDLHAB]2.0.CO;'),(13,'http://arachb.org/arachb/ARACHB_0000311',NULL,'http://arachb.org/arachb/ARACHB_0000311'),(14,NULL,'urn:lsid:amnh.org:spidersp:013764','urn:lsid:amnh.org:spidersp:013764'),(15,'http://purl.obolibrary.org/obo/NBO_0000002',NULL,'http://purl.obolibrary.org/obo/NBO_0000002'),(16,'http://purl.obolibrary.org/obo/NBO_0000358',NULL,'http://purl.obolibrary.org/obo/NBO_0000358'),(17,'http://purl.obolibrary.org/obo/NB0_0000010',NULL,'http://purl.obolibrary.org/obo/NB0_0000010');
+INSERT INTO `uidset` VALUES (1,'http://purl.obolibrary.org/obo/NCBITaxon_336608',NULL,'http://purl.obolibrary.org/obo/NCBITaxon_336608'),(2,'http://purl.obolibrary.org/obo/SPD_0000001',NULL,'http://purl.obolibrary.org/obo/SPD_0000001'),(3,NULL,'http://arachb.org/arachb/ARACHB_0000322','http://arachb.org/arachb/ARACHB_0000322'),(4,NULL,'http://arachb.org/arachb/ARACHB_0000321','http://arachb.org/arachb/ARACHB_0000321'),(5,NULL,'http://arachb.org/arachb/ARACHB_0000343','http://arachb.org/arachb/ARACHB_0000343'),(6,NULL,'http://arachb.org/arachb/ARACHB_0000410','http://arachb.org/arachb/ARACHB_0000410'),(7,NULL,'http://arachb.org/arachb/ARACHB_0000411','http://arachb.org/arachb/ARACHB_0000411'),(8,NULL,'http://arachb.org/arachb/ARACHB_0000424','http://arachb.org/arachb/ARACHB_0000424'),(9,NULL,'http://arachb.org/arachb/ARACHB_0000425','http://arachb.org/arachb/ARACHB_0000425'),(10,NULL,'http://arachb.org/arachb/ARACHB_0000099','http://arachb.org/arachb/ARACHB_0000099'),(11,NULL,'http://arachb.org/arachb/ARACHB_0000285','http://arachb.org/arachb/ARACHB_0000285'),(12,'http://dx.doi.org/10.1636/0161-8202(2000)028[0097:HDLHAB]2.0.CO;2',NULL,'http://dx.doi.org/10.1636/0161-8202(2000)028[0097:HDLHAB]2.0.CO;'),(13,NULL,'http://arachb.org/arachb/ARACHB_0000311','http://arachb.org/arachb/ARACHB_0000311'),(14,'urn:lsid:amnh.org:spidersp:013764',NULL,'urn:lsid:amnh.org:spidersp:013764'),(15,'http://purl.obolibrary.org/obo/NBO_0000002',NULL,'http://purl.obolibrary.org/obo/NBO_0000002'),(16,'http://purl.obolibrary.org/obo/NBO_0000358',NULL,'http://purl.obolibrary.org/obo/NBO_0000358'),(17,'http://purl.obolibrary.org/obo/NB0_0000010',NULL,'http://purl.obolibrary.org/obo/NB0_0000010');
 /*!40000 ALTER TABLE `uidset` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
