@@ -8,24 +8,20 @@ import org.arachb.arachadmin.IRIManager;
 import org.arachb.arachadmin.PublicationBean;
 import org.arachb.owlbuilder.Owlbuilder;
 import org.semanticweb.owlapi.model.IRI;
-import org.semanticweb.owlapi.model.OWLAnnotation;
-import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
-import org.semanticweb.owlapi.model.OWLClassAssertionAxiom;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLIndividual;
 import org.semanticweb.owlapi.model.OWLObject;
-import org.semanticweb.owlapi.model.OWLOntologyManager;
 
 public class Publication implements GeneratingEntity {
-	
-	
+
+
 	private final PublicationBean bean;
 
 	private String generatedLabel;
 
 	private static Logger log = Logger.getLogger(Publication.class);
-	
+
 	public Publication(PublicationBean b){
 		bean = b;
         generatedLabel = generateCitation();
@@ -36,11 +32,11 @@ public class Publication implements GeneratingEntity {
 	public boolean hasGeneratedLabel(){
 		return (generatedLabel != null);
 	}
-	
+
 	public String getGeneratedLabel(){
 		return generatedLabel;
 	}
-	
+
     /**
      * generate a citation; much like the python version in arachadmin
      * @return citation with first one or two authors and a year
@@ -75,9 +71,8 @@ public class Publication implements GeneratingEntity {
 	@Override
 	public OWLObject generateOWL(Owlbuilder builder, Map<String, OWLObject> elements)
 			throws Exception {
-		final OWLOntologyManager manager = builder.getOntologyManager();
 		final OWLDataFactory factory = builder.getDataFactory();
-		final OWLClass pubAboutInvestigationClass = 
+		final OWLClass pubAboutInvestigationClass =
 				factory.getOWLClass(Vocabulary.pubAboutInvestigation);
 		String ref_id = bean.checkIRIString(builder.getIRIManager());
 		if (ref_id.startsWith("http://dx.doi.org")){
@@ -87,21 +82,13 @@ public class Publication implements GeneratingEntity {
 		log.info("Publication_id is " + publication_id + " uriset is " + bean.getuidset());
 		assert(publication_id != null);
 		OWLIndividual pub_ind = factory.getOWLNamedIndividual(publication_id);
-		OWLClassAssertionAxiom classAssertion = 
-				factory.getOWLClassAssertionAxiom(pubAboutInvestigationClass, pub_ind); 
-		manager.addAxiom(builder.getTarget(), classAssertion);
+		builder.addClassAssertionAxiom(pubAboutInvestigationClass, pub_ind);
 		if (hasGeneratedLabel()){
-			OWLAnnotation labelAnno = factory.getOWLAnnotation(factory.getRDFSLabel(),
-					factory.getOWLLiteral(getGeneratedLabel()));
-			OWLAxiom ax = factory.getOWLAnnotationAssertionAxiom(publication_id, labelAnno);
-			// Add the axiom to the ontology
-			manager.addAxiom(builder.getTarget(),ax);
+			builder.addLabel(publication_id, getGeneratedLabel());
 		}
 		final String iComment = "Individual from publication owlgeneration, id = " + bean.getId();
-		OWLAnnotation commentAnno = factory.getOWLAnnotation(factory.getRDFSComment(), 
-				                                             factory.getOWLLiteral(iComment));
-		OWLAxiom ax = factory.getOWLAnnotationAssertionAxiom(publication_id, commentAnno);
-		manager.addAxiom(builder.getTarget(),ax);
+		builder.addComment(publication_id, iComment);
+		builder.addAxioms();
 
 		return pub_ind;
 	}

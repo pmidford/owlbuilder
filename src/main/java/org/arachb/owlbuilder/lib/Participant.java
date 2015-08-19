@@ -228,15 +228,10 @@ public class Participant implements GeneratingEntity{
 		else if (headObject instanceof OWLIndividual){
 			log.info("Generated Individual reference: " + headObject);
 			OWLIndividual eventIndividual = factory.getOWLAnonymousIndividual();
-			//OWLClassAssertionAxiom clAssertion = factory.getOWLClassAssertionAxiom(headObject, eventIndividual);
-			//builder.getOntologyManager().addAxiom(builder.getTarget(), clAssertion);
 			OWLIndividual headIndividual = (OWLIndividual)headObject;
-	        OWLObjectPropertyAssertionAxiom assertion =
-	        		factory.getOWLObjectPropertyAssertionAxiom(elementProperty, eventIndividual, headIndividual);
+			builder.addIndividualAxiom(elementProperty, eventIndividual, headIndividual);
 	        // Finally, add the axiom to our ontology and save
-	        AddAxiom addAxiomChange = new AddAxiom(builder.getTarget(), assertion);
-	        builder.getOntologyManager().applyChange(addAxiomChange);
-
+			builder.addAxioms();
 			return headObject; //TODO finish implementing individual case
 		}
 		else {

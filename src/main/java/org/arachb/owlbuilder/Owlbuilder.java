@@ -274,6 +274,9 @@ public class Owlbuilder{
 	Map<String, OWLObject> processNarratives() throws Exception{
 		Map<String,OWLObject> results = new HashMap<>();
 		final Set<Narrative> narratives = Narrative.wrapSet(connection.getNarrativeTable());
+		for (Narrative n : narratives) {
+			n.generateOWL(this,results);  //no return value, OWLObject added to results map
+		}
 		return results;
 	}
 
@@ -593,12 +596,42 @@ public class Owlbuilder{
 		axiomset.clear();
 	}
 
+	public void addClassAssertionAxiom(OWLClass ce, OWLIndividual ind){
+		OWLDataFactory df = testWrapper.getDataFactory();
+		queueAxiom(df.getOWLClassAssertionAxiom(ce, ind));
+	}
 
-	public void addComment(String iriStr, String commentStr){
+
+	public void addIndividualPartOfAxiom(OWLIndividual part, OWLIndividual whole){
+		OWLDataFactory df = testWrapper.getDataFactory();
+		final OWLObjectProperty partofProperty = df.getOWLObjectProperty(Vocabulary.partOfProperty);
+		queueAxiom(df.getOWLObjectPropertyAssertionAxiom(partofProperty,part,whole));
+	}
+
+
+	public void addIndividualDenotesAxiom(OWLIndividual denoter, OWLIndividual denoted){
+		OWLDataFactory df = testWrapper.getDataFactory();
+		final OWLObjectProperty partofProperty = df.getOWLObjectProperty(Vocabulary.denotesProperty);
+		queueAxiom(df.getOWLObjectPropertyAssertionAxiom(partofProperty,denoter,denoted));
+	}
+
+	public void addIndividualAxiom(OWLObjectProperty oProp, OWLIndividual child, OWLIndividual parent){
+		queueAxiom(testWrapper.getDataFactory().getOWLObjectPropertyAssertionAxiom(oProp,child,parent));
+	}
+
+
+	public void addComment(IRI iri, String commentStr){
 		OWLDataFactory df = testWrapper.getDataFactory();
 		OWLAnnotation commentAnno = df.getOWLAnnotation(df.getRDFSComment(),
                                                         df.getOWLLiteral(commentStr));
-		queueAxiom(df.getOWLAnnotationAssertionAxiom(IRI.create(iriStr),commentAnno));
+		queueAxiom(df.getOWLAnnotationAssertionAxiom(iri,commentAnno));
+	}
+
+	public void addLabel(IRI iri, String label){
+		OWLDataFactory df = testWrapper.getDataFactory();
+		OWLAnnotation labelAnno = df.getOWLAnnotation(df.getRDFSLabel(), df.getOWLLiteral(label));
+		queueAxiom(df.getOWLAnnotationAssertionAxiom(iri,labelAnno));
+
 	}
 
 

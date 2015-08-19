@@ -58,18 +58,13 @@ public class Claim implements GeneratingEntity {
 	@Override
 	public OWLObject generateOWL(Owlbuilder builder, Map<String, OWLObject> elements) throws Exception{
 		final AbstractConnection c = builder.getConnection();
-		final OWLOntology target = builder.getTarget();
-		final OWLOntologyManager manager = builder.getOntologyManager();
 		final OWLDataFactory factory = builder.getDataFactory();
-		final OWLObjectProperty partofProperty = factory.getOWLObjectProperty(Vocabulary.partOfProperty);
-		final Set<OWLAxiom> allaxioms = new HashSet<OWLAxiom>();
-		final OWLIndividual claim_ind = factory.getOWLNamedIndividual(IRI.create(bean.getIRIString()));
+		final IRI claim_iri = IRI.create(bean.getIRIString());
+		final OWLIndividual claim_ind = factory.getOWLNamedIndividual(claim_iri);
 		final OWLClass informationContentClass =
 				factory.getOWLClass(Vocabulary.informationContentEntity);
-		allaxioms.add(factory.getOWLClassAssertionAxiom(informationContentClass, claim_ind));
-		final String iComment = String.format(FORMATTEDINDIVIDUALCOMMENT,bean.getId());
-		builder.addComment(bean.getIRIString(), iComment);
-		builder.addAxioms();
+		builder.addClassAssertionAxiom(informationContentClass, claim_ind);
+		builder.addComment(claim_iri, String.format(FORMATTEDINDIVIDUALCOMMENT,bean.getId()));
 		OWLClass behaviorClass = factory.getOWLClass(IRI.create(bean.getBehaviorIri()));
 		builder.initializeMiscTermAndParents(behaviorClass);
 		final Set<Participant> participants =
@@ -79,12 +74,9 @@ public class Claim implements GeneratingEntity {
 		OWLObject pub_obj = pub.generateOWL(builder);
 		if (pub_obj instanceof OWLIndividual){
 			OWLIndividual pub_ind = (OWLIndividual)pub_obj;
-			allaxioms.add(factory.getOWLObjectPropertyAssertionAxiom(partofProperty,
-																     claim_ind,
-																     pub_ind));
+			builder.addIndividualPartOfAxiom(claim_ind, pub_ind);
 		}
-		manager.addAxioms(target, allaxioms);
-
+		builder.addAxioms();
 		// load participant elements
 		for (Participant p : participants){
 			p.loadElements(c);
@@ -159,9 +151,7 @@ public class Claim implements GeneratingEntity {
                                                     Set<Participant> participants,
                                                     OWLIndividual claim_ind) throws Exception{
 		final OWLOntology target = builder.getTarget();
-		final OWLOntologyManager manager = builder.getOntologyManager();
 		final OWLDataFactory factory = builder.getDataFactory();
-		final OWLObjectProperty denotesProperty = factory.getOWLObjectProperty(Vocabulary.denotesProperty);
 		OWLClass behaviorClass = factory.getOWLClass(IRI.create(bean.getBehaviorIri()));
 		builder.initializeMiscTermAndParents(behaviorClass);
 		final Map<OWLIndividual,PropertyTerm> owlParticipants = new HashMap<OWLIndividual,PropertyTerm>();
@@ -175,15 +165,12 @@ public class Claim implements GeneratingEntity {
 				               bean.getId(),
 				               target.getClassesInSignature().size()));
 		final String iComment = String.format("Individual from claim owlgeneration, id = %d",bean.getId());
-		OWLAnnotation commentAnno = factory.getOWLAnnotation(factory.getRDFSComment(),
-				                                             factory.getOWLLiteral(iComment));
-		Set<OWLAxiom> axioms = new HashSet<OWLAxiom>();
-		axioms.add(factory.getOWLAnnotationAssertionAxiom(IRI.create(bean.getIRIString()), commentAnno));
+		builder.addComment(IRI.create(bean.getIRIString()), iComment);
 		IRI eventIRI = IRI.create(bean.getIRIString()+"_event");  //TODO not OBO compliant...
 		OWLIndividual event_ind = factory.getOWLNamedIndividual(eventIRI);
-		axioms.add(factory.getOWLObjectPropertyAssertionAxiom(denotesProperty, claim_ind, event_ind));
-		axioms.add(factory.getOWLClassAssertionAxiom(behaviorClass, event_ind));
-		manager.addAxioms(builder.getTarget(),axioms);
+		builder.addIndividualDenotesAxiom(claim_ind, event_ind);
+		builder.addClassAssertionAxiom(behaviorClass, event_ind);
+		builder.addAxioms();
 		for (Entry<OWLIndividual, PropertyTerm> ePair : owlParticipants.entrySet()){
 			connectIndividualParticipant(builder, ePair, event_ind, behaviorClass);
 		}
@@ -299,14 +286,11 @@ public class Claim implements GeneratingEntity {
 			                                  Entry<OWLIndividual, PropertyTerm> ePair,
 								              OWLIndividual event_ind,
 								              OWLClass behaviorClass) throws Exception{
-		OWLOntology target = builder.getTarget();
-		OWLOntologyManager manager = builder.getOntologyManager();
-		final OWLDataFactory factory = builder.getDataFactory();
 		OWLIndividual headIndividual = ePair.getKey();
 		PropertyTerm headProperty = ePair.getValue();
 		OWLObjectProperty pExpr = (OWLObjectProperty)headProperty.generateOWL(builder);
-		OWLAxiom a1 = factory.getOWLObjectPropertyAssertionAxiom(pExpr,event_ind,headIndividual);
-		manager.addAxiom(target, a1);
+		builder.addIndividualAxiom(pExpr, event_ind, headIndividual);
+		builder.addAxioms();
 	}
 
 

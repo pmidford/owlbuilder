@@ -9,18 +9,14 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.arachb.arachadmin.ClaimBean;
-import org.arachb.arachadmin.IndividualBean;
 import org.arachb.arachadmin.NarrativeBean;
+import org.arachb.arachadmin.PublicationBean;
 import org.arachb.owlbuilder.Owlbuilder;
 import org.semanticweb.owlapi.model.IRI;
-import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLIndividual;
 import org.semanticweb.owlapi.model.OWLObject;
-import org.semanticweb.owlapi.model.OWLOntology;
-import org.semanticweb.owlapi.model.OWLOntologyManager;
 
 /**
  * @author pmidford
@@ -56,18 +52,33 @@ public class Narrative implements NamedGeneratingEntity {
 	@Override
 	public OWLObject generateOWL(Owlbuilder b, Map<String, OWLObject> elements) throws Exception {
 		final OWLDataFactory factory = b.getDataFactory();
-		final OWLOntologyManager manager = b.getOntologyManager();
-		final OWLOntology target = b.getTarget();
-		final OWLIndividual nar_ind = factory.getOWLNamedIndividual(IRI.create(bean.getIRIString()));
+		final IRI nar_iri = IRI.create(bean.getIRIString());
+		final OWLIndividual nar_ind = factory.getOWLNamedIndividual(nar_iri);
 		final OWLClass informationContentClass =
 				factory.getOWLClass(Vocabulary.informationContentEntity);
-		final Set<OWLAxiom> allaxioms = new HashSet<OWLAxiom>();
-		allaxioms.add(factory.getOWLClassAssertionAxiom(informationContentClass, nar_ind));
-		manager.addAxioms(target, allaxioms);
-		IRI narrativeIRI = IRI.create(bean.getIRIString());
-		OWLObject result = factory.getOWLNamedIndividual(narrativeIRI);
-		elements.put(narrativeIRI.toString(), result);
-		return result;
+		b.addClassAssertionAxiom(informationContentClass, nar_ind);
+		PublicationBean pb = null;
+		if (!PublicationBean.isCached(bean.getPublicationId())){
+			pb = b.getConnection().getPublication(bean.getPublicationId());
+			pb.cache();
+		}
+		else{
+			pb = PublicationBean.getCached(bean.getPublicationId());
+		}
+		Publication pub = new Publication(pb);
+		OWLIndividual pub_ind = (OWLIndividual)pub.generateOWL(b,elements);
+		b.addIndividualPartOfAxiom(nar_ind, pub_ind);
+		final String label = bean.getLabel();
+		if (label != null){
+			b.addLabel(nar_iri,label);
+		}
+		if (bean.getDescription() != null){
+			final String iComment = String.format(bean.getDescription(),bean.getId());
+			b.addComment(nar_iri, iComment);
+		}
+		b.addAxioms();
+		elements.put(nar_iri.toString(), nar_ind);
+		return nar_ind;
 	}
 
 	/* (non-Javadoc)

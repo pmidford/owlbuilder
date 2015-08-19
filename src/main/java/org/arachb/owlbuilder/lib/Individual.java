@@ -1,6 +1,5 @@
 package org.arachb.owlbuilder.lib;
 
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -12,14 +11,10 @@ import org.arachb.arachadmin.PublicationBean;
 import org.arachb.arachadmin.TermBean;
 import org.arachb.owlbuilder.Owlbuilder;
 import org.semanticweb.owlapi.model.IRI;
-import org.semanticweb.owlapi.model.OWLAnnotation;
-import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
-import org.semanticweb.owlapi.model.OWLClassAssertionAxiom;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLIndividual;
 import org.semanticweb.owlapi.model.OWLObject;
-import org.semanticweb.owlapi.model.OWLOntologyManager;
 
 public class Individual implements NamedGeneratingEntity{
 
@@ -45,51 +40,35 @@ public class Individual implements NamedGeneratingEntity{
 		return result;
 	}
 
+	private static final String NOCACHEDTERM = "Term %s for individual %d is not cached";			
 	@Override
 	public OWLObject generateOWL(Owlbuilder builder, Map<String, OWLObject> elements) throws Exception {
 		final OWLDataFactory factory = builder.getDataFactory();
-		final OWLOntologyManager manager = builder.getOntologyManager();
 		IRI individualIRI;
-			try {
-				String indString = bean.checkIRIString(builder.getIRIManager());
-				if (elements.containsKey(indString)){
-					return elements.get(indString);
-				}
-				individualIRI = IRI.create(indString);
-				OWLIndividual namedIndividual = factory.getOWLNamedIndividual(individualIRI);
-				builder.initializeMiscIndividual(namedIndividual);
-				final String label = getLabelFromNarrativeSet();
-				if (label != null){
-					log.info("Individual Bean " + indString + " has label " + label);
-					OWLAnnotation labelAnno = factory.getOWLAnnotation(factory.getRDFSLabel(),
-																	   factory.getOWLLiteral(label));
-					OWLAxiom ax = factory.getOWLAnnotationAssertionAxiom(individualIRI, labelAnno);
-					// Add the axiom to the ontology
-					manager.addAxiom(builder.getTarget(),ax);
-				}
-				final String iComment = "Individual from individual owlgeneration, id = " + bean.getId();
-				OWLAnnotation commentAnno = factory.getOWLAnnotation(factory.getRDFSComment(), 
-						                                             factory.getOWLLiteral(iComment));
-				OWLAxiom ax = factory.getOWLAnnotationAssertionAxiom(individualIRI, commentAnno);
-				manager.addAxiom(builder.getTarget(),ax);
-				ClassTerm ct;
-				if (TermBean.isCached(bean.getTerm())){
-					ct =  new ClassTerm(TermBean.getCached(bean.getTerm()));
-				}
-				else {
-					throw new RuntimeException("Term " + bean.getTerm() + " for individual " + bean.getId() + " is not cached");
-				}
-				OWLClass cl = (OWLClass)ct.generateOWL(builder, elements);
-				OWLClassAssertionAxiom clAssertion = factory.getOWLClassAssertionAxiom(cl, namedIndividual);
-				builder.getOntologyManager().addAxiom(builder.getTarget(), clAssertion);
-				builder.initializeMiscIndividual(namedIndividual);
-				elements.put(indString, namedIndividual);
-				return namedIndividual;
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				return null;
-			}
+		String indString = bean.checkIRIString(builder.getIRIManager());
+		if (elements.containsKey(indString)){
+			return elements.get(indString);
+		}
+		individualIRI = IRI.create(indString);
+		OWLIndividual namedIndividual = factory.getOWLNamedIndividual(individualIRI);
+		builder.initializeMiscIndividual(namedIndividual);
+		final String label = getLabelFromNarrativeSet();
+		if (label != null){
+			log.info("Individual Bean " + indString + " has label " + label);
+			builder.addLabel(individualIRI, label);
+		}
+		final String iComment = "Individual from individual owlgeneration, id = " + bean.getId();
+		builder.addComment(individualIRI, iComment);
+		if (!TermBean.isCached(bean.getTerm())){
+			throw new RuntimeException(String.format(NOCACHEDTERM, bean.getTerm(), bean.getId()));
+		}
+		ClassTerm ct =  new ClassTerm(TermBean.getCached(bean.getTerm()));
+		OWLClass cl = (OWLClass)ct.generateOWL(builder, elements);
+		builder.addClassAssertionAxiom(cl, namedIndividual);
+		builder.addAxioms();
+		builder.initializeMiscIndividual(namedIndividual);
+		elements.put(indString, namedIndividual);
+		return namedIndividual;
 	}
 	
 	private String getLabelFromNarrativeSet(){
