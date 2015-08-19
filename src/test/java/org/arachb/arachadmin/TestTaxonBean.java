@@ -228,7 +228,7 @@ public class TestTaxonBean {
 	@Test(expected = RuntimeException.class)
 	public void testGetCachedException() {
 		TaxonBean.flushCache();
-		TaxonBean foo = TaxonBean.getCached(TESTBEANID);
+		TaxonBean.getCached(TESTBEANID);  //throw out value, just want the exception
 	}
 	
 

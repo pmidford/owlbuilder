@@ -31,8 +31,8 @@ public class TestNarrative {
 	private static Logger log = Logger.getLogger(TestPropertyTerm.class);
 	private static AbstractConnection testConnection;
 
-    private final int TESTNARRATIVE1 = 1;
-    private final int TESTNARRATIVE2 = 2;
+    private static final int TESTNARRATIVE1 = 1;
+    private static final int TESTNARRATIVE2 = 2;
     
     private NarrativeBean nb1;
     private NarrativeBean nb2;
