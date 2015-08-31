@@ -1,8 +1,9 @@
 package org.arachb.arachadmin;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.equalTo;
 
 import java.util.Iterator;
 import java.util.Set;
@@ -39,18 +40,18 @@ public class TestPElementBean {
 	}
 	testParticipant1 = getParticipantForClaim(1);
 	testParticipant29 = getParticipantForClaim(26);
-	assertNotNull(testParticipant29);
+	assertThat(testParticipant29,notNullValue(ParticipantBean.class));
 	testElement1 = testConnection.getPElement(1);
 	testElement2 = testConnection.getPElement(2);
 	testElement61 = testConnection.getPElement(61);
 	testElement62 = testConnection.getPElement(62);
-	assertNotNull(testElement61);
+	assertThat(testElement61,notNullValue(PElementBean.class));
     }
 
     private ParticipantBean getParticipantForClaim(int claimId) throws Exception{
     	final Set<ParticipantBean>testParticipants =
     			testConnection.getParticipantTable(claimId);
-    	assertFalse(testParticipants.isEmpty());
+    	assertThat(testParticipants.isEmpty(),is(false));
     	Iterator<ParticipantBean> piter = testParticipants.iterator();
     	if (piter.hasNext()){
     		return piter.next();
@@ -61,27 +62,27 @@ public class TestPElementBean {
 
     @Test
     public void testFill() throws Exception{
-	assertEquals(1, testElement1.getId());
-	assertEquals(1, testElement1.getType());
-	assertEquals(1, testElement1.getParticipant());
-	assertEquals(2, testElement2.getId());
-	assertEquals(1, testElement2.getType());
-	assertEquals(1, testElement2.getParticipant());
-	assertEquals(61, testElement61.getId());
-	assertEquals(3, testElement61.getType());
-	assertEquals(29, testElement61.getParticipant());
+	assertThat(testElement1.getId(),equalTo(1));
+	assertThat(testElement1.getType(),equalTo(1));
+	assertThat(testElement1.getParticipant(),equalTo(1));
+	assertThat(testElement2.getId(),equalTo(2));
+	assertThat(testElement2.getType(),equalTo(1));
+	assertThat(testElement2.getParticipant(),equalTo(1));
+	assertThat(testElement61.getId(),equalTo(61));
+	assertThat(testElement61.getType(),equalTo(3));
+	assertThat(testElement61.getParticipant(),equalTo(29));
     }
 
     @Test
     public void testFillTerm() throws Exception{
 	final TermBean t1 = testConnection.getTerm(TESTPUBTAXONDBID);
 	final TermBean tx = TermBean.getCached(testElement1.getTermId());
-	assertNotNull(tx);
-	assertEquals(t1, tx);
+	assertThat(tx,notNullValue(TermBean.class));
+	assertThat(t1, equalTo(tx));
 	final TermBean t2 = testConnection.getTerm(TESTPUBANATOMYID);
 	final TermBean tx2 = TermBean.getCached(testElement2.getTermId());
-	assertNotNull(tx2);
-	assertEquals(t2, tx2);
+	assertThat(tx2,notNullValue(TermBean.class));
+	assertThat(t2, equalTo(tx2));
     }
 
 

@@ -8,6 +8,13 @@ import static org.junit.Assert.*;
 import java.sql.SQLException;
 
 import org.apache.log4j.Logger;
+
+import static org.junit.Assert.assertThat;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.CoreMatchers.equalTo;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -73,7 +80,7 @@ public class TestTaxonBean {
 	 */
 	@Test
 	public void testGetId() {
-		assertEquals(1,testbean.getId());
+		assertThat(testbean.getId(),equalTo(1));
 	}
 
 	/**
@@ -81,7 +88,7 @@ public class TestTaxonBean {
 	 */
 	@Test
 	public void testGetSourceId() {
-		assertEquals(TESTBEANURN,testbean.getSourceId());
+		assertThat(testbean.getSourceId(),equalTo(TESTBEANURN));
 	}
 
 	/**
@@ -89,7 +96,7 @@ public class TestTaxonBean {
 	 */
 	@Test
 	public void testGetName() {
-		assertEquals(TESTBEANNAME,testbean.getName());
+		assertThat(testbean.getName(),equalTo(TESTBEANNAME));
 	}
 
 	/**
@@ -97,7 +104,7 @@ public class TestTaxonBean {
 	 */
 	@Test
 	public void testGet_author() {
-		assertEquals(TESTBEANAUTHOR,testbean.get_author());
+		assertThat(testbean.get_author(),equalTo(TESTBEANAUTHOR));
 	}
 
 	/**
@@ -105,7 +112,7 @@ public class TestTaxonBean {
 	 */
 	@Test
 	public void testGet_year() {
-		assertEquals(TESTBEANYEAR,testbean.get_year());
+		assertThat(testbean.get_year(),equalTo(TESTBEANYEAR));
 	}
 
 	/**
@@ -114,7 +121,7 @@ public class TestTaxonBean {
 	@Test
 	public void testGetGeneratedId() {
 		log.info("generated id is " + testbean.getGeneratedId());
-		assertNull(testbean.getGeneratedId());
+		assertThat(testbean.getGeneratedId(),nullValue(String.class));
 	}
 
 	/**
@@ -129,8 +136,8 @@ public class TestTaxonBean {
 	 * Test method for {@link org.arachb.arachadmin.TaxonBean#getAuthority()}.
 	 */
 	@Test
-	public void testGetAuthority() {
-		assertNull(testbean.getAuthority());  //TODO ought to be WCS?
+	public void testGetAuthority(){
+		assertThat(testbean.getAuthority(),nullValue(String.class));  //TODO ought to be WCS?
 	}
 
 	/**
@@ -138,7 +145,7 @@ public class TestTaxonBean {
 	 */
 	@Test
 	public void testGetParentName() {
-		assertNull(testbean.getParentName());
+		assertThat(testbean.getParentName(),nullValue(String.class));
 	}
 
 	/**
@@ -146,7 +153,7 @@ public class TestTaxonBean {
 	 */
 	@Test
 	public void testGetMerged() {
-		assertFalse(testbean.getMerged()); // TODO
+		assertThat(testbean.getMerged(),equalTo(false)); // TODO
 	}
 
 	/**
@@ -154,7 +161,7 @@ public class TestTaxonBean {
 	 */
 	@Test
 	public void testGetMergeStatus() {
-		assertNull(testbean.getMergeStatus()); // TODO
+		assertThat(testbean.getMergeStatus(),nullValue(String.class)); // TODO
 	}
 
 	/**
@@ -162,7 +169,7 @@ public class TestTaxonBean {
 	 */
 	@Test
 	public void testGetParentRefId() {
-		assertNull(testbean.getParentRefId()); // TODO
+		assertThat(testbean.getParentRefId(),nullValue(String.class)); // TODO
 	}
 
 	/**
@@ -179,7 +186,7 @@ public class TestTaxonBean {
 	 */
 	@Test
 	public void testGetIRIString() {
-		assertEquals(TESTBEANURN,testbean.getIRIString());
+		assertThat(testbean.getIRIString(),equalTo(TESTBEANURN));
 	}
 
 	/**
@@ -189,7 +196,7 @@ public class TestTaxonBean {
 	@Test
 	public void testCheckIRIString() throws SQLException {
 		IRIManager manager = testConnection.getIRIManager();
-		assertEquals(TESTBEANURN,testbean.checkIRIString(manager));
+		assertThat(testbean.checkIRIString(manager),equalTo(TESTBEANURN));
 	}
 
 	/**
@@ -197,9 +204,9 @@ public class TestTaxonBean {
 	 */
 	@Test
 	public void testFlushCache() {
-		assertTrue(TaxonBean.isCached(TESTBEANID));
+		assertThat(TaxonBean.isCached(TESTBEANID),equalTo(true));
 		TaxonBean.flushCache();
-		assertFalse(TaxonBean.isCached(TESTBEANID));
+		assertThat(TaxonBean.isCached(TESTBEANID),equalTo(false));
 	}
 
 	/**
@@ -208,7 +215,7 @@ public class TestTaxonBean {
 	@Test
 	public void testIsCached() {
 		TaxonBean.flushCache();
-		assertFalse(TaxonBean.isCached(TESTBEANID));		
+		assertThat(TaxonBean.isCached(TESTBEANID),equalTo(false));		
 	}
 
 	/**
@@ -218,7 +225,7 @@ public class TestTaxonBean {
 	public void testGetCached() {
 		TaxonBean.flushCache();
 		testbean.cache();
-		assertEquals(testbean,TaxonBean.getCached(TESTBEANID));
+		assertThat(TaxonBean.getCached(TESTBEANID),equalTo(testbean));
 		TaxonBean.flushCache();
 	}
 	
@@ -239,7 +246,7 @@ public class TestTaxonBean {
 	public void testCache() {
 		TaxonBean.flushCache();
 		testbean.cache();
-		assertEquals(testbean,TaxonBean.getCached(TESTBEANID));
+		assertThat(TaxonBean.getCached(TESTBEANID),equalTo(testbean));
 	}
 
 	/**
