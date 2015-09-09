@@ -165,7 +165,7 @@ public class DBConnection implements AbstractConnection{
 			"SELECT c.id, c.publication, c.publication_behavior, c.behavior_term, " +
 					"c.evidence, c.generated_id, pub.doi, " +
 					"pub.generated_id, behavior.source_id, behavior.generated_id, " +
-					"c.uidset " +
+					"c.narrative, c.uidset " +
 					"FROM claim AS c " +
 					"LEFT JOIN publication AS pub ON (c.publication = pub.id) " +
 					"LEFT JOIN term AS behavior ON (c.behavior_term = behavior.id) " +
@@ -176,7 +176,7 @@ public class DBConnection implements AbstractConnection{
 			"SELECT c.id, c.publication, c.publication_behavior, c.behavior_term, " +
 					"c.evidence, c.generated_id, pub.doi, " +
 					"pub.generated_id, behavior.source_id, behavior.generated_id, " +
-					"c.uidset " +
+					"c.narrative, c.uidset " +
 					"FROM claim AS c " +
 					"LEFT JOIN publication AS pub ON (c.publication = pub.id) " +
 					"LEFT JOIN term AS behavior ON (c.behavior_term = behavior.id) " +
@@ -505,7 +505,8 @@ public class DBConnection implements AbstractConnection{
 		}
 	}
 
-
+	
+	@Override
 	public ClaimBean getClaim(int id) throws Exception{
 		if (ClaimBean.isCached(id)){
 			return ClaimBean.getCached(id);
@@ -533,6 +534,7 @@ public class DBConnection implements AbstractConnection{
 	}
 
 
+	@Override
 	public Set<ClaimBean> getClaimTable() throws Exception {
 		final Statement allClaimStatement = c.createStatement();
 		try{
