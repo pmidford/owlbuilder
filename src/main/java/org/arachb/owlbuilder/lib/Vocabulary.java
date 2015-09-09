@@ -35,8 +35,10 @@ public class Vocabulary {
 
 	public static final IRI partOfProperty =
 			IRI.create("http://purl.obolibrary.org/obo/BFO_0000050");
-	public static final IRI hasPartProperty =
-			IRI.create("http://purl.obolibrary.org/obo/BFO_0000051");
+// Suppress hasPart - current ontology set allows some reasoners to actually
+// equate this with its inverse.  Predictable stupidity ensues.	
+//	public static final IRI hasPartProperty =
+//			IRI.create("http://purl.obolibrary.org/obo/BFO_0000051");
 	public static final IRI participatesInProperty =
 			IRI.create("http://purl.obolibrary.org/obo/RO_0000056");
 	public static final IRI hasParticipantProperty =
