@@ -1,5 +1,6 @@
 package org.arachb.owlbuilder.lib;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -9,19 +10,25 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.arachb.arachadmin.AbstractConnection;
 import org.arachb.arachadmin.ClaimBean;
+import org.arachb.arachadmin.NarrativeBean;
 import org.arachb.owlbuilder.Owlbuilder;
 import org.semanticweb.owlapi.model.IRI;
-import org.semanticweb.owlapi.model.OWLAnnotation;
-import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassAssertionAxiom;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataFactory;
+import org.semanticweb.owlapi.model.OWLDataPropertyExpression;
 import org.semanticweb.owlapi.model.OWLIndividual;
+import org.semanticweb.owlapi.model.OWLLiteral;
 import org.semanticweb.owlapi.model.OWLObject;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
+import org.semanticweb.owlapi.model.OWLObjectPropertyExpression;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.semanticweb.owlapi.search.EntitySearcher;
+import org.semanticweb.owlapi.util.MultiMap;
+
+import com.google.common.collect.Multimap;
 
 public class Claim implements GeneratingEntity {
 
@@ -140,6 +147,7 @@ public class Claim implements GeneratingEntity {
 				                target.getClassesInSignature().size()));
 
 	}
+
 	/**
 	 * generates all the owl objects and assertions required to represent the claim
 	 * @param builder
@@ -153,6 +161,9 @@ public class Claim implements GeneratingEntity {
 		final OWLOntology target = builder.getTarget();
 		final OWLDataFactory factory = builder.getDataFactory();
 		OWLClass behaviorClass = factory.getOWLClass(IRI.create(bean.getBehaviorIri()));
+		OWLClassExpression active_anatomy = null;
+		OWLClassExpression active_taxon = null;
+		OWLObjectPropertyExpression poExpr = factory.getOWLObjectProperty(Vocabulary.partOfProperty);
 		builder.initializeMiscTermAndParents(behaviorClass);
 		final Map<OWLIndividual,PropertyTerm> owlParticipants = new HashMap<OWLIndividual,PropertyTerm>();
 		for (Participant p : participants){
@@ -160,6 +171,30 @@ public class Claim implements GeneratingEntity {
 			PropertyTerm pt = p.getProperty();
 			assert op != null;
 			owlParticipants.put(op, pt);
+			if (Vocabulary.hasActiveParticipantProperty.equals(IRI.create(pt.getSourceId()))){
+				log.info("participant: " + op.toString());
+				Collection<OWLClassExpression> anatomy_types = EntitySearcher.getTypes(op,builder.getTarget());
+				for (OWLClassExpression anatomy_type : anatomy_types){
+					active_anatomy = anatomy_type;
+				}
+				Collection<OWLIndividual> active_parts_of = EntitySearcher.getObjectPropertyValues(op, poExpr, builder.getTarget());
+				log.info("PropertyValues size = " + active_parts_of.size());
+				for (OWLIndividual indiv_part_of : active_parts_of){
+					log.info("Part:  " + indiv_part_of);
+					Collection <OWLClassExpression> active_taxa = EntitySearcher.getTypes(indiv_part_of, builder.getTarget());
+					log.info("taxa size: " + active_taxa.size());
+					for (OWLClassExpression parent : active_taxa){
+						active_taxon = parent;
+						log.info("taxon is " + active_taxon);
+					}
+				}
+			}
+		}
+		if (active_anatomy == null){
+			throw new RuntimeException("Individual Claim has no active participant " + claim_ind.toStringID());
+		}
+		if (active_taxon == null){
+			throw new RuntimeException("Individual Claim has no active taxon " + claim_ind.toStringID());
 		}
 		log.info(String.format("After processing claim participants: %d, target class count = %d",
 				               bean.getId(),
@@ -169,7 +204,36 @@ public class Claim implements GeneratingEntity {
 		IRI eventIRI = IRI.create(bean.getIRIString()+"_event");  //TODO not OBO compliant...
 		OWLIndividual event_ind = factory.getOWLNamedIndividual(eventIRI);
 		builder.addIndividualDenotesAxiom(claim_ind, event_ind);
-		builder.addClassAssertionAxiom(behaviorClass, event_ind);
+		OWLObjectProperty pExpr = factory.getOWLObjectProperty(Vocabulary.hasActiveParticipantProperty);
+		OWLClassExpression somePartExpr =
+				factory.getOWLObjectSomeValuesFrom(poExpr , active_taxon);
+		OWLClassExpression anatomyAndTaxonExpr = 
+				factory.getOWLObjectIntersectionOf(active_anatomy, somePartExpr);
+		OWLClassExpression someParticipantExpr =
+				factory.getOWLObjectSomeValuesFrom(pExpr, anatomyAndTaxonExpr);
+		OWLClassExpression behaviorWithParticipant =
+				factory.getOWLObjectIntersectionOf(behaviorClass,someParticipantExpr);
+		builder.addClassAssertionAxiom(behaviorWithParticipant, event_ind);
+		if (bean.getNarrative() != 0){
+			NarrativeBean nb = NarrativeBean.getCached(bean.getNarrative());
+			if (elements.containsKey(nb.getIRIString())){
+				OWLObject no = elements.get(nb.getIRIString());
+				if (no instanceof OWLIndividual){
+					builder.addIndividualPartOfAxiom(event_ind, (OWLIndividual)no);		
+				}
+				else {
+					throw new RuntimeException("NarrativeBean references something not OWLIndividual " + 
+							no.toString());
+				}
+			}
+			else {
+				log.info("Elements size = " + elements.size());
+				throw new RuntimeException("No cached object for " + nb.getIRIString());
+			}
+		}
+		else {
+
+		}
 		builder.addAxioms();
 		for (Entry<OWLIndividual, PropertyTerm> ePair : owlParticipants.entrySet()){
 			connectIndividualParticipant(builder, ePair, event_ind, behaviorClass);
