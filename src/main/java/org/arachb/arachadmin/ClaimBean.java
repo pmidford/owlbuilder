@@ -19,7 +19,8 @@ public class ClaimBean implements BeanBase,UpdateableBean,CachingBean{  //do all
 	final static int DBPUBGENERATEDID = 8;
 	final static int DBBEHAVIORSOURCEID = 9;
 	final static int DBBEHAVIORGENERATEDID = 10;
-	final static int DBUIDSET = 11;
+	final static int DBNARRATIVE = 11;
+	final static int DBUIDSET = 12;
 	final static int DBEVIDENCESOURCEID = 12;
 	final static int DBEVIDENCEGENERATEDID = 13;
 	
@@ -44,6 +45,7 @@ public class ClaimBean implements BeanBase,UpdateableBean,CachingBean{  //do all
 	private String behaviorIRI;
 	private String publicationIRI;
 	private String evidenceIRI;
+	private int narrative;
 	private int uidset;
 	
 	static final ClaimBean dummy = new ClaimBean(); 
@@ -66,6 +68,7 @@ public class ClaimBean implements BeanBase,UpdateableBean,CachingBean{  //do all
 		if (evidence != 0){
 			updateEvidenceIRI(record);
 		}
+		narrative = record.getInt(DBNARRATIVE);
 		uidset = record.getInt(DBUIDSET);
 	}
 	
@@ -142,6 +145,10 @@ public class ClaimBean implements BeanBase,UpdateableBean,CachingBean{  //do all
 	
 	public String getEvidenceIri(){
 		return evidenceIRI;
+	}
+	
+	public int getNarrative(){
+		return narrative;
 	}
 	
 	public String getGeneratedId(){
