@@ -2,6 +2,9 @@ package org.arachb.owlbuilder.lib;
 
 import java.sql.SQLException;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.arachb.arachadmin.PublicationBean;
 import org.arachb.owlbuilder.Owlbuilder;
 import org.semanticweb.owlapi.model.IRI;
@@ -55,7 +58,9 @@ public class Publication implements GeneratingEntity {
 		final OWLDataFactory factory = builder.getDataFactory();
 		final OWLClass pubAboutInvestigationClass = 
 				factory.getOWLClass(Vocabulary.pubAboutInvestigation);
-		IRI publication_id = IRI.create(bean.checkIRIString(builder.getIRIManager()));
+		String ref_id = get_ref_id(builder);
+		final IRI publication_id = IRI.create(ref_id);
+		log.info("Publication_id is " + publication_id + " uriset is " + bean.getuidset());
 		assert(publication_id != null);
 		OWLIndividual pub_ind = factory.getOWLNamedIndividual(publication_id);
 		OWLClassAssertionAxiom classAssertion = 
@@ -71,13 +76,14 @@ public class Publication implements GeneratingEntity {
 		return pub_ind;
 	}
 	
-	
 
-
-	
-	
-	
-
+	private String get_ref_id(Owlbuilder b) throws Exception{
+		String ref_id = bean.checkIRIString(b.getIRIManager());
+		if (ref_id.startsWith("http://dx.doi.org")){
+			ref_id = IRIManager.cleanupDoi(ref_id);
+		}
+		return ref_id;
+	}
 	
 	
 }
