@@ -23,9 +23,9 @@ public class TestPropertyTerm {
 	private static Logger log = Logger.getLogger(TestPropertyTerm.class);
 	private static AbstractConnection testConnection;
 
-	private static String hasPartIRI = Vocabulary.hasPartProperty.toString();
-	private static PropertyBean hasPartBean;
-	private static PropertyTerm hasPartPropertyTerm;
+	private static String partOfIRI = Vocabulary.partOfProperty.toString();
+	private static PropertyBean partOfBean;
+	private static PropertyTerm partOfPropertyTerm;
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception{
@@ -37,8 +37,8 @@ public class TestPropertyTerm {
 			log.info("Testing with mock connection");
 			testConnection = DBConnection.getMockConnection();
 		}
-		hasPartBean = testConnection.getPropertyFromSourceId(hasPartIRI);
-		hasPartPropertyTerm = new PropertyTerm(hasPartBean);
+		partOfBean = testConnection.getPropertyFromSourceId(partOfIRI);
+		partOfPropertyTerm = new PropertyTerm(partOfBean);
 	}
 
 	@Before
@@ -50,7 +50,7 @@ public class TestPropertyTerm {
 
 	@Test
 	public void testGenerateOwl1arg() throws Exception {
-		OWLObject owlObj = hasPartPropertyTerm.generateOWL(builder);
+		OWLObject owlObj = partOfPropertyTerm.generateOWL(builder);
 		assertNotNull(owlObj);
 		assert(owlObj instanceof OWLObjectPropertyExpression);
 	}
@@ -59,10 +59,10 @@ public class TestPropertyTerm {
 	@Test
 	public void testGenerateOwl2arg() throws Exception{
 		Map<String,OWLObject> elements = new HashMap<>();
-		OWLObject owlObj = hasPartPropertyTerm.generateOWL(builder, elements);
+		OWLObject owlObj = partOfPropertyTerm.generateOWL(builder, elements);
 		assertEquals(1,elements.size());
-		assertNotNull(elements.get(hasPartIRI));
-		assertEquals(owlObj,elements.get(hasPartIRI));
+		assertNotNull(elements.get(partOfIRI));
+		assertEquals(owlObj,elements.get(partOfIRI));
 	}
 
 	@AfterClass
