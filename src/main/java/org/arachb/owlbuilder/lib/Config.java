@@ -6,6 +6,8 @@ public class Config {
 	private String importDir;
 	private String mireotDir;
 	private String cacheDir;
+	private String targetDir;
+	private String testDir;
 	
 	/**
 	 * @param configFile will specify a path to the configuration file 
@@ -16,6 +18,8 @@ public class Config {
 		importDir = "//Users/pmidford/Projects/arachtools/website/import";
 		mireotDir = "//Users/pmidford/Projects/arachtools/mireot";
 		cacheDir = "//Users/pmidford/Projects/arachadmin/private/ontology_cache";
+		targetDir = "//Users/pmidford/Projects/Spider-Behavior/src/main/resources";
+		testDir = "//Users/pmidford/Projects/arachtools/OwlBuilder";
 	}
 	
 	public String getOntologyDir(){
@@ -33,5 +37,13 @@ public class Config {
 	public String getCacheDir(){
 		return cacheDir;
 	}
+	
+	public String getTargetDir(){
+		return targetDir;
+	}
 
+	public String getTestDir(){
+		return testDir;
+	}
+	
 }
