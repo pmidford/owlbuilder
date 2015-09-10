@@ -1,9 +1,13 @@
 package org.arachb.arachadmin;
 
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.log4j.Logger;
 
 
-public class TermBean extends CachingBean implements UpdateableBean{
+public class TermBean implements CachingBean, UpdateableBean{
 
 
 	static final int DBID = 1;
@@ -13,7 +17,13 @@ public class TermBean extends CachingBean implements UpdateableBean{
 	static final int DBLABEL = 5;
 	static final int DBGENERATEDID = 6;
 	static final int DBCOMMENT = 7;
+	static final int DBUIDSET = 8;
 		
+	private static final Map<Integer, TermBean> cache = new HashMap<>();
+	private static Logger log = Logger.getLogger(TermBean.class);
+
+
+	
 	private int id;
 	private String source_id;
 	private int domain;
@@ -21,6 +31,7 @@ public class TermBean extends CachingBean implements UpdateableBean{
 	private String label;
 	private String generated_id;
 	private String comment;
+	private int uidset;
 	
 		
 
@@ -33,18 +44,21 @@ public class TermBean extends CachingBean implements UpdateableBean{
 		label = record.getString(DBLABEL);
 		generated_id = record.getString(DBGENERATEDID);
 		comment = record.getString(DBCOMMENT);
+		uidset = record.getInt(DBUIDSET);
 	}
 
+	
+	
+	/* accessor */
 	
 	public int getId(){
 		return id;
 	}
 	
-
-
 	
 	public String getSourceId(){
-		return source_id;
+		//exception if not cached, want to see that error
+		return UidSet.getCached(uidset).getGeneratedId();
 	}
 
 	public int getDomain(){
@@ -66,47 +80,79 @@ public class TermBean extends CachingBean implements UpdateableBean{
 
 	@Override
 	public void setGeneratedId(String id) {
-		generated_id = id;
+		//exception if not cached, want to see that error
+		UidSet.getCached(uidset).setGeneratedId(id);
 	}
 
 
 	@Override
 	public String getGeneratedId() {
-		return generated_id;
+		//exception if not cached, want to see that error
+		return UidSet.getCached(uidset).getGeneratedId();
 	}
 
 
-	final static String NOTERMGENID = "Term has no source or generated id; db id = %s";
+	final private static String NOTERMGENID = "Term has no source or generated id; db id = %s";
 
 	@Override
 	public String getIRIString(){
-		final String genId = getGeneratedId();
-		if (genId == null){
+		String refid = UidSet.getCached(uidset).getRefId();
+		if (refid == null){
 			final String msg = String.format(NOTERMGENID, getId());
-			throw new IllegalStateException(msg);
+			throw new IllegalStateException(msg);			
 		}
-		return genId;
+		return refid;
 	}
 
 	@Override
 	public String checkIRIString(IRIManager manager) throws SQLException{
-		if (getSourceId() == null){
-			if (getGeneratedId() == null){
-				manager.generateIRI(this);
-			}
-			return getGeneratedId();
-		}
-		return getSourceId();
+		return UidSet.getCached(uidset).checkIRIString(manager);
 	}
 
 
 	@Override
 	public void updateDB(AbstractConnection c) throws SQLException {
-		c.updateTerm(this);
+		c.updateUidSet(UidSet.getCached(uidset));   //hide uncaching?
+	}
+
+	/**
+	 * may not be needed, but if we ever need to reopen a database
+	 */
+	static void flushCache(){
+		cache.clear();
 	}
 	
+	public static boolean isCached(int id){
+		return cache.containsKey(id);
+	}
+	
+	public static TermBean getCached(int id){
+		assert cache.containsKey(id) : String.format("no cache entry for %d",id);
+		return cache.get(id);
+	}
+
+	
+	@Override
+	public void cache(){
+		if (isCached(getId())){
+			log.warn(String.format("Tried multiple caching of %s with id %d",
+					               getClass().getSimpleName(),
+					               getId()));
+		}
+		cache.put(getId(), this);
+	}
 	
 
+	@Override
+	public void updatecache(){
+		if (!this.equals(cache.get(getId()))){
+			log.warn(String.format("Forcing update of cached bean %s with id %d",
+					               getClass().getSimpleName(),
+					               getId()));
+			cache.put(getId(), this);
+		}
+	}
+	
 
 
 }

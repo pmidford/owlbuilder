@@ -176,7 +176,6 @@ public class MockConnection implements AbstractConnection {
 		mockParticipantResults1.setInteger(0,ParticipantBean.DBID,1);
 		mockParticipantResults1.setString(0,ParticipantBean.DBQUANTIFICATION,"some");
 		mockParticipantResults1.setString(0,ParticipantBean.DBLABEL,"");
-		mockParticipantResults1.setString(0,ParticipantBean.DBGENERATEDID,null);
 		mockParticipantResults1.setInteger(0,ParticipantBean.DBPROPERTY, 306);  //used
 		mockParticipantResults1.setString(0,ParticipantBean.DBPUBLICATIONTAXON,TESTPUBTAXON);
 		mockParticipantResults1.setString(0,ParticipantBean.DBPUBLICATIONANATOMY,"");
@@ -189,7 +188,6 @@ public class MockConnection implements AbstractConnection {
 		mockParticipantResults29.setInteger(0,ParticipantBean.DBID,29);
 		mockParticipantResults29.setString(0,ParticipantBean.DBQUANTIFICATION,"individual");
 		mockParticipantResults29.setString(0,ParticipantBean.DBLABEL,"female");
-		mockParticipantResults29.setString(0,ParticipantBean.DBGENERATEDID,"http://arachb.org/arachb/ARACHB_0000349");
 		mockParticipantResults29.setInteger(0,ParticipantBean.DBPROPERTY, 306);  //used
 		mockParticipantResults29.setString(0,ParticipantBean.DBPUBLICATIONTAXON,"Leucauge mariana");
 		mockParticipantResults29.setString(0,ParticipantBean.DBPUBLICATIONANATOMY,"female");
@@ -203,7 +201,6 @@ public class MockConnection implements AbstractConnection {
 		mockParticipantResults2.setInteger(0,ParticipantBean.DBID,2);
 		mockParticipantResults2.setString(0,ParticipantBean.DBQUANTIFICATION,"some");
 		mockParticipantResults2.setString(0,ParticipantBean.DBLABEL,"");
-		mockParticipantResults2.setString(0,ParticipantBean.DBGENERATEDID,null);
 		mockParticipantResults2.setString(0,ParticipantBean.DBPUBLICATIONTAXON,TESTPUBTAXON);
 		mockParticipantResults2.setString(0,ParticipantBean.DBPUBLICATIONANATOMY,"");
 		mockParticipantResults2.setString(0,ParticipantBean.DBPUBLICATIONSUBSTRATE,"");
@@ -276,6 +273,21 @@ public class MockConnection implements AbstractConnection {
 		mockIndividualResults95.setInteger(0,IndividualBean.DBTERM, 10473);
 	}
 
+	private static MockResults mockNarrativeResults1 = new StaticMockResults();
+	static{
+		mockNarrativeResults1.setInteger(0, NarrativeBean.DBID, 1);
+		mockNarrativeResults1.setInteger(0, NarrativeBean.DBPUBLICATION, 123);
+		mockNarrativeResults1.setString(0, NarrativeBean.DBLABEL, "courtship sequence");
+		mockNarrativeResults1.setString(0, NarrativeBean.DBDESCRIPTION, "");
+	}
+	
+	private static MockResults mockNarrativeResults2 = new StaticMockResults();
+	static{
+		mockNarrativeResults2.setInteger(0, NarrativeBean.DBID, 2);		
+		mockNarrativeResults2.setInteger(0, NarrativeBean.DBPUBLICATION, 123);
+		mockNarrativeResults2.setString(0, NarrativeBean.DBLABEL, "sperm induction");
+		mockNarrativeResults2.setString(0, NarrativeBean.DBDESCRIPTION, "");
+	}
 
 	private static MockResults mockPElementResults = new StaticMockResults();
 	static{
@@ -307,31 +319,31 @@ public class MockConnection implements AbstractConnection {
 		
 	}
 	
-	private static MockResults mockPEParent1Results = new MockResults(1);
-	static {
-		mockPEParent1Results.setInteger(0,PElementBean.DBPARENTID, 2);
-		mockPEParent1Results.setInteger(0,PElementBean.DBPARENTPROPERTY, 15);
-	}
-	
-	private static MockResults mockPEParent61Results = new MockResults(1);
-	static {
-		mockPEParent61Results.setInteger(0,PElementBean.DBPARENTID, 62);
-		mockPEParent61Results.setInteger(0,PElementBean.DBPARENTPROPERTY, 15);
-	}
-	
-	
-	private static MockResults mockPEChild2Results = new MockResults(1);
-	static {
-		mockPEChild2Results.setInteger(0,PElementBean.DBCHILDID, 1);
-		mockPEChild2Results.setInteger(0,PElementBean.DBCHILDPROPERTY, 15);		
-	}
-	
-	
-	private static MockResults mockPEChild62Results = new MockResults(1);
-	static {
-		mockPEChild62Results.setInteger(0,PElementBean.DBCHILDID, 61);
-		mockPEChild62Results.setInteger(0,PElementBean.DBCHILDPROPERTY, 15);		
-	}
+//	private static MockResults mockPEParent1Results = new MockResults(1);
+//	static {
+//		mockPEParent1Results.setInteger(0,PElementBean.DBPARENTID, 2);
+//		mockPEParent1Results.setInteger(0,PElementBean.DBPARENTPROPERTY, 15);
+//	}
+//	
+//	private static MockResults mockPEParent61Results = new MockResults(1);
+//	static {
+//		mockPEParent61Results.setInteger(0,PElementBean.DBPARENTID, 62);
+//		mockPEParent61Results.setInteger(0,PElementBean.DBPARENTPROPERTY, 15);
+//	}
+//	
+//	
+//	private static MockResults mockPEChild2Results = new MockResults(1);
+//	static {
+//		mockPEChild2Results.setInteger(0,PElementBean.DBCHILDID, 1);
+//		mockPEChild2Results.setInteger(0,PElementBean.DBCHILDPROPERTY, 15);		
+//	}
+//	
+//	
+//	private static MockResults mockPEChild62Results = new MockResults(1);
+//	static {
+//		mockPEChild62Results.setInteger(0,PElementBean.DBCHILDID, 61);
+//		mockPEChild62Results.setInteger(0,PElementBean.DBCHILDPROPERTY, 15);		
+//	}
 	
 	final static String ACTIVELYPARTICIPATESINURL = "http://purl.obolibrary.org/obo/RO_0002217";
 	final static String ACTIVELYPARTICIPATESINLABEL = "actively participates in";	
@@ -422,8 +434,13 @@ public class MockConnection implements AbstractConnection {
 		mockOntologyNamesMap.put("http://purl.obolibrary.org/obo/uberon.owl", "Uberon");
 	}
 
+	
+	private IRIManager irimanager;
 
-	public MockConnection() {
+
+
+	public MockConnection() throws Exception{
+		irimanager = new IRIManager(this);
 		// TODO Auto-generated constructor stub
 	}
 
@@ -451,7 +468,6 @@ public class MockConnection implements AbstractConnection {
 	}
 
 	
-	
 	@Override
 	public PublicationBean getPublication(int pub) throws SQLException {
 		PublicationBean result = new PublicationBean();
@@ -475,7 +491,7 @@ public class MockConnection implements AbstractConnection {
 	}
 
 	@Override
-	public Set<PublicationBean> getPublications() throws SQLException {
+	public Set<PublicationBean> getPublicationTable() throws SQLException {
 		Set<PublicationBean> results = new HashSet<PublicationBean>();
 		PublicationBean p1 = new PublicationBean();
 		p1.fill(mockPublicationResults);
@@ -524,36 +540,12 @@ public class MockConnection implements AbstractConnection {
 	}
 
 
-	@Override
-	public Set<TermBean> getTerms() throws SQLException {
-		Set<TermBean> results = new HashSet<TermBean>();
-		TermBean t1 = new TermBean();
-		fillOrThrow(t1,mockTermResults4838);
-		results.add(t1);
-		TermBean t2 = new TermBean();
-		fillOrThrow(t2,mockTermResults11052);
-		results.add(t2);
-		TermBean t11398 = new TermBean();
-		fillOrThrow(t11398,mockTermResults11398);
-		results.add(t11398);
-		TermBean t11502 = new TermBean();
-		fillOrThrow(t11502,mockTermResults11052);
-		results.add(t11502);
-		return results;
-		
-	}
-
-	@Override
-	public void updateTerm(TermBean termBean) throws SQLException {
-		// TODO Auto-generated method stub
-		
-	}
 
 
 	@Override
-	public Set<ParticipantBean> getParticipants(ClaimBean a) throws SQLException {
+	public Set<ParticipantBean> getParticipantTable(int claimId) throws SQLException {
 		Set<ParticipantBean> results = new HashSet<ParticipantBean>();	
-		switch (a.getId()){
+		switch (claimId){
 		case 1:
 			ParticipantBean p1 = new ParticipantBean();
 			fillOrThrow(p1,mockParticipantResults1);
@@ -565,7 +557,7 @@ public class MockConnection implements AbstractConnection {
 			results.add(p29);
 			break;
 		default:
-			throw new IllegalStateException("mock Claim Bean has unknown id: " + a.getId());
+			throw new IllegalStateException("mock Claim Bean has unknown id: " + claimId);
 		}
 		return results;
 	}
@@ -590,7 +582,7 @@ public class MockConnection implements AbstractConnection {
 
 
 	@Override
-	public Set<ClaimBean> getClaims() throws Exception {
+	public Set<ClaimBean> getClaimTable() throws Exception {
 		Set<ClaimBean> results = new HashSet<ClaimBean>();
 		ClaimBean c1 = new ClaimBean();
 		fillOrThrow(c1,mockClaimResults1);
@@ -605,7 +597,7 @@ public class MockConnection implements AbstractConnection {
 	}
 	
 	@Override
-	public TaxonBean getTaxon(int id) throws SQLException {
+	public TaxonBean getTaxonRow(int id) throws SQLException {
 		TaxonBean result = new TaxonBean();
 		switch (id){
 		case 1:
@@ -621,7 +613,7 @@ public class MockConnection implements AbstractConnection {
 	}
 
 	@Override
-	public Set<TaxonBean> getTaxa() throws SQLException {
+	public Set<TaxonBean> getTaxonTable() throws SQLException {
 		Set<TaxonBean> results = new HashSet<TaxonBean>();
 		TaxonBean t1 = new TaxonBean();
 		fillOrThrow(t1,mockTaxonResults);
@@ -651,24 +643,21 @@ public class MockConnection implements AbstractConnection {
 		}
 	}
 	
-	@Override
-	public void updateParticipant(ParticipantBean p){
-		
-	}
 	
-	@Override
-	public void updatePublication(PublicationBean p){
-		switch (p.getId()){
-		case 2:
-			mockPublicationResults2.setString(0,PublicationBean.DBGENERATEDID, p.getGeneratedId());
-			break;
-		case 3:
-			mockPublicationResults3.setString(0,PublicationBean.DBGENERATEDID, p.getGeneratedId());
-			break;
-		default:
-			break;
-		}
-	}		
+// keep this as template - update uidset will be pretty massive	
+//	@Override
+//	public void updatePublication(PublicationBean p){
+//		switch (p.getId()){
+//		case 2:
+//			mockPublicationResults2.setString(0,PublicationBean.DBGENERATEDID, p.getGeneratedId());
+//			break;
+//		case 3:
+//			mockPublicationResults3.setString(0,PublicationBean.DBGENERATEDID, p.getGeneratedId());
+//			break;
+//		default:
+//			break;
+//		}
+//	}		
 	
 	
 	@Override
@@ -727,20 +716,29 @@ public class MockConnection implements AbstractConnection {
 		}
 	}		
 
-
+	
 	@Override
-	public int scanPrivateIDs(){
-		return MAXMOCKIDVALUE;
+	public NarrativeBean getNarrative(int nId) throws SQLException{
+		NarrativeBean nb = new NarrativeBean();
+		switch (nId){
+		case 1:
+			fillOrThrow(nb,mockIndividualResults94);
+			break;
+		case 2: 
+			fillOrThrow(nb,mockIndividualResults95);
+			break;
+		case 0:
+			nb = null;
+			break;
+		default:
+			throw new IllegalStateException("mock Narrative Bean has unknown id: " + nId);
+		}
+		return nb;
 	}
 
-	@Override
-	public Set<ParticipantBean> getParticipantsWithProperty(ClaimBean a,Object p) {
-		// TODO Auto-generated method stub
-		throw new RuntimeException("Need to implement getParticipantWithProperty");
-	}
 
 	@Override
-	public Set<PElementBean> getPElements(ParticipantBean p) throws Exception {
+	public Set<PElementBean> getPElementTable(ParticipantBean p) throws Exception {
 		final Set<PElementBean> result = new HashSet<PElementBean>();
 		switch (p.getId()){
 		case 1:
@@ -748,14 +746,14 @@ public class MockConnection implements AbstractConnection {
 			PElementBean e2 = new PElementBean();
 			e1.fill(mockPElementResults);
 			e2.fill(mockPElementResults2);
-			fillPElementTerm(e1);
-			fillPElementIndividual(e1);
-			fillPElementTerm(e2);
-			fillPElementIndividual(e2);			
-			fillPElementParents(e1);
-			fillPElementChildren(e1);
-			fillPElementChildren(e2);
-			fillPElementChildren(e2);
+//			fillPElementTerm(e1);
+//			fillPElementIndividual(e1);
+//			fillPElementTerm(e2);
+//			fillPElementIndividual(e2);			
+//			fillPElementParents(e1);
+//			fillPElementChildren(e1);
+//			fillPElementChildren(e2);
+//			fillPElementChildren(e2);
 			result.add(e1);
 			result.add(e2);
 			break;
@@ -764,14 +762,14 @@ public class MockConnection implements AbstractConnection {
 			PElementBean e62 = new PElementBean();
 			e61.fill(mockPElementResults61);
 			e62.fill(mockPElementResults62);
-			fillPElementTerm(e61);
-			fillPElementIndividual(e61);
-			fillPElementTerm(e62);
-			fillPElementIndividual(e62);			
-			fillPElementParents(e61);
-			fillPElementChildren(e61);
-			fillPElementChildren(e62);
-			fillPElementChildren(e62);
+//			fillPElementTerm(e61);
+//			fillPElementIndividual(e61);
+//			fillPElementTerm(e62);
+//			fillPElementIndividual(e62);			
+//			fillPElementParents(e61);
+//			fillPElementChildren(e61);
+//			fillPElementChildren(e62);
+//			fillPElementChildren(e62);
 			result.add(e61);
 			result.add(e62);
 			break;
@@ -788,26 +786,26 @@ public class MockConnection implements AbstractConnection {
 		switch (id){
 		case 1:{
 			result.fill(mockPElementResults);
-			fillPElementParents(result);
-			fillPElementChildren(result);
+//			fillPElementParents(result);
+//			fillPElementChildren(result);
 			break;
 		}
 		case 2:{
 			result.fill(mockPElementResults2);
-			fillPElementParents(result);
-			fillPElementChildren(result);
+//			fillPElementParents(result);
+//			fillPElementChildren(result);
 			break;
 		}
 		case 61:{
 			result.fill(mockPElementResults61);
-			fillPElementParents(result);
-			fillPElementChildren(result);
+//			fillPElementParents(result);
+//			fillPElementChildren(result);
 			break;
 		}
 		case 62:{
 			result.fill(mockPElementResults62);
-			fillPElementParents(result);
-			fillPElementChildren(result);
+//			fillPElementParents(result);
+//			fillPElementChildren(result);
 			break;
 		}
 		default :{
@@ -817,35 +815,35 @@ public class MockConnection implements AbstractConnection {
 		return result;
 	}
 
-	public void fillPElementParents(PElementBean result) throws Exception{
-		switch (result.getId()){
-		case 1:
-			mockPEParent1Results.reset();
-			result.fillParents(mockPEParent1Results);
-			break;
-		case 61:
-			mockPEParent61Results.reset();
-			result.fillParents(mockPEParent61Results);
-		default:
-			result.fillParents(MockResults.NullResults);
-		}
-	}
-
-	public void fillPElementChildren(PElementBean result) throws Exception{
-		switch (result.getId()){
-		case 2:
-			mockPEChild2Results.reset();
-			result.fillChildren(mockPEChild2Results);
-			break;
-		case 62:
-			mockPEChild62Results.reset();
-			result.fillChildren(mockPEChild62Results);
-			break;
-		default:
-			result.fillChildren(MockResults.NullResults);
-		}
-		
-	}
+//	public void fillPElementParents(PElementBean result) throws Exception{
+//		switch (result.getId()){
+//		case 1:
+//			mockPEParent1Results.reset();
+//			result.fillParents(mockPEParent1Results);
+//			break;
+//		case 61:
+//			mockPEParent61Results.reset();
+//			result.fillParents(mockPEParent61Results);
+//		default:
+//			result.fillParents(MockResults.NullResults);
+//		}
+//	}
+//
+//	public void fillPElementChildren(PElementBean result) throws Exception{
+//		switch (result.getId()){
+//		case 2:
+//			mockPEChild2Results.reset();
+//			result.fillChildren(mockPEChild2Results);
+//			break;
+//		case 62:
+//			mockPEChild62Results.reset();
+//			result.fillChildren(mockPEChild62Results);
+//			break;
+//		default:
+//			result.fillChildren(MockResults.NullResults);
+//		}
+//		
+//	}
 
 	@Override
 	public PropertyBean getProperty(int id) throws Exception {
@@ -864,42 +862,115 @@ public class MockConnection implements AbstractConnection {
 	}
 
 	@Override
-	public void fillPElementTerm(PElementBean pb) throws Exception {
-		switch (pb.getId()){
-		case 1:
-			pb.fillTerm(termFillResults4838, this);
-			break;
-		case 2: 
-			pb.fillTerm(termFillResults10473, this);
-			break;
-		case 61: 
-		case 62: 
-			pb.fillTerm(termFillResultsNull, this);
-			break;
-		
-		default:
-			throw new RuntimeException("Bad pelementbean id: " + pb.getId());
+	public PropertyBean getPropertyFromSourceId(String uid) throws Exception {
+		final PropertyBean result = new PropertyBean();
+		switch (uid){
+			case ACTIVELYPARTICIPATESINURL:
+				result.fill(mockPropertyResults306);
+				break;
+			case PARTOFURL:
+				result.fill(mockPropertyResults15);
+				break;
+			default:
+				return null;
 		}
-		
+		return result;
 	}
 
+//	@Override
+//	public void fillPElementTerm(PElementBean pb) throws Exception {
+//		switch (pb.getId()){
+//		case 1:
+//			pb.fillTerm(termFillResults4838, this);
+//			break;
+//		case 2: 
+//			pb.fillTerm(termFillResults10473, this);
+//			break;
+//		case 61: 
+//		case 62: 
+//			pb.fillTerm(termFillResultsNull, this);
+//			break;
+//		
+//		default:
+//			throw new RuntimeException("Bad pelementbean id: " + pb.getId());
+//		}
+//		
+//	}
+//
+//	@Override
+//	public void fillPElementIndividual(PElementBean pb) throws Exception {
+//		switch (pb.getId()){
+//		case 1:
+//		case 2:
+//			break;
+//		case 61:
+//			pb.fillIndividual(individualFillResults94, this);
+//			break;
+//		case 62:
+//			pb.fillIndividual(individualFillResults95, this);
+//			break;
+//		default:
+//			throw new RuntimeException("Bad pelementbean id: " + pb.getId());
+//		}
+//	}
+//		// TODO Auto-generated method stub
+//
+
+
 	@Override
-	public void fillPElementIndividual(PElementBean pb) throws Exception {
-		switch (pb.getId()){
-		case 1:
-		case 2:
-			break;
-		case 61:
-			pb.fillIndividual(individualFillResults94, this);
-			break;
-		case 62:
-			pb.fillIndividual(individualFillResults95, this);
-			break;
-		default:
-			throw new RuntimeException("Bad pelementbean id: " + pb.getId());
-		}
-	}
+	public ParticipantBean getParticipant(int id) throws Exception {
 		// TODO Auto-generated method stub
+		return null;
+	}
+
+@Override
+public Set<Integer> getParticipantSet(int claimId) throws Exception {
+	// TODO Auto-generated method stub
+	return null;
+}
+
+
+@Override
+public Set<Integer> getPElementSet(ParticipantBean p) throws Exception {
+	// TODO Auto-generated method stub
+	return null;
+}
+
+@Override
+public IRIManager getIRIManager(){
+	//TODO Not sure how to implement this
+	return null;
+}
+
+@Override
+public UidSet getUidSet(int setId) throws Exception {
+	// TODO Auto-generated method stub
+	return null;
+}
+
+@Override
+public Set<UidSet> getUidSetTable() throws Exception {
+	// TODO Auto-generated method stub
+	return null;
+}
+
+@Override
+public void updateUidSet(UidSet s) throws SQLException {
+	// TODO Auto-generated method stub
+	
+}
+
+@Override
+public String getUidSetLastGenId() throws Exception {
+	// TODO Auto-generated method stub
+	return null;
+}
+
+@Override
+public Set<NarrativeBean> getNarrativeTable() throws SQLException {
+	// TODO Auto-generated method stub
+	return null;
+}
 		
 
 

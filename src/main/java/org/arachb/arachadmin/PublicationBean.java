@@ -1,11 +1,15 @@
 package org.arachb.arachadmin;
 
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.log4j.Logger;
 
 
 
 
-public class PublicationBean implements UpdateableBean{
+public class PublicationBean implements CachingBean,UpdateableBean {
 
 
 	static final int DBID = 1;
@@ -28,9 +32,13 @@ public class PublicationBean implements UpdateableBean{
 	static final int DBGENERATEDID = 18;
 	static final int DBCURATIONSTATUS = 19;
 	static final int DBCURATIONUPDATE = 20;
+	static final int DBUIDSET = 21;
 	
 
-	
+	private static final Map<Integer, PublicationBean> cache = new HashMap<>();
+	private static Logger log = Logger.getLogger(PublicationBean.class);
+
+
 	private int id;
 	private String publication_type;
 	private String dispensation;
@@ -51,7 +59,7 @@ public class PublicationBean implements UpdateableBean{
 	private String generated_id;
 	private String curation_status;
 	private String curation_update;
-	
+	private int uidset;
 
 	
 	
@@ -76,9 +84,12 @@ public class PublicationBean implements UpdateableBean{
 		doi = record.getString(DBDOI);
 		generated_id = record.getString(DBGENERATEDID);
         curation_status = record.getString(DBCURATIONSTATUS);
-        curation_update = record.getString(DBCURATIONUPDATE);        
+        curation_update = record.getString(DBCURATIONUPDATE);
+        uidset = record.getInt(DBUIDSET);
 	}
 	
+	/* accessors */
+
 	@Override
 	public int getId(){
 		return id;
@@ -146,11 +157,11 @@ public class PublicationBean implements UpdateableBean{
 	}
 	
 	public String getDoi(){
-		return doi;
+		return UidSet.getCached(uidset).getSourceId();
 	}
 
 	public String getGeneratedId(){
-		return generated_id;
+		return UidSet.getCached(uidset).getGeneratedId();
 	}
 
 	public String getCurationStatus(){
@@ -161,49 +172,80 @@ public class PublicationBean implements UpdateableBean{
 		return curation_update;
 	}
 	
+	/* Updaters */
+
 	//Just updates the id in the bean - method for updating db is in DBConnection
 	public void setGeneratedId(String id) {
-		generated_id = id;
+		UidSet.getCached(uidset).setGeneratedId(id);
 	}
 
 	
 	public void updateDB(AbstractConnection c) throws SQLException{
-		c.updatePublication(this);
+		c.updateUidSet(UidSet.getCached(uidset));   //hide uncaching?
 	}
 	
-	final static String PUBBADDOIGENID = "Publication has neither doi nor generated id";
+	final private static String NOTERMGENID = "Publication has no doi or generated id; db id = %s";
+
 	@Override
-	public String getIRIString() {
-		if (getDoi() == null){
-			if (getGeneratedId() == null){
-				throw new IllegalStateException(PUBBADDOIGENID);
-			}
-			return getGeneratedId();
+	public String getIRIString(){
+		String refid = UidSet.getCached(uidset).getRefId();
+		if (refid == null){
+			final String msg = String.format(NOTERMGENID, getId());
+			throw new IllegalStateException(msg);			
 		}
-		try {
-			return IRIManager.cleanupDoi(getDoi());
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return "";
-		}
+		return refid;
 	}
 
 	@Override
-	public String checkIRIString(IRIManager manager) throws SQLException {
-		if (getDoi() == null){
-			manager.generateIRI(this);
-			return getGeneratedId();
-		}
-		try {
-			return IRIManager.cleanupDoi(getDoi());
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return "";
-		}
+	public String checkIRIString(IRIManager manager) throws SQLException{
+		return UidSet.getCached(uidset).checkIRIString(manager);
+	}
+
+	/**
+	 * may not be needed, but if we ever need to reopen a database
+	 */
+	static void flushCache(){
+		cache.clear();
+	}
+
+	public static boolean isCached(int id){
+		return cache.containsKey(id);
+	}
+
+	public static int cacheSize(){
+		return cache.size();
+	}
+
+	public static PublicationBean getCached(int id){
+		assert cache.containsKey(id) : String.format("no cache entry for %d",id);
+		return cache.get(id);
 	}
 
 
+	@Override
+	public void cache(){
+		if (isCached(getId())){
+			log.warn(String.format("Tried multiple caching of %s with id %d",
+					               getClass().getSimpleName(),
+					               getId()));
+		}
+		cache.put(getId(), this);
+	}
+
+
+	@Override
+	public void updatecache(){
+		if (!this.equals(cache.get(getId()))){
+			log.warn(String.format("Forcing update of cached bean %s with id %d",
+					               getClass().getSimpleName(),
+					               getId()));
+			cache.put(this.getId(), this);
+		}
+	}
+
+	public int getuidset() {
+		// TODO Auto-generated method stub
+		return uidset;
+	}
 	
 }

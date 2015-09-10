@@ -5,8 +5,25 @@ import java.util.Map;
 import java.util.Set;
 
 
-
 public interface AbstractConnection {
+
+	/**
+	 * Methods for connecting to an arachadmin database or mock of the same.
+	 * Many methods return a single row from a table, as specified by an id,
+	 * and represented by a bean appropriate to the table being queried
+	 * or a set of ids (frequently filtered by an SQL where clause) or a table
+	 * consisting of a set of beans.  Update methods operate on a single row and
+	 * usually just update the generated_id column for that row, since that is the
+	 * only field that can be filled at generation time.
+	 * Not every table has methods for every type of access.
+	 * Note that the implementation of beans is limited to strings, integers, and
+	 * sets of integers (doubles aren't used but wouldn't break the design).  One to
+	 * many and many to many are each captured as sets of indices (currently limited
+	 * to integers, though that's a design pattern (imposed by web2py) that will be 
+	 * tossed when web2py is replaced in the curation tool.
+	 * @author pmidford
+	 */
+	
 
 	/**
 	 * performs query and returns a mapping from uri's of support ontologies used
@@ -22,12 +39,18 @@ public interface AbstractConnection {
 	 */
 	void close() throws Exception;
 
+
 	/**
 	 * 
 	 * @return all the claims in the supplying resource
 	 * @throws Exception
 	 */
-	Set<ClaimBean> getClaims() throws Exception;
+	Set<ClaimBean> getClaimTable() throws Exception;
+
+	/**
+	 * 
+	 */
+	void updateClaim(ClaimBean c) throws SQLException;
 
 	/**
 	 * returns a single publication
@@ -42,57 +65,60 @@ public interface AbstractConnection {
 	 * @return all the publications in the supplying resource
 	 * @throws SQLException
 	 */
-	Set<PublicationBean> getPublications() throws SQLException;
-	
-	/**
-	 * 
-	 */
-	void updateClaim(ClaimBean c) throws SQLException;
+	Set<PublicationBean> getPublicationTable() throws SQLException;
 
 	/**
 	 * 
-	 * @param p
+	 * @param claimId id of claim with associated participants
+	 * @return id's of participant beans associated with claim
 	 * @throws SQLException
 	 */
-	void updatePublication(PublicationBean p) throws SQLException;
+	public Set<Integer> getParticipantSet(int claimId) throws Exception;
 
 	/**
 	 * 
-	 * @param a
-	 * @return
+	 * @param claimId id of claim with associated participants
+	 * @return id's of participant beans associated with claim
 	 * @throws SQLException
 	 */
-	Set<ParticipantBean> getParticipants(ClaimBean a) throws Exception;
-	
+	public Set<ParticipantBean> getParticipantTable(int claimId) throws Exception;
+
+
 	/**
 	 * 
-	 * @param a holds the claim
-	 * @param p specifies the property (e.g., activelyparticipatesin)
-	 * @throws SQLException
+	 * @return bean associated with id
 	 */
-	Set<ParticipantBean> getParticipantsWithProperty(ClaimBean a, Object p);
-	
-	/**
-	 * 
-	 * @param p
-	 * @throws SQLException
-	 */
-	void updateParticipant(ParticipantBean p) throws SQLException;
-	
+	public ParticipantBean getParticipant(int id) throws Exception;
+
 	/**
 	 * @param p specifies the participant that packages these elements
 	 * @throws SQLException
 	 */
-	Set<PElementBean> getPElements(ParticipantBean p) throws Exception;
-	
-	
+	Set<Integer> getPElementSet(ParticipantBean p) throws Exception;
+
+	/**
+	 * 
+	 * @param p
+	 * @return set of PElementBeans associated with p's participant
+	 * @throws Exception
+	 */
+	Set<PElementBean> getPElementTable(ParticipantBean p) throws Exception;
+
+
 	/**
 	 * 
 	 * @param id
-	 * @return
+	 * @return bean reflecting record indexed by id
 	 * @throws Exception
 	 */
 	PElementBean getPElement(int id) throws Exception;
+
+	/**
+	 * 
+	 * @return set of taxa in TaxonTable as beans
+	 * @throws SQLException
+	 */
+	Set<TaxonBean>getTaxonTable() throws SQLException;
 
 	/**
 	 * returns a single (curator added) taxon 
@@ -100,14 +126,8 @@ public interface AbstractConnection {
 	 * @return object filled with the fields from the taxon requested
 	 * @throws SQLException
 	 */
-	TaxonBean getTaxon(int id) throws SQLException;
+	TaxonBean getTaxonRow(int id) throws SQLException;
 
-	/**
-	 * 
-	 * @return all the taxa in the supplying resource
-	 * @throws SQLException
-	 */
-	Set<TaxonBean> getTaxa() throws SQLException;
 
 	/**
 	 * 
@@ -116,6 +136,7 @@ public interface AbstractConnection {
 	 */
 	void updateTaxon(TaxonBean t) throws SQLException;
 
+	
 	/**
 	 * performs query and returns a mapping from uri's of support ontologies used
 	 * in this build to human readable names of the ontologies
@@ -132,20 +153,8 @@ public interface AbstractConnection {
 	 */
 	TermBean getTerm(int termId) throws SQLException;
 
-	/**
-	 * 
-	 * @return
-	 * @throws SQLException
-	 */
-	Set<TermBean> getTerms() throws SQLException;
 
-	/**
-	 * 
-	 * @param termBean
-	 */
-	void updateTerm(TermBean termBean) throws SQLException;
 
-	
 	/**
 	 * should update the database record corresponding to the entity
 	 * @param e
@@ -153,7 +162,7 @@ public interface AbstractConnection {
 	 */
 	void updateNamedEntity(UpdateableBean b) throws SQLException;
 
-	
+
 	/**
 	 * returns representation of a single claim
 	 * @param claimId
@@ -177,49 +186,89 @@ public interface AbstractConnection {
 	 */
 	void updateIndividual(IndividualBean t) throws SQLException;
 
+
 	/**
-	 * returns bean representation of an OWL property from connection or
-	 * property class's cache
-	 * @param pId
+	 * 
+	 * @param nId
+	 * @return bean for narrative record indexed by id
+	 * @throws SQLException
+	 */
+	NarrativeBean getNarrative(int nId) throws SQLException;
+
+	/**
+	 * 
 	 * @return
+	 * @throws SQLException
+	 */
+	Set<NarrativeBean>getNarrativeTable() throws SQLException;
+
+
+	
+	/**
+	 * @param pId index of property record
+	 * @return bean containing record of owl property indexed by id
 	 * @throws Exception 
 	 */
 	PropertyBean getProperty(int pId) throws Exception;
 
 	/**
+	 * This is the right way to access properties.
+	 * @param uid unique string id (generally a uri) for the property
+	 * @return bean filled from the appropriate row in the database
+	 */
+	PropertyBean getPropertyFromSourceId(String uid) throws Exception;
+
+	/**
+	 * @param setId web2py integer key
+	 * @return bean filled from appropriate row in uids table
+	 */
+	UidSet getUidSet(int setId) throws Exception;
+
+	/**
+	 * 
+	 * @return set of beans filled from appropriate row in uids table
+	 */
+	Set<UidSet> getUidSetTable() throws Exception;
+
+	/**
+	 * 
+	 * @param s
+	 * @throws SQLException
+	 */
+	void updateUidSet(UidSet s) throws SQLException;
+	
+	/**
 	 * 
 	 * @return next available serial number in generated id space - not the same as resource id
 	 * @throws Exception
 	 */
-	int scanPrivateIDs() throws Exception;
+//	int scanPrivateIDs() throws Exception;
 
 	/**
 	 * 
 	 * @param pb
 	 * @throws Exception
 	 */
-	void fillPElementTerm(PElementBean pb) throws Exception;
+	//void fillPElementTerm(PElementBean pb) throws Exception;
 
 	/**
 	 * 
 	 * @param pb
 	 * @throws Exception
 	 */
-	void fillPElementIndividual(PElementBean pb) throws Exception;
+	//void fillPElementIndividual(PElementBean pb) throws Exception;
 
 	/**
-	 * 
-	 * @param result
-	 * @throws Exception
+	 * @return object responsible for tracking generated IRI's 
 	 */
-	void fillPElementParents(PElementBean result) throws Exception;
+	public IRIManager getIRIManager();
 
 	/**
-	 * 
-	 * @param result
+	 * Called by IRIManager to get the highest valued generated id string
+	 * @return last generated id
 	 * @throws Exception
 	 */
-	void fillPElementChildren(PElementBean result) throws Exception;
+	String getUidSetLastGenId() throws Exception;
 
 
 

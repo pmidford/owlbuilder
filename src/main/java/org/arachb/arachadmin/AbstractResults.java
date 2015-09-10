@@ -11,5 +11,7 @@ public interface AbstractResults {
 	boolean getBoolean(int field) throws SQLException;
 	
 	boolean next() throws SQLException;
+	
+	void close() throws SQLException;
 
 }

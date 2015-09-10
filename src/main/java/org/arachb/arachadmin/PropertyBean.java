@@ -1,10 +1,14 @@
 package org.arachb.arachadmin;
 
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.log4j.Logger;
 
 
 
-public class PropertyBean extends CachingBean {
+public class PropertyBean implements CachingBean,BeanBase {
 
 	final static int DBID = 1;
 	final static int DBSOURCEID = 2;
@@ -13,20 +17,20 @@ public class PropertyBean extends CachingBean {
 	final static int DBGENERATEDID = 5;
 	final static int DBCOMMENT = 6;
 
+	private static final Map<Integer, PropertyBean> cache = new HashMap<>();
+	private static final Map<String, PropertyBean> sourceIdCache = new HashMap<>();
+	private static Logger log = Logger.getLogger(PropertyBean.class);
+
+
+
 	private int id;
 	private String sourceId;
 	private int authority;
 	private String label;
 	private String generatedId;  //this is dubious
 	private String comment;
-	
-	
-	public final static String INDIVIDUALQUANTIFIER = "INDIVIDUAL";
-	public final static String SOMEQUANTIFIER = "SOME";
-	
 
 
-	
 	@Override
 	public int getId() {
 		return id;
@@ -39,10 +43,10 @@ public class PropertyBean extends CachingBean {
 		authority = record.getInt(DBAUTHORITY);
 		label = record.getString(DBLABEL);
 		generatedId = record.getString(DBGENERATEDID);
-		comment = record.getString(DBCOMMENT);		
+		comment = record.getString(DBCOMMENT);
 	}
-	
-	
+
+
 	public String getSourceId(){
 		return sourceId;
 	}
@@ -50,19 +54,76 @@ public class PropertyBean extends CachingBean {
 	public int getAuthority(){
 		return authority;
 	}
-	
+
 	public String getLabel(){
 		return label;
 	}
-	
+
 	public String getGeneratedId(){
 		return generatedId;
 	}
-	
+
 	public String getComment(){
 		return comment;
 	}
-	
-	
-	
+
+	/**
+	 * may not be needed, but if we ever need to reopen a database
+	 */
+	static void flushCache(){
+		cache.clear();
+		sourceIdCache.clear();
+	}
+
+	public static boolean isCached(int id){
+		return cache.containsKey(id);
+	}
+
+	public static boolean isSourceIdCached(String source_id){
+		return sourceIdCache.containsKey(source_id);
+	}
+
+	public static PropertyBean getCached(int id){
+		assert cache.containsKey(id) : String.format("no cache entry for %d",id);
+		return cache.get(id);
+	}
+
+	public static PropertyBean getSourceIdCached(String source_id){
+		assert sourceIdCache.containsKey(source_id) : String.format("no cache entry for %s",source_id);
+		return sourceIdCache.get(source_id);
+	}
+
+	@Override
+	public void cache(){
+		if (isCached(getId())){
+			log.warn(String.format("Tried multiple caching of %s with id %d",
+					               getClass().getSimpleName(),
+					               getId()));
+		}
+		if (isSourceIdCached(getSourceId())){
+			log.warn(String.format("Tried multiple caching of %s with id %s",
+		               getClass().getSimpleName(),
+		               getSourceId()));
+		}
+		cache.put(getId(), this);
+		sourceIdCache.put(getSourceId(), this);
+	}
+
+
+	@Override
+	public void updatecache(){
+		if (!this.equals(cache.get(getId()))){
+			log.warn(String.format("Forcing update of cached bean %s with id %d",
+					               getClass().getSimpleName(),
+					               getId()));
+			cache.put(getId(), this);
+		}
+		if (!this.equals(sourceIdCache.get(getSourceId()))){
+			log.warn(String.format("Forcing update of cached bean %s with id %s",
+					               getClass().getSimpleName(),
+					               getSourceId()));
+			sourceIdCache.put(getSourceId(), this);
+		}
+	}
+
 }

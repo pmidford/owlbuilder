@@ -1,11 +1,9 @@
-package org.arachb.owlbuilder;
+package org.arachb.arachadmin;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.junit.Assert.assertThat;
 
-import org.arachb.arachadmin.AbstractConnection;
-import org.arachb.arachadmin.IRIManager;
-import org.arachb.arachadmin.MockConnection;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -17,7 +15,7 @@ public class TestIRIManager {
 	private AbstractConnection c;
 
 	@Before
-	public void setup() throws Exception {
+	public void setUp() throws Exception {
 		c = new MockConnection();
 
 	}
@@ -25,23 +23,26 @@ public class TestIRIManager {
 	@Test
 	public void testIRIManager() throws Exception{
 		IRIManager testManager = new IRIManager(c);
-		assertNotNull(testManager);
+		assertThat(testManager,notNullValue(IRIManager.class));
 	}
 
 	@Test
 	public void testGenerateARACHB_IRI_String() throws Exception{
 		IRIManager testManager = new IRIManager(c);
 		String idString = testManager.generateARACHB_IRI_String();
-		assertNotNull(idString);
+		assertThat(idString,notNullValue(String.class));
 	}
 
+	
+	static final String TESTTAXONURI = "http://purl.obolibrary.org/obo/NCBITaxon_6866";
+	static final String TESTTAXONID = "6866";
+	
 	@Test
 	public void testGetNCBI_IRI() throws Exception{
-		String test1 = "6866";
 		IRIManager testManager = new IRIManager(c);
-		IRI testid = testManager.getNCBI_IRI(test1);
-		assertNotNull(testid);
-		assertEquals("http://purl.obolibrary.org/obo/NCBITaxon_6866",testid.toString());
+		IRI testid = testManager.getNCBI_IRI(TESTTAXONID);
+		assertThat(testid,notNullValue(IRI.class));
+		assertThat(testid.toString(),equalTo(TESTTAXONURI));
 	}
 
 	@Rule

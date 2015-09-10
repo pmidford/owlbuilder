@@ -2,7 +2,7 @@ package org.arachb.owlbuilder;
 
 /**
  * Main class - merges or generates fresh owl file from admindb
- *
+ * @author Peter E. Midford
  */
 
 import java.io.File;
@@ -19,9 +19,12 @@ import org.apache.log4j.PropertyConfigurator;
 import org.arachb.arachadmin.AbstractConnection;
 import org.arachb.arachadmin.DBConnection;
 import org.arachb.arachadmin.IRIManager;
+import org.arachb.arachadmin.PropertyBean;
 import org.arachb.arachadmin.TaxonBean;
 import org.arachb.owlbuilder.lib.Claim;
 import org.arachb.owlbuilder.lib.Config;
+import org.arachb.owlbuilder.lib.Narrative;
+import org.arachb.owlbuilder.lib.Participant;
 import org.arachb.owlbuilder.lib.Taxon;
 import org.arachb.owlbuilder.lib.Vocabulary;
 import org.semanticweb.HermiT.Reasoner;
@@ -29,12 +32,17 @@ import org.semanticweb.elk.owlapi.ElkReasonerFactory;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAnnotation;
 import org.semanticweb.owlapi.model.OWLAnnotationAssertionAxiom;
+import org.semanticweb.owlapi.model.OWLAnnotationAxiom;
+import org.semanticweb.owlapi.model.OWLAnnotationProperty;
+import org.semanticweb.owlapi.model.OWLAnnotationValue;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassAxiom;
+import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLDocumentFormat;
 import org.semanticweb.owlapi.model.OWLIndividual;
+import org.semanticweb.owlapi.model.OWLObject;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLObjectPropertyAxiom;
 import org.semanticweb.owlapi.model.OWLObjectPropertyExpression;
@@ -42,7 +50,6 @@ import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 import org.semanticweb.owlapi.reasoner.InferenceType;
-import org.semanticweb.owlapi.reasoner.Node;
 import org.semanticweb.owlapi.reasoner.NodeSet;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
@@ -59,7 +66,7 @@ import owltools.graph.OWLGraphWrapper;
 
 public class Owlbuilder{
 
-	
+
 	//private OWLOntologyManager manager;
 	//private OWLDataFactory factory;
 	private final IRIManager iriManager;
@@ -71,18 +78,20 @@ public class Owlbuilder{
 	private OWLReasoner preReasoner;
 	private OWLReasoner postReasoner;
 	private final Map<IRI,Taxon>nonNCBITaxa = new HashMap<IRI,Taxon>();
-	
+
+	private final Set<OWLAxiom> axiomset = new HashSet<OWLAxiom>();
+
 	private final Map<String,OWLOntology>supportOntologies = new HashMap<String,OWLOntology>();
 	private OWLOntology mergedSources = null;
-	
+
 	private final OWLGraphWrapper testWrapper;
-		
-	
+
+
 	public static final String targetIRI = "http://arachb.org/arachb/arachb.owl";
 	public static final String taxonomyTarget = "http://arachb.org/imports/NCBI_import.owl";
 
 	private static String temporaryOutput = "test.owl";
-	
+
 	private final Config config;
 	private static Logger log = Logger.getLogger(Owlbuilder.class);
 
@@ -95,10 +104,10 @@ public class Owlbuilder{
 		builder.process();
 		builder.shutdown();
 	}
-	
-	Owlbuilder() throws Exception{
+
+	public Owlbuilder() throws Exception{
 		config = new Config("");
-		if (DBConnection.testConnection()){
+		if (DBConnection.probeConnection()){
 			connection = DBConnection.getDBConnection();
 		}
 		else{
@@ -107,27 +116,40 @@ public class Owlbuilder{
 		testWrapper = new OWLGraphWrapper(targetIRI);
 		rfactory = new Reasoner.ReasonerFactory();
 		elkFactory = new ElkReasonerFactory();
-		iriManager = new IRIManager(connection);
+		iriManager = connection.getIRIManager();
 		final OWLDocumentFormat format = testWrapper.getManager().getOntologyFormat(testWrapper.getSourceOntology());
 		format.asPrefixOWLOntologyFormat().setPrefix("doi", "http://dx.doi.org/");
 	}
 
-	void setUpForTesting() throws Exception{
+	public Owlbuilder(AbstractConnection existingConnection) throws Exception{
+		config = new Config("");
+		connection = existingConnection;
+		testWrapper = new OWLGraphWrapper(targetIRI);
+		rfactory = new Reasoner.ReasonerFactory();
+		elkFactory = new ElkReasonerFactory();
+		iriManager = connection.getIRIManager();
+		final OWLDocumentFormat format = testWrapper.getManager().getOntologyFormat(testWrapper.getSourceOntology());
+		format.asPrefixOWLOntologyFormat().setPrefix("doi", "http://dx.doi.org/");
+
+	}
+
+	public void setUpForTesting() throws Exception{
 		mergedSources = testWrapper.getSourceOntology();
 		preReasoner = elkFactory.createReasoner(mergedSources);
+		target = testWrapper.getSourceOntology();
 	}
-	
-	
-	void process() throws Exception{	
+
+
+	void process() throws Exception{
 		target = testWrapper.getSourceOntology();
 		log.info("Loading ontologies");
 		loadImportedOntologies();
 		mergedSources = mergeImportedOntologies();
 		loadCuratorAddedTerms(mergedSources);
-		//log.info("Saving ontology");			
+		//log.info("Saving ontology");
 		//File f = new File("merged.owl");
-		//testWrapper.getManager().saveOntology(mergedSources, IRI.create(f.toURI()));		
-		
+		//testWrapper.getManager().saveOntology(mergedSources, IRI.create(f.toURI()));
+
 		log.info("Initializing reasoner");
 
         OWLReasonerFactory rf = new StructuralReasonerFactory();
@@ -150,8 +172,8 @@ public class Owlbuilder{
 			log.info("Before processing database, target class count = " +target.getClassesInSignature().size());
 			processDatabase();
 			log.info("After processing database, target class count = " +target.getClassesInSignature().size());
-			
-			//log.info("Saving ontology");			
+
+			//log.info("Saving ontology");
 			//File f = new File("checkpoint.owl");
 			//testWrapper.getManager().saveOntology(target, IRI.create(f.toURI()));
 			if (true){
@@ -190,31 +212,34 @@ public class Owlbuilder{
 		finally{
 			preReasoner.dispose();
 			if (postReasoner != null){
-				postReasoner.dispose();					
+				postReasoner.dispose();
 			}
 			else{
 				log.info("No post reasoner found at shutdown");
 			}
 		}
 	}
-	
+
 	void shutdown() throws Exception{
         log.info("Done");
 		connection.close();
 	}
 
 	void processDatabase() throws Exception{
+		log.info("Processing Narratives");
+		Map<String,OWLObject> narrativeIndividuals = processNarratives();
 		log.info("Processing Claims");
-		processClaims();
+		processClaims(narrativeIndividuals);
 		connection.close();
 	}
-	
+
 	/**
 	 * This loads the support ontologies specified in the source_ontologies table
 	 * @throws Exception
 	 */
 	void loadImportedOntologies() throws Exception{
-		final Map <String,String> sourceMap = connection.loadImportSourceMap();
+		Map<String, String> sourceMap;
+		sourceMap = connection.loadImportSourceMap();
 		final Map <String,String> namesForLoading = connection.loadOntologyNamesForLoading();
 		final OWLOntologyManager manager = testWrapper.getManager();
 		for (String source : sourceMap.keySet()){
@@ -223,16 +248,20 @@ public class Owlbuilder{
 			String sourcePath = iri.toURI().getPath();
 			String [] pathParts = sourcePath.split("/");
 			String cachePath = "file:/" + config.getCacheDir() + "/" + pathParts[pathParts.length-1];
-            log.info("Cachepath is " + cachePath);
-            manager.getIRIMappers().add(new SimpleIRIMapper(iri, IRI.create(cachePath)));
+			log.info("Cachepath is " + cachePath);
+			manager.getIRIMappers().add(new SimpleIRIMapper(iri, IRI.create(cachePath)));
 			log.info("Added IRIMapper");
-			OWLOntology ont = manager.loadOntology(iri);
-			log.info("Loaded " + ont.getAxiomCount() + " axioms from " + cachePath);
-            supportOntologies.put(source, ont);
+			try{
+				OWLOntology ont = manager.loadOntology(iri);
+				log.info("Loaded " + ont.getAxiomCount() + " axioms from " + cachePath);
+				supportOntologies.put(source, ont);
+			}
+			catch (Exception e){
+				e.printStackTrace();
+			}
 		}
 	}
-	
-	
+
 	OWLOntology mergeImportedOntologies() throws Exception{
 		log.info("Starting ontology merge");
 		final OWLOntologyManager manager = testWrapper.getManager();
@@ -242,18 +271,36 @@ public class Owlbuilder{
         log.info("Finished ontology merge; merged support ontologies axiom count = " + merged.getAxiomCount());
 		return merged;
 	}
-	
-	
-		
-	void processClaims() throws Exception{
-		final Set<Claim> claims = Claim.wrapSet(connection.getClaims());
+
+	Map<String, OWLObject> processNarratives() throws Exception{
+		Map<String,OWLObject> results = new HashMap<>();
+		final Set<Narrative> narratives = Narrative.wrapSet(connection.getNarrativeTable());
+		for (Narrative n : narratives) {
+			n.generateOWL(this,results);  //no return value, OWLObject added to results map
+		}
+		return results;
+	}
+
+	/**
+	 * @param narratives map of ids and OWLObjects generated in processNarratives
+	 * @throws Exception
+	 */
+	void processClaims(Map<String, OWLObject> narratives) throws Exception{
+		final Set<Claim> claims = Claim.wrapSet(connection.getClaimTable());
 		log.info("In ProcessClaims");
 		for (Claim cl : claims){
+			final Set<Participant> participants =
+					Participant.wrapSet(connection.getParticipantTable(cl.getId()));
+			// load participant elements
+			for (Participant p : participants){
+				p.loadElements(connection);
+				p.resolveElements();
+			}
 			//IRI's for individual participants are generated by their generateOWL method
-			cl.generateOWL(this);
- 		}		
+			cl.generateOWL(this, narratives);
+ 		}
 	}
-	
+
 	private void initializeTaxonomy(OWLOntology targetontology){
 		OWLClass arachnidaClass = testWrapper.getDataFactory().getOWLClass(Vocabulary.arachnidaTaxon);
 		final NodeSet<OWLClass> arachnidaParents = preReasoner.getSuperClasses(arachnidaClass, false);
@@ -266,7 +313,8 @@ public class Owlbuilder{
 			initializeTaxon(c,targetontology);
 		}
 	}
-	
+
+	//TODO: consider moving this to a configuration file
 	private final static List<String> filterLabels = new ArrayList<String>();
 	static{
 		filterLabels.add("sp. BOLD:");
@@ -277,10 +325,10 @@ public class Owlbuilder{
 		filterLabels.add("MCZDNA");
 		filterLabels.add("DNA10");
 	}
-	
+
 	private void initializeTaxon(OWLClass taxon, OWLOntology targetontology){
 		final OWLOntologyManager manager = testWrapper.getManager();
-		final Set<OWLAnnotationAssertionAxiom> taxonAnnotations = 
+		final Set<OWLAnnotationAssertionAxiom> taxonAnnotations =
 				mergedSources.getAnnotationAssertionAxioms(taxon.getIRI());
 		boolean skipTaxon = false;
 		for (OWLAnnotationAssertionAxiom a : taxonAnnotations){
@@ -306,69 +354,76 @@ public class Owlbuilder{
 		}
 	}
 
-	
+	/**
+	 * Should be about generating metadata from target ontology (version, etc.)
+	 */
 	void generateOntologyProperties(){
-		
+
 	}
-	
+
 	static final IRI[] MISC_PROPERTIES = {
 		Vocabulary.partOfProperty,
 		Vocabulary.denotesProperty,
-		Vocabulary.hasParticipantProperty
+		Vocabulary.hasParticipantProperty,
+		Vocabulary.hasParticipantAtSomeTimeProperty,
+		Vocabulary.hasActiveParticipantProperty,
+		Vocabulary.determinesProperty,
+		Vocabulary.hasMaterialContributionProperty,
+		Vocabulary.mereotopologicallyRelatedToProperty,
+		Vocabulary.overlapsProperty,
+		//Vocabulary.hasPartProperty,  //suppressed (see Vocabulary.java)
+		Vocabulary.participatesInProperty,
+		Vocabulary.activelyParticipatesInProperty
 	};
-	
+
 	static final IRI[] MISC_TERMS = {
 		Vocabulary.informationContentEntity,
 		Vocabulary.pubAboutInvestigation,
 		Vocabulary.textualEntity
 	};
-	
+
+
+	//somewhere we should assert that 'part_of' is SAMEAS 'part of' from BFO for any OBO-based
+	//ontology (e.g., SPD) that defines part_of on their own
+
+	static final IRI [] PARTOFEQUIVALENTS = {
+		IRI.create("http://purl.obolibrary.org/obo/spd#part_of")
+	};
+
 	private void initializeMisc(){
 		final OWLDataFactory factory = testWrapper.getDataFactory();
 		for (IRI mTerm : MISC_TERMS){
+			//pull stuff from database for this
 			OWLClass mClass = factory.getOWLClass(mTerm);
 			initializeMiscTermAndParents(mClass);
 		}
 		for (IRI mProp : MISC_PROPERTIES){
+			try {
+				connection.getPropertyFromSourceId(mProp.toString());
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			OWLObjectProperty mprop = factory.getOWLObjectProperty(mProp);
 			initializeMiscObjPropertyAndParents(mprop);
 		}
+		for (IRI partofEquiv : PARTOFEQUIVALENTS){
+			//factory.getOWLEquivalentObjectPropertiesAxiom(partofEquiv, Vocabulary.partOfProperty);
+		}
 	}
-	
+
 	public void initializeMiscTermAndParents(OWLClass term){
 		assert term != null;
-		if (term.getIRI().equals(IRI.create("http://purl.obolibrary.org/obo/NBO_0000356"))){
-			log.info("Found target Term; targetsize = " + this.getTarget().getClassesInSignature().size());
-			initializeMiscTerm(term);
-			log.info("Found target Term; targetsize = " + this.getTarget().getClassesInSignature().size());
-			final NodeSet<OWLClass> termParents = preReasoner.getSuperClasses(term, true);
-			log.info("Found target Term; parent set size = " + termParents.getFlattened().size());
-			log.info("Node set size = " + termParents.getNodes().size());
-			for (Node<OWLClass> n : termParents.getNodes()){
-				log.info("Node: " + n + "; size = " + n.getSize());
-				OWLClass c = n.getRepresentativeElement();
-				NodeSet<OWLClass> foo = preReasoner.getSubClasses(c, true);
-				if (foo.containsEntity(term)){
-					log.info("Subclass backcheck is true");
-				}
-				else {
-					log.info("Subclass backcheck is false");
-				}
-			}
-			for (OWLClass c : termParents.getFlattened()){
-				initializeMiscTerm(c);
-			}
-		}
-		else{
-			initializeMiscTerm(term);
-			final NodeSet<OWLClass> termParents = preReasoner.getSuperClasses(term, false);
-			for (OWLClass c : termParents.getFlattened()){
-				initializeMiscTerm(c);
-			}
+		initializeMiscTerm(term);
+		log.info("initializing terms for: " + term.toStringID());
+		final NodeSet<OWLClass> termParents = preReasoner.getSuperClasses(term, false);
+		for (OWLClass c : termParents.getFlattened()){
+			log.debug("examining parent term: " + c.toStringID());
+			initializeMiscTerm(c);
 		}
 
 	}
-	
+
 	public void initializeMiscTerm(OWLClass term){
 		final OWLOntologyManager manager = testWrapper.getManager();
 		assert mergedSources != null;
@@ -380,39 +435,55 @@ public class Owlbuilder{
 		else{
 			manager.addAxioms(target, taxonAxioms);
 		}
-		Set<OWLAnnotationAssertionAxiom> termAnnotations = 
+		Set<OWLAnnotationAssertionAxiom> termAnnotations =
 				mergedSources.getAnnotationAssertionAxioms(term.getIRI());
+		log.debug("Checking for label for " + term.getIRI().toString());
 		for (OWLAnnotationAssertionAxiom a : termAnnotations){
 			if (a.getAnnotation().getProperty().isLabel()){
+				log.debug("Found label for " + term.getIRI().toString());
 				manager.addAxiom(target, a);
 			}
 		}
 
 	}
+	
 	public void initializeMiscObjPropertyAndParents(OWLObjectProperty prop){
 		initializeMiscObjProperty(prop);
-		//ELK doesn't support a hierarchy among Object properties
-		//final NodeSet<OWLObjectPropertyExpression> propParents = reasoner.getSuperObjectProperties(prop,false);
-		//for (OWLObjectPropertyExpression c : propParents.getFlattened()){
-		//	initializeMiscObjProperty(c);
-		//}
-
+		final NodeSet<OWLObjectPropertyExpression> propParents = preReasoner.getSuperObjectProperties(prop,true);
+		for (OWLObjectPropertyExpression c : propParents.getFlattened()){
+			initializeMiscObjProperty(c);
+		}
 	}
-	
+
 	public void initializeMiscObjProperty(OWLObjectPropertyExpression prope){
 		final OWLOntologyManager manager = testWrapper.getManager();
+		final OWLDataFactory factory = getDataFactory();
 		Set<OWLObjectPropertyAxiom> propertyAxioms =  mergedSources.getAxioms(prope,org.semanticweb.owlapi.model.parameters.Imports.INCLUDED);
 		if (propertyAxioms.isEmpty()){
-			log.error("No Axioms for object property " + prope);
+			for (OWLObjectProperty p : prope.getObjectPropertiesInSignature()){
+				if (PropertyBean.isSourceIdCached(p.getIRI().toString())){
+					PropertyBean pb = PropertyBean.getSourceIdCached(p.getIRI().toString());
+					OWLAnnotationProperty labelProperty = factory.getRDFSLabel();
+					OWLAnnotationValue labelValue = factory.getOWLLiteral(pb.getLabel());
+					OWLAnnotation labelAnnotation = factory.getOWLAnnotation(labelProperty, labelValue);
+					OWLAnnotationAxiom labelAxiom = factory.getOWLAnnotationAssertionAxiom(p.getIRI(), labelAnnotation);
+					manager.addAxiom(target,labelAxiom);
+				}
+				else {
+					log.warn("Couldn't find propertybean for IRI " + p.getIRI().toString());
+				}
+
+			}
 		}
 		else{
+			log.debug("Adding axioms for " + prope.toString());
 			manager.addAxioms(target, propertyAxioms);
 		}
 		//log.info("Annotations");
 		if (prope instanceof OWLObjectProperty){
 			OWLObjectProperty prop = (OWLObjectProperty) prope;
 
-			    Set<OWLAnnotationAssertionAxiom> termAnnotations = 
+			    Set<OWLAnnotationAssertionAxiom> termAnnotations =
 			    		mergedSources.getAnnotationAssertionAxioms(prop.getIRI());
 			    for (OWLAnnotationAssertionAxiom a : termAnnotations){
 				//log.info("   Annotation Axiom: " + a.toString());
@@ -422,7 +493,7 @@ public class Owlbuilder{
 			}
 		}
 	}
-	
+
 	/**
 	 * This should assert misc properties for individuals (e.g., a rdf:label)
 	 * @param ind
@@ -430,70 +501,67 @@ public class Owlbuilder{
 	public void initializeMiscIndividual(OWLIndividual ind){
 		//TODO implement
 	}
-	
-	
-	private void saveOntology() throws OWLOntologyStorageException{
-		log.info("Saving ontology");			
-		File f = new File(temporaryOutput);
-		testWrapper.getManager().saveOntology(target, IRI.create(f.toURI()));		
-	}
-	
 
-	
+
+	private void saveOntology() throws OWLOntologyStorageException{
+		log.info("Saving ontology");
+		File f = new File(temporaryOutput);
+		testWrapper.getManager().saveOntology(target, IRI.create(f.toURI()));
+	}
+
+
+
 	private void generateHTML(){
 		log.info("Generating HTML pages");
 	}
-	
+
 	/**
 	 * @return the ontology containing extracted terms and axioms (not reasoned over)
 	 */
 	public OWLOntology getTarget(){
 		return target;
 	}
-	
-	
+
+
 	public OWLOntologyManager getOntologyManager(){
 		return testWrapper.getManager();
 	}
-	
-	
+
+
 	public OWLDataFactory getDataFactory(){
 		return testWrapper.getDataFactory();
 	}
-	
+
+
 	public IRIManager getIRIManager(){
 		return iriManager;
 	}
-	
+
 	public AbstractConnection getConnection(){
 		return connection;
 	}
-	
+
 	public OWLOntology getMergedSources(){
 		return mergedSources;
 	}
-	
+
 	public OWLReasoner getPreReasoner(){
 		return preReasoner;
 	}
-	
+
 	public OWLReasoner getPostReasoner(){
 		return postReasoner;
 	}
 
 	public void loadCuratorAddedTerms(OWLOntology mergedSources) throws SQLException{
-		final Set<TaxonBean> taxa = connection.getTaxa();
+		final Set<TaxonBean> taxa = connection.getTaxonTable();
 		final Set<OWLAxiom> taxonAxioms = new HashSet<OWLAxiom>();
 		final OWLDataFactory factory = getDataFactory();
 		for (TaxonBean tb : taxa){
 			Taxon t = new Taxon(tb);
-			String usable = tb.checkIRIString(getIRIManager());
-			if (usable == null){
-				throw new RuntimeException("No usable IRI for curator added taxon: " + tb.getId());
-			}
-			final IRI taxonIRI = IRI.create(usable);
+			final IRI taxonIRI = IRI.create(tb.getIRIString());
 			OWLClass taxonClass = getDataFactory().getOWLClass(taxonIRI);
-			String parentString = tb.getParentSourceId();
+			String parentString = tb.getParentRefId();
 			if (parentString == null){
 				log.error("No parent specified for curator added taxon: " + tb.getId());
 			}
@@ -503,7 +571,7 @@ public class Owlbuilder{
 				taxonAxioms.add(factory.getOWLSubClassOfAxiom(taxonClass, parentClass));
 				nonNCBITaxa.put(taxonIRI, t);
 				if (tb.getName() != null){
-					OWLAnnotation labelAnno = 
+					OWLAnnotation labelAnno =
 							factory.getOWLAnnotation(factory.getRDFSLabel(),
 									                 factory.getOWLLiteral(t.getName()));
 					taxonAxioms.add(factory.getOWLAnnotationAssertionAxiom(taxonIRI, labelAnno));
@@ -516,7 +584,56 @@ public class Owlbuilder{
 	public Map<IRI, Taxon> getNonNCBITaxa() {
 		return nonNCBITaxa;
 	}
-	
-	
-		
+
+
+	/* Utilities - some of these maybe belong in the testwrapper */
+
+	private void queueAxiom(OWLAxiom a){
+		axiomset.add(a);
+	}
+
+	public void addAxioms(){
+		testWrapper.getManager().addAxioms(testWrapper.getSourceOntology(), axiomset);
+		axiomset.clear();
+	}
+
+	public void addClassAssertionAxiom(OWLClassExpression ce, OWLIndividual ind){
+		OWLDataFactory df = testWrapper.getDataFactory();
+		queueAxiom(df.getOWLClassAssertionAxiom(ce, ind));
+	}
+
+
+	public void addIndividualPartOfAxiom(OWLIndividual part, OWLIndividual whole){
+		OWLDataFactory df = testWrapper.getDataFactory();
+		final OWLObjectProperty partofProperty = df.getOWLObjectProperty(Vocabulary.partOfProperty);
+		queueAxiom(df.getOWLObjectPropertyAssertionAxiom(partofProperty,part,whole));
+	}
+
+
+	public void addIndividualDenotesAxiom(OWLIndividual denoter, OWLIndividual denoted){
+		OWLDataFactory df = testWrapper.getDataFactory();
+		final OWLObjectProperty partofProperty = df.getOWLObjectProperty(Vocabulary.denotesProperty);
+		queueAxiom(df.getOWLObjectPropertyAssertionAxiom(partofProperty,denoter,denoted));
+	}
+
+	public void addIndividualAxiom(OWLObjectProperty oProp, OWLIndividual child, OWLIndividual parent){
+		queueAxiom(testWrapper.getDataFactory().getOWLObjectPropertyAssertionAxiom(oProp,child,parent));
+	}
+
+
+	public void addComment(IRI iri, String commentStr){
+		OWLDataFactory df = testWrapper.getDataFactory();
+		OWLAnnotation commentAnno = df.getOWLAnnotation(df.getRDFSComment(),
+                                                        df.getOWLLiteral(commentStr));
+		queueAxiom(df.getOWLAnnotationAssertionAxiom(iri,commentAnno));
+	}
+
+	public void addLabel(IRI iri, String label){
+		OWLDataFactory df = testWrapper.getDataFactory();
+		OWLAnnotation labelAnno = df.getOWLAnnotation(df.getRDFSLabel(), df.getOWLLiteral(label));
+		queueAxiom(df.getOWLAnnotationAssertionAxiom(iri,labelAnno));
+
+	}
+
+
 }

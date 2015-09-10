@@ -19,10 +19,36 @@ public class IRIManager {
 	private int idCounter=-1;
 	private AbstractConnection c;
 	
+	
+	/**
+	 * Loads the uid table and scans it (or change to sql query) to initialize
+	 * generated id counter
+	 * @param connection
+	 * @throws Exception
+	 */
 	public IRIManager(AbstractConnection connection) throws Exception{
-		idCounter = connection.scanPrivateIDs();
+		connection.getUidSetTable();
+		String lastgenid = connection.getUidSetLastGenId();
+		idCounter = extractCount(lastgenid);
+		log.info("id counter is " + idCounter);
 		c = connection;
 	}
+	
+	private int extractCount(String id){
+		if (id != null && id.startsWith(IRIManager.ARACHBPREFIX)){
+			try{
+				int result = Integer.parseInt(id.substring(IRIManager.ARACHBPREFIX.length()));
+				return result;
+			}
+			catch(NumberFormatException e){
+				log.warn("Bad id format: " + id);
+				return -1;
+			}
+		}
+		return -1;
+	}
+
+
 	
 	
 	//TODO this should be configurable...
@@ -53,7 +79,6 @@ public class IRIManager {
 	 * This cleans up doi's (which tend to have lots of URI unfriendly characters) and returns a properly prefixed doi
 	 * @param doi
 	 * @return IRI using using doi prefix
-	 * @throws Exception either MalformedURL or Encoding exceptions can be thrown
 	 */
 	public static String cleanupDoi(String doi){
 		if (doi == null || doi.length() == 0){
