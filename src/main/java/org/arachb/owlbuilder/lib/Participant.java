@@ -8,19 +8,24 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.arachb.arachadmin.AbstractConnection;
-import org.arachb.arachadmin.IndividualBean;
 import org.arachb.arachadmin.PElementBean;
 import org.arachb.arachadmin.ParticipantBean;
 import org.arachb.arachadmin.PropertyBean;
 import org.arachb.arachadmin.TermBean;
 import org.arachb.owlbuilder.Owlbuilder;
+import org.semanticweb.owlapi.model.AddAxiom;
 import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLAnnotationAssertionAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
+import org.semanticweb.owlapi.model.OWLClassAxiom;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLIndividual;
 import org.semanticweb.owlapi.model.OWLObject;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
+import org.semanticweb.owlapi.model.OWLObjectPropertyAssertionAxiom;
+import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyManager;
 
 public class Participant implements GeneratingEntity{
 
@@ -39,9 +44,15 @@ public class Participant implements GeneratingEntity{
 	private static Logger log = Logger.getLogger(Participant.class);
 	private final ParticipantBean bean;
 
+	final Set<ParticipantElement> elements = new HashSet<ParticipantElement>();
+
+	private final ParticipantElement headElement;
+	private final PropertyTerm property;
+
 	public Participant(ParticipantBean b){
 		bean = b;
-
+		property = new PropertyTerm(PropertyBean.getCached(b.getProperty()));
+		headElement = ParticipantElement.getElement(PElementBean.getCached(bean.getHeadElement()));
 	}
 
 	/**
@@ -54,63 +65,173 @@ public class Participant implements GeneratingEntity{
 		}
 		return result;
 	}
-	
+
+	final static String BADELEMENTMSG = "head Element generated neither a class or a individual: %s";
+
+	//TODO work through the assumption here
+	/*
+	 * @return true if the headElement is an individual
+	 * This should suffice, at least for the moment
+	 *
+	 */
+	boolean isIndividual(){
+		return headElement.isIndividual();
+	}
+
 	@Override
-	public OWLObject generateOWL(Owlbuilder builder) throws SQLException{
-		final Map<String, OWLObject> owlElements = new HashMap<String, OWLObject>();
-		PElementBean headBean = bean.getElementBean(bean.getHeadElement());
-		PropertyBean propBean= bean.getParticipationBean();
-		OWLObject headObject = generateElementOWL(headBean,builder, owlElements);
-		Set <Integer>children = headBean.getChildren();
+	public OWLObject generateOWL(Owlbuilder builder, Map<String,OWLObject> owlElements) throws Exception{
+		OWLObject headObject = headElement.generateOWL(builder, owlElements);
+		Set <Integer>children = headElement.getChildren();
 		switch (children.size()){
 		case 0:
-			return generateNoDependentOWL(builder, propBean, headObject);
+			if (headObject instanceof OWLClassExpression){
+				return generateNoDependentOWL(builder, property, headObject,owlElements);
+			}
+			else if (headObject instanceof OWLIndividual){
+				return generateNoDependentOWL(builder, property, headObject,owlElements);
+			}
+			else {
+				throw new RuntimeException(String.format(BADELEMENTMSG,headElement));
+			}
 		case 1:
 			Integer childIndex = children.iterator().next();
-			PElementBean childBean = bean.getElementBean(childIndex);
-			OWLObject childObject = generateRestrictionClass(builder, owlElements, childBean);
-			return generateDependentOWL(builder, propBean, headObject, childObject);
+			ParticipantElement child = headElement.getChildElement(childIndex);
+			PropertyTerm childProperty = headElement.getChildProperty(childIndex);
+			if (headObject instanceof OWLClassExpression){
+				OWLObject childObject = generateRestrictionClass(builder, owlElements, child, childProperty);
+				return generateDependentOWLClass(builder,
+						                         childProperty,
+						                         (OWLClassExpression)headObject,
+						                         childObject,
+						                         owlElements);
+			}
+			else if (headObject instanceof OWLIndividual){
+				OWLObject childObject = generateRestrictionClass(builder,
+						                                         owlElements,
+						                                         child,
+						                                         childProperty);
+				return generateDependentOWLIndividual(builder,
+													  childProperty,
+													  (OWLIndividual)headObject,
+													  childObject,
+													  owlElements);
+			}
+			else {
+				throw new RuntimeException(String.format(BADELEMENTMSG,headElement));
+			}
 		default:
-			throw new RuntimeException("Didn't expect " + children.size() + " children");
+			throw new RuntimeException(String.format("Didn't expect %d children",children.size()));
 		}
 	}
 
+
+	final Map<String,OWLObject> defaultElementTable = new HashMap<String,OWLObject>();
+
+	@Override
+	public OWLObject generateOWL(Owlbuilder b) throws Exception{
+		defaultElementTable.clear();
+		OWLObject result = null;
+		try{
+			result = generateOWL(b,defaultElementTable);
+		}
+		finally{
+			defaultElementTable.clear();
+		}
+		return result;
+	}
+
+
 	/**
 	 * @param factory
-	 * @param propBean
+	 * @param headProperty
 	 * @param headObject
 	 * @param childObject
+     * @param names
 	 * @return
 	 */
-	private OWLObject generateDependentOWL(Owlbuilder builder,
-			PropertyBean propBean, OWLObject headObject, OWLObject childObject) {
+	private OWLObject generateDependentOWLClass(Owlbuilder builder,
+			PropertyTerm childProperty,
+			OWLClassExpression headClassExpr,
+			OWLObject childObject,
+			Map<String,OWLObject> names) throws Exception{
 		final OWLDataFactory factory = builder.getDataFactory();
-		IRI propertyIRI = IRI.create(propBean.getSourceId());
-		OWLObjectProperty elementProperty = factory.getOWLObjectProperty(propertyIRI);
+		OWLObjectProperty elementProperty = (OWLObjectProperty)childProperty.generateOWL(builder,names);
+		if (childObject != null){
+			if (childObject instanceof OWLClassExpression){
+				final OWLClassExpression childClass = (OWLClassExpression)childObject;
+				OWLClassExpression intersect =
+						factory.getOWLObjectIntersectionOf(headClassExpr,childClass);
+				OWLClassExpression propertyRestriction =
+						factory.getOWLObjectSomeValuesFrom(elementProperty,intersect);
+				log.info("Generated Property restriction(2): " + propertyRestriction);
+				return intersect;
+			}
+			else if (childObject instanceof OWLIndividual){
+				log.info("Individual child of class");
+			}
+			else {
+				throw new RuntimeException("child is neither a class expression or individual: " + childObject);
+			}
+		}
+		OWLClassExpression propertyRestriction =
+				factory.getOWLObjectSomeValuesFrom(elementProperty,headClassExpr);
+		log.info("Generated Property restriction: " + propertyRestriction);
+		return headClassExpr;
+	}
+
+
+	private OWLObject generateDependentOWLIndividual(Owlbuilder builder,
+			PropertyTerm childProperty,
+			OWLIndividual headInd,
+			OWLObject childObject,
+			Map<String,OWLObject> names) throws Exception{
+		final OWLDataFactory factory = builder.getDataFactory();
+		OWLObjectProperty elementProperty = (OWLObjectProperty)childProperty.generateOWL(builder,names);
+		log.info("Generated Individual reference: " + headInd);
+		if (childObject != null){
+			if (childObject instanceof OWLIndividual){
+				OWLIndividual childIndividual = (OWLIndividual)childObject;
+				OWLObjectPropertyAssertionAxiom assertion =
+						factory.getOWLObjectPropertyAssertionAxiom(elementProperty, headInd, childIndividual);
+				// Finally, add the axiom to our ontology and save
+				AddAxiom addAxiomChange = new AddAxiom(builder.getTarget(), assertion);
+				builder.getOntologyManager().applyChange(addAxiomChange);
+			}
+			else {  //child is class expression?
+				log.info("class child of individual");
+			}
+
+		}
+		return headInd; //TODO finish implementing individual case
+	}
+
+	/**
+	 * @param builder
+	 * @param headProperty
+	 * @param headObject
+	 * @param names
+	 * @return
+	 */
+	private OWLObject generateNoDependentOWL(Owlbuilder builder,
+											 PropertyTerm headProperty,
+											 OWLObject headObject,
+											 Map<String,OWLObject> names) throws Exception {
+		final OWLDataFactory factory = builder.getDataFactory();
+		final OWLObjectProperty elementProperty = (OWLObjectProperty)headProperty.generateOWL(builder,names);
 		if (headObject instanceof OWLClassExpression){
 			final OWLClassExpression headClass = (OWLClassExpression)headObject;
-			if (childObject != null){
-				if (childObject instanceof OWLClassExpression){
-					final OWLClassExpression childClass = (OWLClassExpression)childObject;
-					OWLClassExpression intersect = 
-							factory.getOWLObjectIntersectionOf(headClass,childClass);
-					OWLClassExpression propertyRestriction = 
-							factory.getOWLObjectSomeValuesFrom(elementProperty,intersect);
-					log.info("Generated Property restriction(2): " + propertyRestriction);					
-					return propertyRestriction;
-				}
-				OWLClassExpression propertyRestriction = 
-						factory.getOWLObjectSomeValuesFrom(elementProperty,headClass); 
-				log.info("Generated Property restriction (3): " + propertyRestriction);
-				return propertyRestriction;					
-			}
-			OWLClassExpression propertyRestriction = 
+			OWLClassExpression propertyRestriction =
 					factory.getOWLObjectSomeValuesFrom(elementProperty,headClass);
 			log.info("Generated Property restriction: " + propertyRestriction);
 			return propertyRestriction;
 		}
 		else if (headObject instanceof OWLIndividual){
 			log.info("Generated Individual reference: " + headObject);
+			OWLIndividual eventIndividual = factory.getOWLAnonymousIndividual();
+			OWLIndividual headIndividual = (OWLIndividual)headObject;
+			builder.addIndividualAxiom(elementProperty, eventIndividual, headIndividual);
+	        // Finally, add the axiom to our ontology and save
+			builder.addAxioms();
 			return headObject; //TODO finish implementing individual case
 		}
 		else {
@@ -118,36 +239,7 @@ public class Participant implements GeneratingEntity{
 		}
 	}
 
-	
-	/**
-	 * @param factory
-	 * @param propBean
-	 * @param headObject
-	 * @param childObject
-	 * @return
-	 */
-	private OWLObject generateNoDependentOWL(Owlbuilder builder,
-			PropertyBean propBean, OWLObject headObject) {
-		final OWLDataFactory factory = builder.getDataFactory();
-		IRI propertyIRI = IRI.create(propBean.getSourceId());
-		OWLObjectProperty elementProperty = factory.getOWLObjectProperty(propertyIRI);
-		if (headObject instanceof OWLClassExpression){
-			final OWLClassExpression headClass = (OWLClassExpression)headObject;
-			OWLClassExpression propertyRestriction = 
-					factory.getOWLObjectSomeValuesFrom(elementProperty,headClass); 
-			log.info("Generated Property restriction: " + propertyRestriction);
-			return propertyRestriction;
-		}
-		else if (headObject instanceof OWLIndividual){
-			log.info("Generated Individual reference: " + headObject);
-			return headObject; //TODO finish implementing individual case  
-		}
-		else {
-			throw new RuntimeException("Bad head object in participant: " + headObject);
-		}
-	}
 
-	
 	/**
 	 * @param builder
 	 * @param owlElements
@@ -157,20 +249,20 @@ public class Participant implements GeneratingEntity{
 	 */
 	private OWLObject generateRestrictionClass(Owlbuilder builder,
 											   final Map<String, OWLObject> owlElements,
-											   PElementBean peb) {
+											   ParticipantElement pe,
+											   PropertyTerm pt) throws Exception{
 		final OWLDataFactory factory = builder.getDataFactory();
-		Integer parentIndex = peb.getSingletonParent();
-		PropertyBean childProp = peb.getParentProperty(parentIndex);
-		IRI childPropIRI = IRI.create(childProp.getSourceId());
+		//PropertyBean childProp = peb.getParentProperty(parentIndex);
+		IRI childPropIRI = IRI.create(pt.getSourceId());
 		OWLObjectProperty childProperty = factory.getOWLObjectProperty(childPropIRI);
-		OWLObject childElement = generateElementOWL(peb,builder, owlElements);
-		Set <Integer>children = peb.getChildren();
-		if (children.size() >0){
-			log.info("children size: " + children.size());
+		OWLObject childElement = pe.generateOWL(builder, owlElements);
+		int s = pe.getChildren().size();
+		if (s >0){
+			log.info("children size: " + s);
 		}
 		if (childElement instanceof OWLClassExpression){
 			final OWLClassExpression childClass = (OWLClassExpression)childElement;
-			OWLClassExpression childPropertyRestriction = 
+			OWLClassExpression childPropertyRestriction =
 					factory.getOWLObjectSomeValuesFrom(childProperty, childClass);
 			log.info("Generated (child) Property restriction: " + childPropertyRestriction);
 			return childPropertyRestriction;
@@ -182,24 +274,9 @@ public class Participant implements GeneratingEntity{
 			throw new RuntimeException("Bad child element: " + childElement);
 		}
 	}
-	
-	
-	final static String GENERATEOWLBADCHILD = 
-			"Child passed to generateElementOWL is neither ClassExpression or Individual";
-	
-	public OWLObject generateElementOWL(PElementBean pe, Owlbuilder builder, Map<String, OWLObject> elements){
-		if (pe.getTerm() != null){
-			return generateTermOWL(pe.getTerm(), builder, elements);
-		}
-		else if (pe.getIndividual() != null){
-			return generateIndividualOWL(pe.getIndividual(), builder, elements);
-		}
-		else {
-			throw new RuntimeException(GENERATEOWLBADCHILD + pe);
-		}
-	}
-		
-		
+
+
+
 	public OWLClassExpression generateTermOWL(TermBean tb, Owlbuilder builder, Map<String, OWLObject> elements){
 		final OWLDataFactory factory = builder.getDataFactory();
 		IRI termIRI;
@@ -220,31 +297,99 @@ public class Participant implements GeneratingEntity{
 			return null;
 		}
 	}
-	
 
-	public OWLIndividual generateIndividualOWL(IndividualBean ib, Owlbuilder builder, Map<String, OWLObject> elements){
-		final OWLDataFactory factory = builder.getDataFactory();
-		IRI individualIRI;
-		try {
-			String indString = ib.checkIRIString(builder.getIRIManager());
-			if (elements.containsKey(indString)){
-				return (OWLIndividual)elements.get(indString);
+
+
+
+	//TODO should these be merged?
+
+		public void loadElements(AbstractConnection c) throws Exception{
+			log.debug("In load elements");
+			// special handling for head participation property
+			if (bean.getElements().isEmpty()){
+				throw new RuntimeException("bean " + bean.getId() + " has no elements");
 			}
-			individualIRI = IRI.create(indString);
-			OWLIndividual namedIndividual = factory.getOWLNamedIndividual(individualIRI);
-			builder.initializeMiscIndividual(namedIndividual);
-			elements.put(indString, namedIndividual);
-			return namedIndividual;
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return null;
+			log.debug("Should be listing elements here");
+			for (Integer id : bean.getElements()){
+				c.getPElement(id).cache();
+				final ParticipantElement pe = ParticipantElement.getElement(PElementBean.getCached(id));
+				log.debug("    loading element" + pe);
+				log.debug("     id is" + pe.getId());
+				log.debug("     entity is " + pe.entity);
+				elements.add(pe);
+			}
+			for (ParticipantElement pe : elements){
+				pe.resolveLinks(c);
+			}
 		}
-	}
-	
-	
+
+		public void resolveElements() throws Exception{
+			assert elements.size() > 0 : "Participant: " + bean.getId() + " has no elements";
+			log.debug("      pb: " + this.getId() + " element count: " + elements.size());
+			assert bean.getHeadElement() > 0;
+			assert bean.getProperty() > 0;
+			assert PElementBean.getCached(bean.getHeadElement()) != null;
+			//assert elements.contains(bean.getHeadElement()) : "Participant: " + bean.getId() + " has unregistered head element: " + bean.getHeadElement();
+			//PElementBean head = PElementBean.getCached(bean.getHeadElement());
+			//headElement = ParticipantElement.getElement(head);
+		}
+
+		void processTaxon(Owlbuilder builder,OWLClass taxon){
+			final OWLOntologyManager manager = builder.getOntologyManager();
+			final OWLOntology merged = builder.getMergedSources();
+			final OWLOntology extracted = builder.getTarget();
+			if (true){  //add appropriate when figured out
+				//log.info("Need to add taxon: " + taxon.getIRI());
+				//log.info("Defining Axioms");
+				manager.addAxioms(extracted, merged.getAxioms(taxon,org.semanticweb.owlapi.model.parameters.Imports.INCLUDED));
+				//log.info("Annotations");
+				Set<OWLAnnotationAssertionAxiom> taxonAnnotations = merged.getAnnotationAssertionAxioms(taxon.getIRI());
+				for (OWLAnnotationAssertionAxiom a : taxonAnnotations){
+					//log.info("   Annotation Axiom: " + a.toString());
+					if (a.getAnnotation().getProperty().isLabel()){
+						log.debug("Label is " + a.getAnnotation().getValue().toString());
+						manager.addAxiom(extracted, a);
+					}
+				}
+			}
+		}
+
+		public void processAnatomy(Owlbuilder builder, OWLClass anatomyClass) {
+			final OWLOntologyManager manager = builder.getOntologyManager();
+			final OWLOntology merged = builder.getMergedSources();
+			final OWLOntology extracted = builder.getTarget();
+			if (true){
+				log.info("Need to add anatomy: " + anatomyClass.getIRI());
+				Set<OWLClassAxiom> anatAxioms = merged.getAxioms(anatomyClass,org.semanticweb.owlapi.model.parameters.Imports.INCLUDED);
+				manager.addAxioms(extracted, anatAxioms);
+				Set<OWLAnnotationAssertionAxiom> anatAnnotations =
+						merged.getAnnotationAssertionAxioms(anatomyClass.getIRI());
+				for (OWLAnnotationAssertionAxiom a : anatAnnotations){
+					//log.info("   Annotation Axiom: " + a.toString());
+					if (a.getAnnotation().getProperty().isLabel()){
+						log.info("Label is " + a.getAnnotation().getValue().toString());
+						manager.addAxiom(extracted, a);
+					}
+				}
+			}
+	    	builder.initializeMiscTermAndParents(anatomyClass);
+
+		}
+
+		public void processSubstrate(Owlbuilder builder, OWLClass substrateClass) {
+			builder.initializeMiscTermAndParents(substrateClass);
+		}
+
+		public ParticipantElement getHeadElement(){
+			return headElement;
+		}
+
+		public PropertyTerm getProperty(){
+			return property;
+		}
+
 //	/**
-//	 * 
+//	 *
 //	 * @param builder
 //	 * @param iri
 //	 */
@@ -263,7 +408,7 @@ public class Participant implements GeneratingEntity{
 //		}
 //	}
 //
-//	
+//
 //	/**
 //	 * @param builder
 //	 * @param factory
@@ -294,7 +439,7 @@ public class Participant implements GeneratingEntity{
 //						OWLClassAssertionAxiom taxonAssertion = factory.getOWLClassAssertionAxiom(taxon,organism);
 //						log.warn("assert " + organism + " is " + taxon);
 //						manager.addAxiom(target, taxonAssertion);
-//						OWLObjectPropertyAssertionAxiom partofAssertion = 
+//						OWLObjectPropertyAssertionAxiom partofAssertion =
 //								factory.getOWLObjectPropertyAssertionAxiom(partofProperty, organism, ind);
 //						log.warn("assert " + organism + " part of " + ind);
 //						manager.addAxiom(target, partofAssertion);
@@ -305,7 +450,7 @@ public class Participant implements GeneratingEntity{
 //					else {
 //						final String msg = String.format("No taxon IRI available; id = %s",getId());
 //						throw new IllegalStateException(msg);
-//					}				
+//					}
 //				}
 //				else {
 //		             final String msg = String.format("No taxon specified; id = %s", getId());
@@ -318,9 +463,9 @@ public class Participant implements GeneratingEntity{
 //			}
 //		}
 //	}
-//	
+//
 //	/**
-//	 * 
+//	 *
 //	 * @param builder
 //	 * @param iri
 //	 * @return
@@ -345,7 +490,7 @@ public class Participant implements GeneratingEntity{
 //
 //
 //	/**
-//	 * 
+//	 *
 //	 * @param builder
 //	 * @param iri
 //	 * @return class for anatomy
@@ -433,7 +578,7 @@ public class Participant implements GeneratingEntity{
 //		}
 //	}
 //
-//	
+//
 //	void participantProcessTaxon(Owlbuilder builder,OWLClass taxon){
 //		final OWLOntologyManager manager = builder.getOntologyManager();
 //		final OWLOntology merged = builder.getMergedSources();
@@ -457,7 +602,7 @@ public class Participant implements GeneratingEntity{
 //
 //
 //	/**
-//	 * 
+//	 *
 //	 * @param builder
 //	 * @param iri
 //	 * @return
@@ -480,7 +625,7 @@ public class Participant implements GeneratingEntity{
 //	}
 //
 //	/**
-//	 * 
+//	 *
 //	 * @param builder
 //	 * @param iri
 //	 * @return
@@ -523,7 +668,7 @@ public class Participant implements GeneratingEntity{
 //	}
 //
 //
-//	
+//
 //	/**
 //	 * @param builder
 //	 * @param iri
@@ -586,7 +731,7 @@ public class Participant implements GeneratingEntity{
 //			return taxonClass; // may not be right
 //		}
 //	}
-//	
+//
 //	public void participantProcessAnatomy(Owlbuilder builder, OWLClass anatomyClass) {
 //		final OWLOntologyManager manager = builder.getOntologyManager();
 //		final OWLOntology merged = builder.getMergedSources();
@@ -619,7 +764,7 @@ public class Participant implements GeneratingEntity{
 //			log.info("Need to add anatomy: " + anatomyClass.getIRI());
 //			Set<OWLClassAxiom> anatAxioms = merged.getAxioms(anatomyClass);
 //			manager.addAxioms(extracted, anatAxioms);
-//			Set<OWLAnnotationAssertionAxiom> anatAnnotations = 
+//			Set<OWLAnnotationAssertionAxiom> anatAnnotations =
 //					merged.getAnnotationAssertionAxioms(anatomyClass.getIRI());
 //			for (OWLAnnotationAssertionAxiom a : anatAnnotations){
 //				//log.info("   Annotation Axiom: " + a.toString());
@@ -651,11 +796,11 @@ public class Participant implements GeneratingEntity{
 //	}
 //
 //	public void processSubstrate(Owlbuilder builder, OWLClass substrateClass) {
-//		builder.initializeMiscTermAndParents(substrateClass);	
-//	}	
+//		builder.initializeMiscTermAndParents(substrateClass);
+//	}
 //
 
-	
+
 	public int getId(){
 		return bean.getId();
 	}
@@ -702,32 +847,6 @@ public class Participant implements GeneratingEntity{
 
 	public String getAnatomyIri(){
 		return bean.getAnatomyIri();
-	}
-
-	
-	public String getGeneratedId(){
-		return bean.getGeneratedId();
-	}
-
-	public void setGeneratedId(String s){
-		bean.setGeneratedId(s);
-	}
-
-	public String getIriString(){
-		if (getGeneratedId() == null){
-			throw new IllegalStateException("Individual has neither assigned nor generated id");
-		}
-		return getGeneratedId();
-	}
-
-	
-	public void loadElements(AbstractConnection c) throws Exception{
-		bean.loadElements(c);
-	}
-	
-	
-	public void resolveElements(AbstractConnection c) throws Exception{
-		bean.resolveElements(c);
 	}
 
 

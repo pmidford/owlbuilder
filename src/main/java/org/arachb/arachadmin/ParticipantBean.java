@@ -2,31 +2,24 @@ package org.arachb.arachadmin;
 
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.arachb.owlbuilder.Owlbuilder;
-import org.semanticweb.owlapi.model.OWLAnnotationAssertionAxiom;
-import org.semanticweb.owlapi.model.OWLClass;
-import org.semanticweb.owlapi.model.OWLClassAxiom;
-import org.semanticweb.owlapi.model.OWLOntology;
-import org.semanticweb.owlapi.model.OWLOntologyManager;
 
-public class ParticipantBean implements UpdateableBean{
+public class ParticipantBean implements CachingBean,BeanBase{
 
-	
 
 		
 	final static int DBID = 1;
 	final static int DBQUANTIFICATION = 2;
 	final static int DBLABEL = 3;
-	final static int DBGENERATEDID = 4;
-	final static int DBPROPERTY = 5;
-	final static int DBPUBLICATIONTAXON = 6;
-	final static int DBPUBLICATIONANATOMY = 7;
-	final static int DBPUBLICATIONSUBSTRATE = 8;
-	final static int DBHEADELEMENT = 9;
+	final static int DBPROPERTY = 4;
+	final static int DBPUBLICATIONTAXON = 5;
+	final static int DBPUBLICATIONANATOMY = 6;
+	final static int DBPUBLICATIONSUBSTRATE = 7;
+	final static int DBHEADELEMENT = 8;
 
 	final static String BADTAXONIRI =
 			"Term without IRI referenced as participant taxon: participant id = %s; taxon id = %s";
@@ -35,13 +28,12 @@ public class ParticipantBean implements UpdateableBean{
 	final static String BADSUBSTRATEIRI =
 			"Term without IRI referenced as participant substrate; participant id = %s; substrate id = %s";
 	
-    
+	private static final Map<Integer, ParticipantBean> cache = new HashMap<>();
 	private int id;
 	private int taxon;
 	private int substrate;
 	private int anatomy;
 	private String quantification;
-	private String generatedId;
 	private int property;
 	private String publicationTaxon;
 	private String label;
@@ -50,12 +42,10 @@ public class ParticipantBean implements UpdateableBean{
 	private String taxonIRI = null;
 	private String substrateIRI = null;
 	private String anatomyIRI = null;
-	private PropertyBean propertyBean;
 	private int headElement;
-	private PElementBean headBean;
 
 	
-	final Map<Integer, PElementBean> elements = new HashMap<Integer, PElementBean>();
+	final private Set<Integer> elements = new HashSet<Integer>();
 	
 	public final static String INDIVIDUALQUANTIFIER = "INDIVIDUAL";
 	public final static String SOMEQUANTIFIER = "SOME";
@@ -68,7 +58,6 @@ public class ParticipantBean implements UpdateableBean{
 		id = record.getInt(DBID);
 		quantification = record.getString(DBQUANTIFICATION);
 		label = record.getString(DBLABEL);
-		generatedId = record.getString(DBGENERATEDID);
 		property = record.getInt(DBPROPERTY);
 		publicationTaxon = record.getString(DBPUBLICATIONTAXON);
 		publicationAnatomy = record.getString(DBPUBLICATIONANATOMY);
@@ -128,136 +117,61 @@ public class ParticipantBean implements UpdateableBean{
 		return anatomyIRI;
 	}
 	
-	public String getGeneratedId(){
-		return generatedId;
-	}
-	
-	public void setGeneratedId(String s){
-		generatedId = s;
-	}
-	
 	public int getHeadElement(){
 		return headElement;
 	}
 	
+	void setElements(Set<Integer> pes){
+		elements.clear();
+		elements.addAll(pes);
+	}
 
-	public PElementBean getElementBean(int index){
-		return elements.get(index);
+	public Set<Integer> getElements(){
+		return elements;
 	}
 	
-	public PropertyBean getParticipationBean(){
-		return propertyBean;
-	}
-
-//TODO should these be merged?
-	
-	public void loadElements(AbstractConnection c) throws Exception{
-		// special handling for head participation property
-		if (property > 0){
-			propertyBean = c.getProperty(property);
-		}
-		else {
-			throw new IllegalStateException("No participantProperty specified");
-		}
-		Set<PElementBean> elementset = c.getPElements(this);
-		for (PElementBean e : elementset){
-			log.debug("    loading element" + e);
-			log.debug("     id is" + e.getId());
-			log.debug("     term is " + e.getTerm());
-			log.debug("     individual is " + e.getIndividual());
-			elements.put(e.getId(), e);
-		}
-	}
-
-	public void resolveElements(AbstractConnection c) throws Exception{
-		assert elements.size() > 0 : "Participant: " + this.id + " has no elements";
-		log.debug("      pb: " + this.getId() + " element count: " + elements.size());
-		assert elements.containsKey(getHeadElement()) : "Participant: " + this.id + " has unregistered head element: " + getHeadElement();
-		headBean = c.getPElement(getHeadElement());
-		propertyBean = c.getProperty(getProperty());
-		assert headBean != null;
-		assert propertyBean != null;
-		for (PElementBean element : elements.values()){
-			element.resolveParents(this,c);
-			element.resolveChildren(this,c);
-		}
-	}
-	
-	void processTaxon(Owlbuilder builder,OWLClass taxon){
-		final OWLOntologyManager manager = builder.getOntologyManager();
-		final OWLOntology merged = builder.getMergedSources();
-		final OWLOntology extracted = builder.getTarget();
-		if (true){  //add appropriate when figured out
-			//log.info("Need to add taxon: " + taxon.getIRI());
-			//log.info("Defining Axioms");
-			manager.addAxioms(extracted, merged.getAxioms(taxon,org.semanticweb.owlapi.model.parameters.Imports.INCLUDED));
-			//log.info("Annotations");
-			Set<OWLAnnotationAssertionAxiom> taxonAnnotations = merged.getAnnotationAssertionAxioms(taxon.getIRI());
-			for (OWLAnnotationAssertionAxiom a : taxonAnnotations){
-				//log.info("   Annotation Axiom: " + a.toString());
-				if (a.getAnnotation().getProperty().isLabel()){
-					log.debug("Label is " + a.getAnnotation().getValue().toString());
-					manager.addAxiom(extracted, a);
-				}
-			}
-		}
-	}
-
-	public void processAnatomy(Owlbuilder builder, OWLClass anatomyClass) {
-		final OWLOntologyManager manager = builder.getOntologyManager();
-		final OWLOntology merged = builder.getMergedSources();
-		final OWLOntology extracted = builder.getTarget();
-		if (true){
-			log.info("Need to add anatomy: " + anatomyClass.getIRI());
-			Set<OWLClassAxiom> anatAxioms = merged.getAxioms(anatomyClass,org.semanticweb.owlapi.model.parameters.Imports.INCLUDED);
-			manager.addAxioms(extracted, anatAxioms);
-			Set<OWLAnnotationAssertionAxiom> anatAnnotations = 
-					merged.getAnnotationAssertionAxioms(anatomyClass.getIRI());
-			for (OWLAnnotationAssertionAxiom a : anatAnnotations){
-				//log.info("   Annotation Axiom: " + a.toString());
-				if (a.getAnnotation().getProperty().isLabel()){
-					log.info("Label is " + a.getAnnotation().getValue().toString());
-					manager.addAxiom(extracted, a);
-				}
-			}
-		}
-    	builder.initializeMiscTermAndParents(anatomyClass);
-		
-	}
-
-	public void processSubstrate(Owlbuilder builder, OWLClass substrateClass) {
-		builder.initializeMiscTermAndParents(substrateClass);
-		
+	public int getHeadProperty(){
+		return property;
 	}
 
 	final static String NOPARTICGENID = "Participant has no generated id; db id = %s";
 
+
+	/**
+	 * may not be needed, but if we ever need to reopen a database
+	 */
+	static void flushCache(){
+		cache.clear();
+	}
+
+	public static boolean isCached(int id){
+		return cache.containsKey(id);
+	}
+
+	public static ParticipantBean getCached(int id){
+		assert cache.containsKey(id) : String.format("no cache entry for %d",id);
+		return cache.get(id);
+	}
+
 	@Override
-	public String getIRIString() {
-		final String genId = getGeneratedId();
-		if (genId == null){
-			final String msg = String.format(NOPARTICGENID, getId());
-			throw new IllegalStateException(msg);
+	public void cache(){
+		if (isCached(getId())){
+			log.warn(String.format("Tried multiple caching of %s with id %d",
+					               getClass().getSimpleName(),
+					               getId()));
 		}
-		return genId;
+		cache.put(getId(), this);
 	}
 
+
 	@Override
-	public String checkIRIString(IRIManager manager) throws SQLException{
-		if (getGeneratedId() == null){
-			manager.generateIRI(this);
+	public void updatecache(){
+		if (!this.equals(cache.get(getId()))){
+			log.warn(String.format("Forcing update of cached bean %s with id %d",
+					               getClass().getSimpleName(),
+					               getId()));
+			cache.put(getId(), this);
 		}
-		return getGeneratedId();
 	}
-
-	@Override
-	public void updateDB(AbstractConnection c) throws SQLException {
-		// TODO Auto-generated method stub
-		
-	}
-
-
-
-
 
 }

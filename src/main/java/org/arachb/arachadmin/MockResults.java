@@ -23,6 +23,10 @@ public class MockResults implements AbstractResults, ResetableResults{
 		}
 	}
 	
+	public void close(){
+		
+	}
+	
 	final public static MockResults NullResults = new MockResults(0);
 	
 	@Override

@@ -32,7 +32,7 @@ CREATE TABLE `author` (
   PRIMARY KEY (`id`),
   KEY `merge_set__idx` (`merge_set`),
   CONSTRAINT `author_ibfk_1` FOREIGN KEY (`merge_set`) REFERENCES `author_merge` (`id`) ON DELETE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=964 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=102 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -143,14 +143,17 @@ CREATE TABLE `claim` (
   `generated_id` varchar(512) DEFAULT NULL,
   `publication_behavior` varchar(512) DEFAULT NULL,
   `narrative` int(11) DEFAULT NULL,
+  `uidset` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `publication__idx` (`publication`),
   KEY `primary_participant__idx` (`primary_participant`),
   KEY `narrative__idx` (`narrative`),
+  KEY `uidset__idx` (`uidset`),
   CONSTRAINT `claim_ibfk_1` FOREIGN KEY (`publication`) REFERENCES `publication` (`id`) ON DELETE CASCADE,
   CONSTRAINT `claim_ibfk_2` FOREIGN KEY (`primary_participant`) REFERENCES `participant` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `claim_ibfk_3` FOREIGN KEY (`narrative`) REFERENCES `narrative` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=41 DEFAULT CHARSET=utf8;
+  CONSTRAINT `claim_ibfk_3` FOREIGN KEY (`narrative`) REFERENCES `narrative` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `claim_ibfk_4` FOREIGN KEY (`uidset`) REFERENCES `uidset` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=27 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -159,11 +162,9 @@ CREATE TABLE `claim` (
 
 LOCK TABLES `claim` WRITE;
 /*!40000 ALTER TABLE `claim` DISABLE KEYS */;
-INSERT INTO `claim` VALUES (1,3,11398,0,NULL,'http://arachb.org/arachb/ARACHB_0000322','Stick-like posture',NULL),(2,3,11132,0,NULL,'http://arachb.org/arachb/ARACHB_0000321','prey capture',NULL),
-(26,123,11052,0,NULL,'http://arachb.org/arachb/ARACHB_0000343','turn toward male',1);
+INSERT INTO `claim` VALUES (1,3,11398,0,NULL,'','Stick-like posture',NULL,3),(2,3,11132,0,NULL,'http://arachb.org/arachb/ARACHB_0000321','prey capture',NULL,4),(26,123,11052,0,NULL,'http://arachb.org/arachb/ARACHB_0000343','turn toward male',1,5);
 /*!40000 ALTER TABLE `claim` ENABLE KEYS */;
 UNLOCK TABLES;
-
 
 --
 -- Table structure for table `domain`
@@ -228,10 +229,13 @@ CREATE TABLE `individual` (
   `generated_id` varchar(512) DEFAULT NULL,
   `label` varchar(64) DEFAULT NULL,
   `term` int(11) DEFAULT NULL,
+  `uidset` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `term__idx` (`term`),
-  CONSTRAINT `individual_ibfk_1` FOREIGN KEY (`term`) REFERENCES `term` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=108 DEFAULT CHARSET=utf8;
+  KEY `uidset__idx` (`uidset`),
+  CONSTRAINT `individual_ibfk_1` FOREIGN KEY (`term`) REFERENCES `term` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `individual_ibfk_2` FOREIGN KEY (`uidset`) REFERENCES `uidset` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=96 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -240,10 +244,9 @@ CREATE TABLE `individual` (
 
 LOCK TABLES `individual` WRITE;
 /*!40000 ALTER TABLE `individual` DISABLE KEYS */;
-INSERT INTO `individual` VALUES (94,NULL,NULL,'female',111938),(95,NULL,NULL,'whole organism of female',10473);
+INSERT INTO `individual` VALUES (94,NULL,'http://arachb.org/arachb/ARACHB_0000001','female',111938,6),(95,NULL,'http://arachb.org/arachb/ARACHB_0000411','whole organism of female',10473,7);
 /*!40000 ALTER TABLE `individual` ENABLE KEYS */;
 UNLOCK TABLES;
-
 
 --
 -- Table structure for table `individual2narrative`
@@ -286,9 +289,16 @@ CREATE TABLE `narrative` (
   `publication` int(11) DEFAULT NULL,
   `label` varchar(64) DEFAULT NULL,
   `description` varchar(512) DEFAULT NULL,
+  `generated_id` varchar(512) DEFAULT NULL,
+  `uidset` int(11) DEFAULT NULL,
+  `behavior_annotation` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `publication__idx` (`publication`),
-  CONSTRAINT `narrative_ibfk_1` FOREIGN KEY (`publication`) REFERENCES `publication` (`id`) ON DELETE NO ACTION
+  KEY `uidset__idx` (`uidset`),
+  KEY `behavior_annotation__idx` (`behavior_annotation`),
+  CONSTRAINT `narrative_ibfk_1` FOREIGN KEY (`publication`) REFERENCES `publication` (`id`) ON DELETE NO ACTION,
+  CONSTRAINT `narrative_ibfk_2` FOREIGN KEY (`uidset`) REFERENCES `uidset` (`id`) ON DELETE NO ACTION,
+  CONSTRAINT `narrative_ibfk_3` FOREIGN KEY (`behavior_annotation`) REFERENCES `term` (`id`) ON DELETE NO ACTION
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -298,7 +308,7 @@ CREATE TABLE `narrative` (
 
 LOCK TABLES `narrative` WRITE;
 /*!40000 ALTER TABLE `narrative` DISABLE KEYS */;
-INSERT INTO `narrative` VALUES (1,123,'courtship sequence',''),(2,123,'sperm induction','');
+INSERT INTO `narrative` VALUES (1,123,'courtship sequence','','http://arachb.org/arachb/ARACHB_0000424',8,11059),(2,123,'sperm induction','','http://arachb.org/arachb/ARACHB_0000425',9,11059);
 /*!40000 ALTER TABLE `narrative` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -393,7 +403,7 @@ CREATE TABLE `participant` (
   CONSTRAINT `participant_ibfk_3` FOREIGN KEY (`anatomy`) REFERENCES `term` (`id`) ON DELETE CASCADE,
   CONSTRAINT `participant_ibfk_4` FOREIGN KEY (`participation_property`) REFERENCES `property` (`id`) ON DELETE CASCADE,
   CONSTRAINT `participant_ibfk_5` FOREIGN KEY (`head_element`) REFERENCES `participant_element` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=58 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=30 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -421,7 +431,7 @@ CREATE TABLE `participant2claim` (
   PRIMARY KEY (`id`),
   KEY `participant__idx` (`participant`),
   CONSTRAINT `participant2claim_ibfk_1` FOREIGN KEY (`participant`) REFERENCES `participant` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -450,7 +460,7 @@ CREATE TABLE `participant_element` (
   KEY `participant__idx` (`participant`),
   CONSTRAINT `participant_element_ibfk_1` FOREIGN KEY (`type`) REFERENCES `participant_type` (`id`) ON DELETE CASCADE,
   CONSTRAINT `participant_element_ibfk_2` FOREIGN KEY (`participant`) REFERENCES `participant` (`id`) ON DELETE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=110 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=65 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -482,7 +492,7 @@ CREATE TABLE `participant_link` (
   CONSTRAINT `participant_link_ibfk_1` FOREIGN KEY (`child`) REFERENCES `participant_element` (`id`) ON DELETE SET NULL,
   CONSTRAINT `participant_link_ibfk_2` FOREIGN KEY (`parent`) REFERENCES `participant_element` (`id`) ON DELETE SET NULL,
   CONSTRAINT `participant_link_ibfk_3` FOREIGN KEY (`property`) REFERENCES `property` (`id`) ON DELETE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=582 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -535,7 +545,7 @@ CREATE TABLE `pelement2individual` (
   KEY `individual__idx` (`individual`),
   CONSTRAINT `pelement2individual_ibfk_1` FOREIGN KEY (`element`) REFERENCES `participant_element` (`id`) ON DELETE NO ACTION,
   CONSTRAINT `pelement2individual_ibfk_2` FOREIGN KEY (`individual`) REFERENCES `individual` (`id`) ON DELETE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -564,7 +574,7 @@ CREATE TABLE `pelement2term` (
   KEY `term__idx` (`term`),
   CONSTRAINT `pelement2term_ibfk_1` FOREIGN KEY (`element`) REFERENCES `participant_element` (`id`) ON DELETE SET NULL,
   CONSTRAINT `pelement2term_ibfk_2` FOREIGN KEY (`term`) REFERENCES `term` (`id`) ON DELETE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -576,7 +586,6 @@ LOCK TABLES `pelement2term` WRITE;
 INSERT INTO `pelement2term` VALUES (1,1,4838),(2,2,10473),(3,3,4838),(4,4,10473);
 /*!40000 ALTER TABLE `pelement2term` ENABLE KEYS */;
 UNLOCK TABLES;
-
 
 --
 -- Table structure for table `property`
@@ -608,7 +617,6 @@ INSERT INTO `property` VALUES (2,'http://purl.obolibrary.org/obo/ECO_9000000',NU
 /*!40000 ALTER TABLE `property` ENABLE KEYS */;
 UNLOCK TABLES;
 
-
 --
 -- Table structure for table `publication`
 --
@@ -637,11 +645,14 @@ CREATE TABLE `publication` (
   `issue` varchar(512) DEFAULT NULL,
   `page_range` varchar(512) DEFAULT NULL,
   `serial_identifier` varchar(512) DEFAULT NULL,
+  `uidset` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `curation_status__idx` (`curation_status`),
   KEY `pubauthoridx` (`author_list`(32)),
-  CONSTRAINT `publication_ibfk_1` FOREIGN KEY (`curation_status`) REFERENCES `publication_curation` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
+  KEY `uidset__idx` (`uidset`),
+  CONSTRAINT `publication_ibfk_1` FOREIGN KEY (`curation_status`) REFERENCES `publication_curation` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `publication_ibfk_2` FOREIGN KEY (`uidset`) REFERENCES `uidset` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=124 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -650,8 +661,7 @@ CREATE TABLE `publication` (
 
 LOCK TABLES `publication` WRITE;
 /*!40000 ALTER TABLE `publication` DISABLE KEYS */;
-
-INSERT INTO `publication` VALUES (1,'Journal','Not Found',NULL,NULL,'The influence of prey on size, capture area and mesh height of the orb-web of the garden spider, Argiope aemula (Walckenaer, 1841) (Araneaea: Araneidae).\r\n','','Abrenica-Adamat, Liza R.; Torres, Mark Anthony J.; Barrion, Adelina A.; Dupo, Aimee Lynn B.; Demayo, Cesar G.\r\n','',1,2,NULL,NULL,'2009','Egyptian Academic Journal of Biological Sciences B Zoology ','http://arachb.org/arachb/ARACHB_0000099','','1','65-71 ',''),(2,'Journal','Not Found',NULL,NULL,'New species of Anelosimus (Araneae: Theridiidae) from Africa and Southeast Asia, with notes on sociality and color polymorphism.\r\n','','Agnarsson, Ingi; Zhang, Jun-Xia\r\n','',1147,2,NULL,NULL,'2006','Zootaxa','http://arachb.org/arachb/ARACHB_0000285','10-Mar','','1-34',''),(3,'Journal','Downloaded','2011-04-18','2011-04-23','Habitat distribution, life history and behavior of Tetragnatha spider species in the Great Smoky Mountains National Park.\r\n','','Aiken, Marie; Coyle, Frederick A.','',28,4,NULL,'http://dx.doi.org/10.1636/0161-8202(2000)028[0097:HDLHAB]2.0.CO;2','2000','Journal of Arachnology',NULL,'','1','97-106',''),(123,'Journal','Downloaded','2011-05-11',NULL,'Courtship, copulation, and sperm transfer in Leucauge mariana (Araneae, Tetragnathidae) with implications for higher classification','','Eberhard, William G.; Huber, Bernhard A.','',26,4,NULL,NULL,'1998','Journal of Arachnology','http://arachb.org/arachb/ARACHB_0000311','','3','342-368','');
+INSERT INTO `publication` VALUES (1,'Journal','Not Found',NULL,NULL,'The influence of prey on size, capture area and mesh height of the orb-web of the garden spider, Argiope aemula (Walckenaer, 1841) (Araneaea: Araneidae).\r\n','','Abrenica-Adamat, Liza R.; Torres, Mark Anthony J.; Barrion, Adelina A.; Dupo, Aimee Lynn B.; Demayo, Cesar G.\r\n','',1,2,NULL,NULL,'2009','Egyptian Academic Journal of Biological Sciences B Zoology ','http://arachb.org/arachb/ARACHB_0000099','','1','65-71 ','',10),(2,'Journal','Not Found',NULL,NULL,'New species of Anelosimus (Araneae: Theridiidae) from Africa and Southeast Asia, with notes on sociality and color polymorphism.\r\n','','Agnarsson, Ingi; Zhang, Jun-Xia\r\n','',1147,2,NULL,NULL,'2006','Zootaxa','http://arachb.org/arachb/ARACHB_0000285','10-Mar','','1-34','',11),(3,'Journal','Downloaded','2011-04-18','2011-04-23','Habitat distribution, life history and behavior of Tetragnatha spider species in the Great Smoky Mountains National Park.\r\n','','Aiken, Marie; Coyle, Frederick A.','',28,4,NULL,'http://dx.doi.org/10.1636/0161-8202(2000)028[0097:HDLHAB]2.0.CO;2','2000','Journal of Arachnology',NULL,'','1','97-106','',12),(123,'Journal','Downloaded','2011-05-11',NULL,'Courtship, copulation, and sperm transfer in Leucauge mariana (Araneae, Tetragnathidae) with implications for higher classification','','Eberhard, William G.; Huber, Bernhard A.','',26,4,NULL,NULL,'1998','Journal of Arachnology','http://arachb.org/arachb/ARACHB_0000311','','3','342-368','',13);
 /*!40000 ALTER TABLE `publication` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -693,8 +703,23 @@ CREATE TABLE `taxon` (
   `ottol_id` varchar(255) DEFAULT NULL,
   `author` varchar(255) DEFAULT NULL,
   `year` varchar(255) DEFAULT NULL,
+  `external_id` varchar(64) DEFAULT NULL,
   `generated_id` varchar(255) DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  `parent_term` int(11) DEFAULT NULL,
+  `merged` char(1) DEFAULT NULL,
+  `merge_status` varchar(64) DEFAULT NULL,
+  `uidset` int(11) DEFAULT NULL,
+  `authority` int(11) DEFAULT NULL,
+  `parent` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `parent_term__idx` (`parent_term`),
+  KEY `uidset__idx` (`uidset`),
+  KEY `authority__idx` (`authority`),
+  KEY `parent__idx` (`parent`),
+  CONSTRAINT `taxon_ibfk_1` FOREIGN KEY (`parent_term`) REFERENCES `term` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `taxon_ibfk_2` FOREIGN KEY (`uidset`) REFERENCES `uidset` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `taxon_ibfk_3` FOREIGN KEY (`authority`) REFERENCES `authority` (`id`) ON DELETE NO ACTION,
+  CONSTRAINT `taxon_ibfk_4` FOREIGN KEY (`parent`) REFERENCES `taxon` (`id`) ON DELETE NO ACTION
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -704,7 +729,7 @@ CREATE TABLE `taxon` (
 
 LOCK TABLES `taxon` WRITE;
 /*!40000 ALTER TABLE `taxon` DISABLE KEYS */;
-INSERT INTO `taxon` VALUES (1,'Tetragnatha straminea','336608','','Emerton','1884','');
+INSERT INTO `taxon` VALUES (1,'Leucauge mariana',NULL,NULL,'Emerton','1884','urn:lsid:amnh.org:spidersp:013764',NULL,NULL,NULL,NULL,14,NULL,NULL);
 /*!40000 ALTER TABLE `taxon` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -751,12 +776,15 @@ CREATE TABLE `term` (
   `label` varchar(255) DEFAULT NULL,
   `generated_id` varchar(255) DEFAULT NULL,
   `comment` varchar(255) DEFAULT NULL,
+  `uidset` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `domain__idx` (`domain`),
   KEY `authority__idx` (`authority`),
+  KEY `uidset__idx` (`uidset`),
   CONSTRAINT `term_ibfk_1` FOREIGN KEY (`domain`) REFERENCES `domain` (`id`) ON DELETE NO ACTION,
-  CONSTRAINT `term_ibfk_2` FOREIGN KEY (`authority`) REFERENCES `authority` (`id`) ON DELETE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
+  CONSTRAINT `term_ibfk_2` FOREIGN KEY (`authority`) REFERENCES `authority` (`id`) ON DELETE NO ACTION,
+  CONSTRAINT `term_ibfk_3` FOREIGN KEY (`uidset`) REFERENCES `uidset` (`id`) ON DELETE NO ACTION
+) ENGINE=InnoDB AUTO_INCREMENT=111939 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -765,12 +793,36 @@ CREATE TABLE `term` (
 
 LOCK TABLES `term` WRITE;
 /*!40000 ALTER TABLE `term` DISABLE KEYS */;
-INSERT INTO `term` VALUES 
-(4838,'http://purl.obolibrary.org/obo/NCBITaxon_336608',3,NULL,'Tetragnatha straminea','http://arachb.org/arachb/TEST_0000001',NULL),
-(10473,'http://purl.obolibrary.org/obo/SPD_0000001',2,NULL,'whole organism','http://purl.obolibrary.org/obo/SPD_0000001',NULL),
-(11398,'http://purl.obolibrary.org/obo/NBO_0000358',1,4,'resting posture',NULL,'\"Intentionally or habitually assumed arrangement of the body and its limbs in inactivity.\" [NBO:GVG]'),
-(11052,'http://purl.obolibrary.org/obo/NBO_0000002',1,4,'whole body movement',NULL,NULL);
+INSERT INTO `term` VALUES (4838,'http://purl.obolibrary.org/obo/NCBITaxon_336608',3,NULL,'Tetragnatha straminea','http://arachb.org/arachb/TEST_0000001',NULL,1),(10473,'http://purl.obolibrary.org/obo/SPD_0000001',2,NULL,'whole organism','http://purl.obolibrary.org/obo/SPD_0000001',NULL,2),(11052,'http://purl.obolibrary.org/obo/NBO_0000002',1,4,'whole body movement',NULL,NULL,15),(11059,'http://purl.obolibrary.org/obo/NBO_0000010',1,4,'reproductive behavior',NULL,NULL,17),(11398,'http://purl.obolibrary.org/obo/NBO_0000358',1,4,'resting posture',NULL,'\"Intentionally or habitually assumed arrangement of the body and its limbs in inactivity.\" [NBO:GVG]',16),(111938,'urn:lsid:amnh.org:spidersp:013764',3,10,'Leucauge mariana',NULL,NULL,14);
 /*!40000 ALTER TABLE `term` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `uidset`
+--
+
+DROP TABLE IF EXISTS `uidset`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `uidset` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `source_id` varchar(256) DEFAULT NULL,
+  `generated_id` varchar(64) DEFAULT NULL,
+  `ref_id` varchar(64) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `generated_id` (`generated_id`),
+  UNIQUE KEY `ref_id` (`ref_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `uidset`
+--
+
+LOCK TABLES `uidset` WRITE;
+/*!40000 ALTER TABLE `uidset` DISABLE KEYS */;
+INSERT INTO `uidset` VALUES (1,'http://purl.obolibrary.org/obo/NCBITaxon_336608',NULL,'http://purl.obolibrary.org/obo/NCBITaxon_336608'),(2,'http://purl.obolibrary.org/obo/SPD_0000001',NULL,'http://purl.obolibrary.org/obo/SPD_0000001'),(3,NULL,'http://arachb.org/arachb/ARACHB_0000322','http://arachb.org/arachb/ARACHB_0000322'),(4,NULL,'http://arachb.org/arachb/ARACHB_0000321','http://arachb.org/arachb/ARACHB_0000321'),(5,NULL,'http://arachb.org/arachb/ARACHB_0000343','http://arachb.org/arachb/ARACHB_0000343'),(6,NULL,'http://arachb.org/arachb/ARACHB_0000410','http://arachb.org/arachb/ARACHB_0000410'),(7,NULL,'http://arachb.org/arachb/ARACHB_0000411','http://arachb.org/arachb/ARACHB_0000411'),(8,NULL,'http://arachb.org/arachb/ARACHB_0000424','http://arachb.org/arachb/ARACHB_0000424'),(9,NULL,'http://arachb.org/arachb/ARACHB_0000425','http://arachb.org/arachb/ARACHB_0000425'),(10,NULL,'http://arachb.org/arachb/ARACHB_0000099','http://arachb.org/arachb/ARACHB_0000099'),(11,NULL,'http://arachb.org/arachb/ARACHB_0000285','http://arachb.org/arachb/ARACHB_0000285'),(12,'http://dx.doi.org/10.1636/0161-8202(2000)028[0097:HDLHAB]2.0.CO;2',NULL,'http://dx.doi.org/10.1636/0161-8202(2000)028[0097:HDLHAB]2.0.CO;'),(13,NULL,'http://arachb.org/arachb/ARACHB_0000311','http://arachb.org/arachb/ARACHB_0000311'),(14,'urn:lsid:amnh.org:spidersp:013764',NULL,'urn:lsid:amnh.org:spidersp:013764'),(15,'http://purl.obolibrary.org/obo/NBO_0000002',NULL,'http://purl.obolibrary.org/obo/NBO_0000002'),(16,'http://purl.obolibrary.org/obo/NBO_0000358',NULL,'http://purl.obolibrary.org/obo/NBO_0000358'),(17,'http://purl.obolibrary.org/obo/NB0_0000010',NULL,'http://purl.obolibrary.org/obo/NB0_0000010');
+/*!40000 ALTER TABLE `uidset` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -782,4 +834,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2015-02-01 15:29:29
+-- Dump completed on 2015-08-05 10:19:44

@@ -32,4 +32,9 @@ public class DBResults implements AbstractResults {
 		return results.next();
 	}
 
+	@Override
+	public void close() throws SQLException {
+		results.close();
+	}
+
 }

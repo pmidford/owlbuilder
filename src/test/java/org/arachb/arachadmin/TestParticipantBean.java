@@ -1,8 +1,11 @@
 package org.arachb.arachadmin;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.nullValue;
 
 import java.util.Set;
 
@@ -15,14 +18,15 @@ public class TestParticipantBean {
     private static Logger log = Logger.getLogger(TestParticipantBean.class);
 
     private AbstractConnection testConnection;
+    private IRIManager im;
 
-    private ClaimBean testClaim1;
-    private ClaimBean testClaim26;
-    
-	
+    private final static int SOMECLAIMID = 1;
+    private final static int INDIVIDUALCLAIMID = 26;
+
+
 	@Before
 	public void setUp() throws Exception {
-		if (DBConnection.testConnection()){
+		if (DBConnection.probeTestConnection()){
 			log.info("Testing with live connection");
 			testConnection = DBConnection.getTestConnection();
 		}
@@ -30,58 +34,38 @@ public class TestParticipantBean {
 			log.info("Testing with mock connection");
 			testConnection = DBConnection.getMockConnection();
 		}
-		testClaim1 = testConnection.getClaim(1);
-		testClaim26 = testConnection.getClaim(26);
+		im = new IRIManager(testConnection);
 	}
 
 	@Test
 	public void testFill() throws Exception {
-		Set<ParticipantBean> pbs1 = testConnection.getParticipants(testClaim1);
-		assertEquals(1, pbs1.size());
+		Set<ParticipantBean> pbs1 = testConnection.getParticipantTable(SOMECLAIMID);
+		assertThat(pbs1.size(), equalTo(1));
 		for (ParticipantBean pb : pbs1){
-			assertEquals(1, pb.getId());
-			assertEquals("some",pb.getQuantification());
-			assertEquals("",pb.getLabel());  //should improve this
-			assertEquals(null,pb.getGeneratedId());  //improve ??
-			assertEquals(306,pb.getProperty());
-			assertEquals("Tetragnatha straminea", pb.getPublicationTaxon());
-			assertEquals("", pb.getPublicationAnatomy());
-			assertEquals(0, pb.getSubstrate());
-			assertEquals(1, pb.getHeadElement());
+			assertThat(pb.getId(),equalTo(1));
+			assertThat(pb.getQuantification(),equalTo("some"));
+			assertThat(pb.getLabel(),equalTo(""));  //should improve this
+			assertThat(pb.getProperty(),equalTo(306));
+			assertThat(pb.getPublicationTaxon(),equalTo("Tetragnatha straminea"));
+			assertThat(pb.getPublicationAnatomy(),equalTo(""));
+			assertThat(pb.getSubstrate(),equalTo(0));
+			assertThat(pb.getHeadElement(),equalTo(1));
 		}
-		Set<ParticipantBean> pbs29 = testConnection.getParticipants(testClaim26);
-		assertEquals(1, pbs29.size());
+		Set<ParticipantBean> pbs29 = testConnection.getParticipantTable(INDIVIDUALCLAIMID);
+		assertThat(pbs29.size(),equalTo(1));
 		for (ParticipantBean pb : pbs29){
-			assertEquals(29, pb.getId());
-			assertEquals("individual",pb.getQuantification());
-			assertEquals("female",pb.getLabel());  //should improve this
-			assertEquals("http://arachb.org/arachb/ARACHB_0000349",pb.getGeneratedId());  //improve ??
-			assertEquals(306,pb.getProperty());
-			assertEquals("Leucauge mariana", pb.getPublicationTaxon());
-			assertEquals("female", pb.getPublicationAnatomy());
-			assertEquals(0, pb.getSubstrate());
-			assertEquals(62, pb.getHeadElement());
+			assertThat(pb.getId(),equalTo(29));
+			assertThat(pb.getQuantification(),equalTo("individual"));
+			assertThat(pb.getLabel(),equalTo("female"));  //should improve this
+			assertThat(pb.getProperty(),equalTo(306));
+			assertThat(pb.getPublicationTaxon(),equalTo("Leucauge mariana"));
+			assertThat(pb.getPublicationAnatomy(),equalTo("female"));
+			assertThat(pb.getSubstrate(),equalTo(0));
+			assertThat(pb.getHeadElement(),equalTo(62));
 		}
 	}
 
 
-	@Test
-	public void testLoadElements() throws Exception {
-		final Set<ParticipantBean> pbs1 = testConnection.getParticipants(testClaim1);
-		assertEquals(1, pbs1.size());
-		for (ParticipantBean pb : pbs1){
-			assertNull(pb.getElementBean(1));
-			pb.loadElements(testConnection);
-			assertNotNull(pb.getElementBean(1));
-		}
-		Set<ParticipantBean> pbs29 = testConnection.getParticipants(testClaim26);
-		assertEquals(1, pbs29.size());
-		for (ParticipantBean pb : pbs29){
-			assertNull(pb.getElementBean(1));
-			pb.loadElements(testConnection);
-			assertNotNull(pb.getElementBean(61));
-		}
-	}
 
 
 }

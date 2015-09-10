@@ -1,28 +1,19 @@
 package org.arachb.arachadmin;
 
-import java.util.HashMap;
-import java.util.Map;
 
 
-public abstract class CachingBean implements BeanBase {
+public interface CachingBean  {
 
-	private static final Map<Integer, CachingBean> cache = new HashMap<Integer, CachingBean>();
-	
+	/**
+	 * Caches the object in a id cache and possibly a source_id cache
+	 * Eventually the integer id should go away
+	 */
+	void cache();
 
-	static boolean isCached(int id){
-		return cache.containsKey(id);
-	}
-	
-	static CachingBean getCached(int id){
-		assert(cache.containsKey(id));  //shouldn't be calling this w/o checking first
-		return cache.get(id);
-	}
-
-	static void cache(CachingBean cb){
-		final int id = cb.getId();
-		cache.put(id, cb);
-	}
-
-	
+	/**
+	 * Less an update, but more a warning if multiple copies of 'cached' beans are floating
+	 * around - inconsistency is a likely outcome
+	 */
+	void updatecache();
 
 }
