@@ -24,7 +24,6 @@ import org.arachb.arachadmin.PropertyBean;
 import org.arachb.arachadmin.PublicationBean;
 import org.arachb.arachadmin.TaxonBean;
 import org.arachb.owlbuilder.lib.Claim;
-import org.arachb.owlbuilder.lib.Config;
 import org.arachb.owlbuilder.lib.Narrative;
 import org.arachb.owlbuilder.lib.Participant;
 import org.arachb.owlbuilder.lib.Publication;
