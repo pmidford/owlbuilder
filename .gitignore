@@ -6,3 +6,7 @@ src/main/resources/Connection.properties
 catalog-v001.xml
 .DS_Store
 test.owl
+*.java~
+*.yml~
+*.sql~
+.gitignore~
