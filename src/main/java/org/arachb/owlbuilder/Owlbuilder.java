@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -20,11 +21,13 @@ import org.arachb.arachadmin.AbstractConnection;
 import org.arachb.arachadmin.DBConnection;
 import org.arachb.arachadmin.IRIManager;
 import org.arachb.arachadmin.PropertyBean;
+import org.arachb.arachadmin.PublicationBean;
 import org.arachb.arachadmin.TaxonBean;
 import org.arachb.owlbuilder.lib.Claim;
 import org.arachb.owlbuilder.lib.Config;
 import org.arachb.owlbuilder.lib.Narrative;
 import org.arachb.owlbuilder.lib.Participant;
+import org.arachb.owlbuilder.lib.Publication;
 import org.arachb.owlbuilder.lib.Taxon;
 import org.arachb.owlbuilder.lib.Vocabulary;
 import org.semanticweb.HermiT.Reasoner;
@@ -92,7 +95,7 @@ public class Owlbuilder{
 
 	private static String temporaryOutput = "test.owl";
 
-	private final Config config;
+	private final Properties config = new Properties();
 	private static Logger log = Logger.getLogger(Owlbuilder.class);
 
 	public static void main(String[] args) throws Exception {
@@ -106,7 +109,7 @@ public class Owlbuilder{
 	}
 
 	public Owlbuilder() throws Exception{
-		config = new Config("");
+		config.load(DBConnection.class.getClassLoader().getResourceAsStream("owlbuilder.properties"));
 		if (DBConnection.probeConnection()){
 			connection = DBConnection.getDBConnection();
 		}
@@ -122,7 +125,7 @@ public class Owlbuilder{
 	}
 
 	public Owlbuilder(AbstractConnection existingConnection) throws Exception{
-		config = new Config("");
+		config.load(DBConnection.class.getClassLoader().getResourceAsStream("owlbuilder.properties"));
 		connection = existingConnection;
 		testWrapper = new OWLGraphWrapper(targetIRI);
 		rfactory = new Reasoner.ReasonerFactory();
@@ -173,9 +176,6 @@ public class Owlbuilder{
 			processDatabase();
 			log.info("After processing database, target class count = " +target.getClassesInSignature().size());
 
-			//log.info("Saving ontology");
-			//File f = new File("checkpoint.owl");
-			//testWrapper.getManager().saveOntology(target, IRI.create(f.toURI()));
 			if (true){
 				//preReasoner.flush();
 				log.info("disposing preReasoner");
@@ -201,7 +201,6 @@ public class Owlbuilder{
 				postReasoner.flush();
 
 				saveOntology();
-				generateHTML();
 				log.info("Shutting down reasoner");
 			}
 		}
@@ -230,7 +229,6 @@ public class Owlbuilder{
 		Map<String,OWLObject> narrativeIndividuals = processNarratives();
 		log.info("Processing Claims");
 		processClaims(narrativeIndividuals);
-		connection.close();
 	}
 
 	/**
@@ -247,7 +245,8 @@ public class Owlbuilder{
 			IRI iri = IRI.create(source);
 			String sourcePath = iri.toURI().getPath();
 			String [] pathParts = sourcePath.split("/");
-			String cachePath = "file:/" + config.getCacheDir() + "/" + pathParts[pathParts.length-1];
+			String cacheDir = config.getProperty("cacheDir");
+			String cachePath = "file:/" + cacheDir + "/" + pathParts[pathParts.length-1];
 			log.info("Cachepath is " + cachePath);
 			manager.getIRIMappers().add(new SimpleIRIMapper(iri, IRI.create(cachePath)));
 			log.info("Added IRIMapper");
@@ -511,10 +510,6 @@ public class Owlbuilder{
 
 
 
-	private void generateHTML(){
-		log.info("Generating HTML pages");
-	}
-
 	/**
 	 * @return the ontology containing extracted terms and axioms (not reasoned over)
 	 */
@@ -553,6 +548,11 @@ public class Owlbuilder{
 		return postReasoner;
 	}
 
+	/**
+	 * mostly processes non-NCBI taxa at this point
+	 * @param mergedSources
+	 * @throws SQLException
+	 */
 	public void loadCuratorAddedTerms(OWLOntology mergedSources) throws SQLException{
 		final Set<TaxonBean> taxa = connection.getTaxonTable();
 		final Set<OWLAxiom> taxonAxioms = new HashSet<OWLAxiom>();
@@ -581,6 +581,10 @@ public class Owlbuilder{
 		this.getOntologyManager().addAxioms(mergedSources, taxonAxioms);
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
 	public Map<IRI, Taxon> getNonNCBITaxa() {
 		return nonNCBITaxa;
 	}
@@ -588,39 +592,69 @@ public class Owlbuilder{
 
 	/* Utilities - some of these maybe belong in the testwrapper */
 
+	/**
+	 *
+	 * @param a
+	 */
 	private void queueAxiom(OWLAxiom a){
 		axiomset.add(a);
 	}
 
+	/**
+	 * adds the queued axioms to the ontology, so all reasoning side effects happen once
+	 */
 	public void addAxioms(){
 		testWrapper.getManager().addAxioms(testWrapper.getSourceOntology(), axiomset);
 		axiomset.clear();
 	}
 
+	/**
+	 * queues axiom that ind's type is ce
+	 * @param ce class of individual ind
+	 * @param ind individual to be assigned a class
+	 */
 	public void addClassAssertionAxiom(OWLClassExpression ce, OWLIndividual ind){
 		OWLDataFactory df = testWrapper.getDataFactory();
 		queueAxiom(df.getOWLClassAssertionAxiom(ce, ind));
 	}
 
-
+	/**
+	 * queues individual level axiom that part is part_of whole
+	 * @param part part of something
+	 * @param whole contains part
+	 */
 	public void addIndividualPartOfAxiom(OWLIndividual part, OWLIndividual whole){
 		OWLDataFactory df = testWrapper.getDataFactory();
 		final OWLObjectProperty partofProperty = df.getOWLObjectProperty(Vocabulary.partOfProperty);
 		queueAxiom(df.getOWLObjectPropertyAssertionAxiom(partofProperty,part,whole));
 	}
 
-
+	/**
+	 * queues individual level axiom that information object denoter denotes some (individual entity)
+	 * @param denoter
+	 * @param denoted
+	 */
 	public void addIndividualDenotesAxiom(OWLIndividual denoter, OWLIndividual denoted){
 		OWLDataFactory df = testWrapper.getDataFactory();
-		final OWLObjectProperty partofProperty = df.getOWLObjectProperty(Vocabulary.denotesProperty);
-		queueAxiom(df.getOWLObjectPropertyAssertionAxiom(partofProperty,denoter,denoted));
+		final OWLObjectProperty denotesProperty = df.getOWLObjectProperty(Vocabulary.denotesProperty);
+		queueAxiom(df.getOWLObjectPropertyAssertionAxiom(denotesProperty,denoter,denoted));
 	}
 
+	/**
+	 * general method for queuing axioms relating individuals where property is specified
+	 * @param oProp
+	 * @param child
+	 * @param parent
+	 */
 	public void addIndividualAxiom(OWLObjectProperty oProp, OWLIndividual child, OWLIndividual parent){
 		queueAxiom(testWrapper.getDataFactory().getOWLObjectPropertyAssertionAxiom(oProp,child,parent));
 	}
 
-
+	/**
+	 * adds an rdfs:comment to the object identified by the iri
+	 * @param iri identifier of object to be annotated
+	 * @param commentStr annotation for human use
+	 */
 	public void addComment(IRI iri, String commentStr){
 		OWLDataFactory df = testWrapper.getDataFactory();
 		OWLAnnotation commentAnno = df.getOWLAnnotation(df.getRDFSComment(),
@@ -628,6 +662,11 @@ public class Owlbuilder{
 		queueAxiom(df.getOWLAnnotationAssertionAxiom(iri,commentAnno));
 	}
 
+	/**
+	 * adds an rdfs:label annotation to the object identified by the iri
+	 * @param iri identifier of object to be annotated
+	 * @param label 'name' for human use
+	 */
 	public void addLabel(IRI iri, String label){
 		OWLDataFactory df = testWrapper.getDataFactory();
 		OWLAnnotation labelAnno = df.getOWLAnnotation(df.getRDFSLabel(), df.getOWLLiteral(label));
