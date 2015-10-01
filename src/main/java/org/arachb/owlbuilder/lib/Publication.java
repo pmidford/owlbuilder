@@ -139,62 +139,22 @@ public class Publication implements GeneratingEntity {
 		final String nl = System.lineSeparator();
 		b.append("{");
 		b.append(nl);
-		if (bean.getPublicationType() != null){
-			b.append(String.format(STRINGPAIRFORMAT, "publicationType", bean.getPublicationType()));
-			b.append(nl);
-		}
-		if (bean.getTitle() != null){
-			b.append(String.format(STRINGPAIRFORMAT, "title", bean.getTitle()));
-			b.append(nl);
-		}
-		if (bean.getAlternateTitle() != null){
-			b.append(String.format(STRINGPAIRFORMAT, "alternateTitle", bean.getAlternateTitle()));
-			b.append(nl);
-		}
-		if (bean.getAuthorList() != null){
-			b.append(String.format(STRINGPAIRFORMAT, "authorList", bean.getAuthorList()));
-			b.append(nl);
-		}
-		if (bean.getEditorList() != null){
-			b.append(String.format(STRINGPAIRFORMAT, "editorList", bean.getEditorList()));
-			b.append(nl);
-		}
-		if (bean.getSourcePublication() != null){
-			b.append(String.format(STRINGPAIRFORMAT, "sourcePublication", bean.getSourcePublication()));
-			b.append(nl);
-		}
+		addjsonfield(b,bean.getPublicationType(),"publicationType");
+		addjsonfield(b,bean.getTitle(),"title");
+		addjsonfield(b,bean.getAlternateTitle(),"alternateTitle");
+		addjsonfield(b,bean.getAuthorList(),"authorList");
+		addjsonfield(b,bean.getEditorList(),"editorList");
+		addjsonfield(b,bean.getSourcePublication(), "sourcePublication");
 		if (bean.getVolume() != 0){
-			b.append(String.format(STRINGPAIRFORMAT, "volume", Integer.toString(bean.getVolume())));
-			b.append(nl);
+			addjsonfield(b,Integer.toString(bean.getVolume()),"volume");
 		}
-		if (bean.getIssue() != null){
-			b.append(String.format(STRINGPAIRFORMAT, "issue", bean.getIssue()));
-			b.append(nl);
-		}
-		if (bean.getSerialIdentifier() != null){
-			b.append(String.format(STRINGPAIRFORMAT, "serialIdentifier", bean.getSerialIdentifier()));
-			b.append(nl);
-		}
-		if (bean.getPageRange() != null){
-			b.append(String.format(STRINGPAIRFORMAT, "pageRange", bean.getPageRange()));
-			b.append(nl);
-		}
-		if (bean.getPublicationDate() != null){
-			b.append(String.format(STRINGPAIRFORMAT, "publicationDate", bean.getPublicationDate()));
-			b.append(nl);
-		}
-		if (bean.getPublicationYear() != null){
-			b.append(String.format(STRINGPAIRFORMAT, "publicationYear", bean.getPublicationYear()));
-			b.append(nl);
-		}
-		if (bean.getCurationStatus() != null){
-			b.append(String.format(STRINGPAIRFORMAT, "curationStatus", bean.getCurationStatus()));
-			b.append(nl);
-		}
-		if (bean.getCurationUpdate() != null){
-			b.append(String.format(STRINGPAIRFORMAT, "curationUpdate", bean.getCurationUpdate()));
-			b.append(nl);
-		}
+		addjsonfield(b,bean.getIssue(),"issue");
+		addjsonfield(b,bean.getSerialIdentifier(), "serialIdentifier");
+		addjsonfield(b,bean.getPageRange(),"pageRange");
+		addjsonfield(b,bean.getPublicationDate(),"publicationDate");
+		addjsonfield(b,bean.getPublicationYear(),"publicationYear");
+		addjsonfield(b,bean.getCurationStatus(),"curationStatus");
+		addjsonfield(b,bean.getCurationUpdate(),"curationUpdate");
 		if (refId.startsWith(DOIPREFIX)){
 			b.append(String.format(STRINGPAIRFORMATNC, "doi", refId));
 		}
@@ -204,6 +164,20 @@ public class Publication implements GeneratingEntity {
 		b.append(nl);
 		b.append("}");
 		return b.toString();
+	}
+
+
+
+	/**
+	 * @param b
+	 * @param beanfield
+	 * @param fieldname
+	 */
+	private void addjsonfield(final StringBuilder b,final String beanfield, final String fieldname) {
+		if (beanfield != null && !beanfield.isEmpty()){
+			b.append(String.format(STRINGPAIRFORMAT, fieldname, beanfield));
+			b.append(System.lineSeparator());
+		}
 	}
 
 
