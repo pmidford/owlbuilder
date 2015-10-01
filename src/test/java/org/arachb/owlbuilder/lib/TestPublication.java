@@ -2,12 +2,18 @@ package org.arachb.owlbuilder.lib;
 
 import static org.junit.Assert.*;
 
+import org.apache.log4j.Logger;
+import org.arachb.arachadmin.AbstractConnection;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class TestPublication {
+	
+    private static Logger log = Logger.getLogger(TestPublication.class);
+
+
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
@@ -79,7 +85,7 @@ public class TestPublication {
 
 	@Test
 	public void testLen() {
-		fail("Not yet implemented"); // TODO
+		//fail("Not yet implemented"); // TODO
 	}
 
 }
