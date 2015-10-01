@@ -49,7 +49,12 @@ public class DBConnection implements AbstractConnection{
 	static final String PUBLICATIONUPDATESTATEMENT =
 			"UPDATE publication SET generated_id = ? WHERE id = ?";
 
-
+	static final String PUBLICATIONCURATIONSTATUSROWQUERY =
+			"SELECT id,status FROM publication_curation WHERE id = ?";
+	
+	static final String PUBLICATIONCURATIONSTATUSTABLEQUERY =
+			"SELECT id,status FROM publication_curation";
+	
 	/* arachadmin has the union of all support ontologies - DO NOT want to load the whole
 	 * term table, stay with singletons and caching.
 	 */
@@ -410,24 +415,29 @@ public class DBConnection implements AbstractConnection{
 			return PublicationBean.getCached(id);
 		}
 		final PreparedStatement publicationStatement = c.prepareStatement(PUBLICATIONROWQUERY);
+		PublicationBean result;
 		try{
 			publicationStatement.setInt(1, id);
 			final AbstractResults publicationResults = executeAndAbstract(publicationStatement);
-			PublicationBean results;
 			if (publicationResults.next()){
-				results = new PublicationBean();
-				results.fill(publicationResults);
-				results.cache();
+				result = new PublicationBean();
+				result.fill(publicationResults);
+				result.cache();
 			}
 			else {
-				results = null;
+				result = null;
 			}
 			publicationResults.close();
-			return results;
 		}
 		finally{
 			publicationStatement.close();
 		}
+		if (result != null){
+			if (!PublicationCurationBean.isCached(result.getCurationStatusCode())){
+				getPublicationCurationStatus(result.getCurationStatusCode()).cache();
+			}
+		}
+		return result;
 	}
 
 	private AbstractResults executeAndAbstract(PreparedStatement p) throws SQLException{
@@ -470,7 +480,53 @@ public class DBConnection implements AbstractConnection{
 		}
 	}
 
+	public PublicationCurationBean getPublicationCurationStatus(int id) throws SQLException{
+		if (PublicationCurationBean.isCached(id)){
+			return PublicationCurationBean.getCached(id);
+		}
+		final PreparedStatement statusStatement = c.prepareStatement(PUBLICATIONCURATIONSTATUSROWQUERY);
+		try{
+			statusStatement.setInt(1, id);
+			final AbstractResults statusResults = executeAndAbstract(statusStatement);
+			PublicationCurationBean results;
+			if (statusResults.next()){
+				results = new PublicationCurationBean();
+				results.fill(statusResults);
+				results.cache();
+			}
+			else {
+				results = null;
+			}
+			statusResults.close();
+			return results;
+		}
+		finally{
+			statusStatement.close();
+		}
+	}
 
+	
+	public Set<PublicationCurationBean> getPublicationCurationStatusTable() throws SQLException{
+		final Set<PublicationCurationBean> result = new HashSet<PublicationCurationBean>();
+		Statement allStatusStatement = c.createStatement();
+		try{
+			ResultSet rawResults = allStatusStatement.executeQuery(PUBLICATIONCURATIONSTATUSTABLEQUERY);
+			AbstractResults statusResults = new DBResults(rawResults);
+			while (statusResults.next()){
+				PublicationCurationBean pcb = new PublicationCurationBean();
+				pcb.fill(statusResults);
+				pcb.cache();
+				result.add(pcb);
+			}
+			rawResults.close();
+			return result;
+		}
+		finally{
+			allStatusStatement.close();
+		}
+	}	
+
+	
 	public TermBean getTerm(int id) throws SQLException{
 		if (TermBean.isCached(id)){
 			return TermBean.getCached(id);

@@ -49,7 +49,7 @@ public class PublicationBean implements CachingBean,UpdateableBean {
 	private String author_list;
 	private String editor_list;
 	private String source_publication;
-	private int volume;
+	private int volume;  //TODO make this string
 	private String issue;
 	private String serial_identifier;
 	private String page_range;
@@ -57,7 +57,7 @@ public class PublicationBean implements CachingBean,UpdateableBean {
 	private String publication_year;
 	private String doi;
 	private String generated_id;
-	private String curation_status;
+	private int curation_status;
 	private String curation_update;
 	private int uidset;
 
@@ -83,7 +83,7 @@ public class PublicationBean implements CachingBean,UpdateableBean {
 		publication_year = record.getString(DBPUBLICATIONYEAR);
 		doi = record.getString(DBDOI);
 		generated_id = record.getString(DBGENERATEDID);
-        curation_status = record.getString(DBCURATIONSTATUS);
+        curation_status = record.getInt(DBCURATIONSTATUS);
         curation_update = record.getString(DBCURATIONUPDATE);
         uidset = record.getInt(DBUIDSET);
 	}
@@ -164,8 +164,12 @@ public class PublicationBean implements CachingBean,UpdateableBean {
 		return UidSet.getCached(uidset).getGeneratedId();
 	}
 
-	public String getCurationStatus(){
+	int getCurationStatusCode(){
 		return curation_status;
+	}
+	
+	public String getCurationStatus(){
+		return PublicationCurationBean.getCached(curation_status).getStatus();
 	}
 	
 	public String getCurationUpdate(){
