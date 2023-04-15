@@ -3,6 +3,7 @@ package org.arachb.arachadmin;
 import org.apache.log4j.Logger;
 import org.semanticweb.owlapi.model.IRI;
 
+
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -70,5 +71,4 @@ public class IRIManager {
         }
         return IRI.create("http://dx.doi.org/",cleanpath).toString();
     }
-
 }

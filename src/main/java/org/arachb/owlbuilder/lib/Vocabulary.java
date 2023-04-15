@@ -12,7 +12,6 @@ import org.semanticweb.owlapi.model.IRI;
  *
  */
 
-
 public class Vocabulary {
 
 
@@ -69,9 +68,9 @@ public class Vocabulary {
             IRI.create("http://purl.obolibrary.org/obo/BFO_0000050");
     public static final String partOfString = "part of";
     // Suppress hasPart - current ontology set allows some reasoners to actually
-// equate this with its inverse.  Predictable stupidity ensues.
-//	public static final IRI hasPartProperty =
-//			IRI.create("http://purl.obolibrary.org/obo/BFO_0000051");
+    // equate this with its inverse.  Predictable stupidity ensues.
+    //	public static final IRI hasPartProperty =
+    //			IRI.create("http://purl.obolibrary.org/obo/BFO_0000051");
     public static final IRI participatesInProperty =
             IRI.create("http://purl.obolibrary.org/obo/RO_0000056");
     public static final String participatesInString = "participates in";
@@ -131,7 +130,5 @@ public class Vocabulary {
     // NCBI Taxonomy terms
     public static final IRI arachnidaTaxon =
             IRI.create("http://purl.obolibrary.org/obo/NCBITaxon_6854");
-
-
 
 }

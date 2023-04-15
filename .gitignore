@@ -14,3 +14,12 @@ target/
 
 ### Ignore the owl files; should come up with another way to manage them.
 *.owl
+
+### other files
+src/main/resources/Connection.properties
+/target
+.classpath
+.project
+.settings
+catalog-v001.xml
+test.owl

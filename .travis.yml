@@ -1,0 +1,9 @@
+sudo: false
+language: java
+before_install:
+  - mysql -u travis  -e 'CREATE DATABASE testadmin;'
+  - mysql -u root -e "CREATE USER 'spidertester'@'localhost' IDENTIFIED BY 'testsuite';"
+  - mysql -u root -e "GRANT ALL PRIVILEGES ON testadmin.* TO 'spidertester'@'localhost';"
+  - cat src/test/resources/testadmin.sql | mysql -u spidertester -ptestsuite testadmin
+  - mysql -u spidertester -ptestsuite testadmin -e "SELECT COUNT(*) FROM term;"
+
